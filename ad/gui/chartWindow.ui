@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog2</class>
+ <widget class="QDialog" name="Dialog2">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1283</width>
+    <height>1101</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="PlotWidget" name="graphWidget1" native="true">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>10</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget2" native="true">
+   <property name="geometry">
+    <rect>
+     <x>437</x>
+     <y>10</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget3" native="true">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>10</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget4" native="true">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>230</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget5" native="true">
+   <property name="geometry">
+    <rect>
+     <x>437</x>
+     <y>230</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget6" native="true">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>230</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget8" native="true">
+   <property name="geometry">
+    <rect>
+     <x>437</x>
+     <y>450</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget9" native="true">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>450</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget7" native="true">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>450</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget11" native="true">
+   <property name="geometry">
+    <rect>
+     <x>437</x>
+     <y>670</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget10" native="true">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>670</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget12" native="true">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>670</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget13" native="true">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>890</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget14" native="true">
+   <property name="geometry">
+    <rect>
+     <x>437</x>
+     <y>890</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="graphWidget15" native="true">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>890</y>
+     <width>400</width>
+     <height>200</height>
+    </rect>
+   </property>
+  </widget>
+  <zorder>graphWidget6</zorder>
+  <zorder>graphWidget9</zorder>
+  <zorder>graphWidget1</zorder>
+  <zorder>graphWidget2</zorder>
+  <zorder>graphWidget3</zorder>
+  <zorder>graphWidget4</zorder>
+  <zorder>graphWidget5</zorder>
+  <zorder>graphWidget8</zorder>
+  <zorder>graphWidget7</zorder>
+  <zorder>graphWidget11</zorder>
+  <zorder>graphWidget10</zorder>
+  <zorder>graphWidget12</zorder>
+  <zorder>graphWidget13</zorder>
+  <zorder>graphWidget14</zorder>
+  <zorder>graphWidget15</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

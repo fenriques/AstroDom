@@ -1,5 +1,5 @@
 # AstroDom
-Astro(nomy) Dom(ine) is a catalogue for deep sky images. It scans the directories where images (FITS format only) are 
+Astro(nomy) Dom(ine) is a catalogue tool for deep sky images. It scans the directories where images (FITS format only) are 
 stored and reads information from FITS headers. 
 Additional parameter like FWHM, Eccentricity, Noise can be added from Pixinsight CSV exports.
 The catalogue can be used to keep track of your imaging sessions and to benchmark your images.
@@ -7,7 +7,12 @@ The catalogue can be used to keep track of your imaging sessions and to benchmar
 # Features
 - Scans recursively filesystem directories for FITS files.
 - Add image parameters from Pixinsight's SubFrameSelector process: FWHM, Eccentricity, SNRWeight, Noise.
-- List, filter, search all the images in the database. It shows mean values and standard deviation for most important parameters. See image below:
+- List, filter, search all the images in the database. It shows mean values and standard deviation for most important parameters. See image 1 below.
+- Outputs charts with several information. See image 2 below.
 
+# Screenshot
+Main windows with search criteria and results:
+![image 1](/docs/ADImages.png?raw=true)
 
-![GOES15_FD_VS_20170821.gif](./docs/ADImages.png)
+Charts plotted for a subset of images:
+![image 2](/docs/ADcharts.png?raw=true)

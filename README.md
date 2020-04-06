@@ -18,7 +18,7 @@ With the Charts tool you can discover important information from your data, e.g.
 # Screenshot
 Main windows with search criteria and results:
 
-![image 1](/docs/ADMain.png?raw=true)
+![image 1](/docs/test.gif?raw=true)
 
 Charts plotted for a subset of images:
 ![image 2](/docs/ADcharts.png?raw=true)

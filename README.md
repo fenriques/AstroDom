@@ -9,5 +9,5 @@ The catalogue can be used to keep track of your imaging sessions and to benchmar
 - Add image parameters from Pixinsight's SubFrameSelector process: FWHM, Eccentricity, SNRWeight, Noise.
 - List, filter, search all the images in the database. It shows mean values and standard deviation for most important parameters. See image below:
 
-![Image of AstroDom](https://github.com/fenriques/AstroDom/blob/master/docs/ADImages.png)
+![Alt text](./docs/ADImages.png?raw=true)
 

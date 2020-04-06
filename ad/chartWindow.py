@@ -87,9 +87,9 @@ class ChartWindow(QDialog):
             if filters[row] in self.app.confFilters['L']:
                 colors.append(pg.mkBrush(244, 244, 244, 255))
             elif filters[row] in self.app.confFilters['R']:
-                colors.append('r')
+                colors.append(pg.mkBrush(255, 0, 0, 255))
             elif filters[row] in self.app.confFilters['B']:
-                colors.append('b')
+                colors.append(pg.mkBrush(0, 0, 255, 255))
             elif filters[row] in self.app.confFilters['G']:
                 colors.append(pg.mkBrush(0, 140, 55, 255))
             elif filters[row] in self.app.confFilters['Ha']:

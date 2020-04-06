@@ -28,7 +28,8 @@ class SortFilterProxyModel(QSortFilterProxyModel):
                               Qt.CaseInsensitive, QRegExp.RegExp)
 
         indexExposure = self.sourceModel().index(sourceRow, 6, sourceParent)
-        dataExposure = int(self.sourceModel().data(indexExposure))
+        if self.sourceModel().data(indexExposure):
+            dataExposure = int(self.sourceModel().data(indexExposure))
         operatorExposure = self.ui.comboBoxExposure.itemText(
             self.ui.comboBoxExposure.currentIndex())
 
@@ -64,7 +65,8 @@ class SortFilterProxyModel(QSortFilterProxyModel):
 
         indexDate = self.sourceModel().index(sourceRow, 16, sourceParent)
         dataDate = self.sourceModel().data(indexDate)
-        dataDate = datetime.strptime(dataDate, '%Y-%m-%dT%H:%M:%S.%f')
+        if dataDate:
+            dataDate = datetime.strptime(dataDate, '%Y-%m-%dT%H:%M:%S.%f')
         bReturn = True
 
         if regExpTarget.indexIn(dataTarget) < 0:
@@ -144,7 +146,7 @@ class SortFilterProxyModel(QSortFilterProxyModel):
             else:
                 bReturn = False
 
-        if self.ui.dateEditStartDate.date() and self.ui.dateEditEndDate.date() and bReturn == True:
+        if self.ui.dateEditStartDate.date() and self.ui.dateEditEndDate.date() and dataDate and bReturn == True:
             if (self.ui.dateEditStartDate.date() < dataDate and self.ui.dateEditEndDate.date() > dataDate):
                 bReturn = True
             else:

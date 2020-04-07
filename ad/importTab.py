@@ -10,9 +10,11 @@ from pathlib import Path
 from os.path import expanduser
 from astropy.io import fits
 from .astropyCalc import AstropyCalc
-from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog
+from PyQt5 import QtWidgets
 from PyQt5 import QtSql, QtGui, QtCore
-from .csvTableView import *
+from datetime import datetime
+
+from .importTableModel import *
 
 
 class ImportTab():
@@ -24,41 +26,34 @@ class ImportTab():
 
     def importFitsDir(self):
 
-        # Table row counter
-        rowTable = 0
-
         # List .fits file contained in chosen dir
         fileList = []
         fitsParameter = {}
 
-        fitsKeyList = self.app.filterDictToList('fitsHeader', 'keys')
-
-        self.mainW.ui.tableWidgetData.setHorizontalHeaderLabels(fitsKeyList)
-
         # Choose dir and filter .fits files
-        input_dir = QFileDialog.getExistingDirectory(
+        input_dir = QtWidgets.QFileDialog.getExistingDirectory(
             None, 'Select a folder:', expanduser("~"))
         fileList = list(Path(input_dir).rglob("*.[Ff][Ii][Tt][Ss]"))
 
-        # Create a list containing the files
-        for file in fileList:
-            rowPosition = self.mainW.ui.tableWidgetData.rowCount()
-            self.mainW.ui.tableWidgetData.insertRow(rowPosition)
+        fitsKeyList = self.app.filterDictToList('fitsHeader', 'keys')
+        self._headers = self.app.filterDictToList(
+            'fitsHeader', 'description')
+        self._data = []
 
-            fileItem = QTableWidgetItem(str(file))
-            self.mainW.ui.tableWidgetData.setItem(rowTable, 0, fileItem)
-            hashItem = QTableWidgetItem(self.hashFile(file))
-            self.mainW.ui.tableWidgetData.setItem(rowTable, 1, hashItem)
-
-            rowTable += 1
-
-        rowTable = 0
-
-        # Populate tablewidget
+        # Populate tableview
         for f in fileList:
-
+            row = []
+            # Parse FITS header for given file
             fitsParameters = self.parseFitsHeader(f)
+            for fitsParameter in fitsKeyList:
+                oneitem = str(
+                    fitsParameters[self.app.conf[fitsParameter]['fitsHeader']])
+                row.insert(self.app.conf[fitsParameter]['order'], oneitem)
 
+            row[fitsKeyList.index('file')] = str(f)
+            row[fitsKeyList.index('hash')] = self.hashFile(f)
+
+            # Calculate Alt, Az coordinates
             strAlt = ''
             strAz = ''
             AstropyCalcObj = AstropyCalc()
@@ -74,123 +69,94 @@ class ImportTab():
                 strAlt = str("{0.alt:.4f}".format(altAz))[:-4]
                 strAz = str("{0.az:.4f}".format(altAz))[:-4]
 
-            altItem = QTableWidgetItem(strAlt)
-            self.mainW.ui.tableWidgetData.setItem(
-                rowTable, self.app.conf['alt']['order'], altItem)
+            row[fitsKeyList.index('alt')] = strAlt
+            row[fitsKeyList.index('az')] = strAz
 
-            azItem = QTableWidgetItem(strAz)
-            self.mainW.ui.tableWidgetData.setItem(
-                rowTable, self.app.conf['az']['order'], azItem)
+            self._data.append(row)
 
-            for fitsParameter in fitsKeyList:
-                oneitem = QTableWidgetItem(
-                    str(fitsParameters[self.app.conf[fitsParameter]['fitsHeader']]))
-                if self.mainW.ui.tableWidgetData.item(rowTable, self.app.conf[fitsParameter]['order']) is None:
+        self.model = ImportTableModel(self._data, self._headers)
+        self.mainW.ui.tableViewImport.setSortingEnabled(True)
+        self.mainW.ui.tableViewImport.setAlternatingRowColors(True)
+        self.mainW.ui.tableViewImport.hideColumn(2)  # Hide HASH
 
-                    self.mainW.ui.tableWidgetData.setItem(
-                        rowTable, self.app.conf[fitsParameter]['order'], oneitem)
-            rowTable += 1
+        self.mainW.ui.tableViewImport.setModel(self.model)
 
-    def importCSV(self, data):
-        # counts the rows read from file
-        rowFile = 0
-        # Table row counter
-        rowTable = 0
-        self.data = data
-
-        csvList = self.app.filterDictToList('pix_csv')
-        self.mainW.ui.tableWidgetData.setHorizontalHeaderLabels(
-            self.app.filterDictToList('pix_csv', 'description'))
-
-        for csvRow in self.data:
-            # File column counter
-            colFile = 0
-            # Table column counter
-            colTable = 0
-
-            # Some parameters in the header of csv are 0.0'
-            # added to the row item list
-            if self.data[rowFile][0] == 'Subframe Scale':
-                subframeScale = str(self.data[rowFile][1])
-
-            if self.data[rowFile][0] == 'Camera Gain':
-                cameraGain = str(self.data[rowFile][1])
-
-            if self.data[rowFile][0] == 'Camera Resolution':
-                cameraResolution = str(self.data[rowFile][1])
-
-            if self.data[rowFile][0] == 'Scale Unit':
-                scaleUnit = str(self.data[rowFile][1])
-
-            if self.data[rowFile][0] == 'Data Unit':
-                dataUnit = str(self.data[rowFile][1])
-
-            if self.data[rowFile][0].isnumeric():
-                rowPosition = self.mainW.ui.tableWidgetData.rowCount()
-                self.mainW.ui.tableWidgetData.insertRow(rowPosition)
-
-                csvRow.insert(0, subframeScale)
-                csvRow.insert(1, cameraGain)
-                csvRow.insert(2, cameraResolution)
-                csvRow.insert(3, scaleUnit)
-                csvRow.insert(4, dataUnit)
-
-                # Items (columns) for each row
-                for item in csvRow:
-                    if str(colFile) in csvList:
-
-                        oneitem = QTableWidgetItem(item)
-                        self.mainW.ui.tableWidgetData.setItem(
-                            rowTable, colTable, oneitem)
-
-                        # Check if the file (hash) exists in the database
-                        if colFile == 8:
-                            hashItem = self.hashFile(item)
-                            sqlStatement = "SELECT hash FROM images where hash = '"+hashItem+"'"
-
-                            r = self.app.db.exec(sqlStatement)
-                            r.next()
-                            if r.value(0):
-                                color = QtGui.QColor('green')
-                                oneitem = QTableWidgetItem(hashItem)
-                            else:
-                                color = QtGui.QColor('red')
-                                oneitem = QTableWidgetItem(hashItem)
-
-                            self.mainW.ui.tableWidgetData.setItem(
-                                rowTable, colTable, oneitem)
-                            self.mainW.ui.tableWidgetData.item(
-                                rowTable, colTable).setBackground(color)
-
-                        colTable += 1
-                    colFile += 1
-
-                # increase row counters
-                rowTable += 1
-            rowFile += 1
-
-    def loadCSVDialog(self):
-        fname = QFileDialog.getOpenFileName(
-            self.mainW, 'Open CSV', os.getenv('HOME'), 'CSV(*.csv)')
-        with open(fname[0], newline='') as csv_file:
-            data = csv.reader(csv_file, delimiter=',', quotechar='"')
-            self.importCSV(list(data))
-
-    def select_file(self):
-        filename, _ = QFileDialog.getOpenFileName(
+    def importCsvFile(self):
+        filename, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.mainW,
             'Select a CSV file to open…',
             QtCore.QDir.homePath(),
             'CSV Files (*.csv) ;; All Files (*)'
         )
         if filename:
-            self.model = CsvTableModel(filename)
-            #self.model.deleteCol(1, 3, None)
-            self.model.removeColumnd(1, None)
+            with open(filename) as fh:
+                csvreader = csv.reader(fh)
+                dataTemp = list(csvreader)
+
+        csvList = self.app.filterDictToList('pix_csv')
+
+        # First rows of the CSV file don't contain images.
+        checkCsv = False
+        self._data = []
+        self._headers = []
+        for row, val in enumerate(dataTemp):
+            if dataTemp[row][0] == 'Subframe Scale':
+                subframeScale = str(dataTemp[row][1])
+            if dataTemp[row][0] == 'Camera Gain':
+                cameraGain = str(dataTemp[row][1])
+            if dataTemp[row][0] == 'Camera Resolution':
+                cameraResolution = str(dataTemp[row][1])
+            if dataTemp[row][0] == 'Scale Unit':
+                scaleUnit = str(dataTemp[row][1])
+            if dataTemp[row][0] == 'Data Unit':
+                dataUnit = str(dataTemp[row][1])
+
+            if checkCsv == True:
+                dataTemp[row].insert(0, subframeScale)
+                dataTemp[row].insert(1, cameraGain)
+                dataTemp[row].insert(2, cameraResolution)
+                dataTemp[row].insert(3, scaleUnit)
+                dataTemp[row].insert(4, dataUnit)
+
+                # Items (columns) for each row
+                filteredRow = []
+                for col in range(len(val)):
+                    if str(col) in csvList:
+                        item = dataTemp[row][col]
+                        # Check if the file (hash) exists in the database
+                        if col == 8:
+                            hashItem = self.hashFile(item)
+                            sqlStatement = "SELECT hash FROM images where hash = '"+hashItem+"'"
+
+                            r = self.app.db.exec(sqlStatement)
+                            r.next()
+                            if r.value(0):
+                                item = "Corresponding FITS file found"
+                            else:
+                                item = "FITS file not found"
+                        filteredRow.insert(col,  str(item))
+                        """
+                        print("row "+str(row) +
+                              " col " + str(col) +
+                              " item "+str(item))
+                        """
+                self._data.append(filteredRow)
+
+            # Headers row
+            if dataTemp[row][0] == 'Index':
+                self._headers = self.app.filterDictToList(
+                    'pix_csv', 'description')
+                checkCsv = True
+
+            self.model = ImportTableModel(self._data, self._headers)
             self.mainW.ui.tableViewImport.setModel(self.model)
             self.mainW.ui.tableViewImport.setSortingEnabled(True)
-            # self.mainW.ui.tableViewImport.hideColumn(0)  # Hide ID
-            # self.mainW.ui.tableViewImport.hideColumn(1)  # Hide ID
+
+    def filterHeaders(self, csvHeaders):
+        csvList = self.app.filterDictToList('pix_csv')
+        print("svList "+csvList)
+        print("svheaders "+csvHeaders)
+        return csvHeaders in csvList
 
     def parseFitsHeader(self, fitsFile):
         returnDifferentParameter = {}

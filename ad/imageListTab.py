@@ -1,5 +1,5 @@
 # -----------------------------------------------------------
-# pixView:
+# AstrDom:
 #
 # (C) 2020 Ferrante Enriques, ferrante.enriques@gmail.com
 # Released under GNU Public License (GPL)
@@ -69,9 +69,6 @@ class ImageListTab():
         self.mainW.ui.tableViewImages.hideColumn(22)
         self.mainW.ui.tableViewImages.hideColumn(23)
         self.mainW.ui.tableViewImages.hideColumn(24)
-        # self.reviews.model().setFilter(f'coffee_id = {self.coffee_id}')
-        # self.reviews.resizeRowsToContents()
-        # self.mainW.ui.tableViewImages.resizeColumnsToContents()
 
 
 class FileDelegate(QtWidgets.QStyledItemDelegate):

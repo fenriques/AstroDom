@@ -30,7 +30,7 @@ class MainWindow(QDialog):
         self.settingsTab = SettingsTab(self, app)
 
         self.setWindowTitle("AstroDom")
-        self.ui.pushButtonLoadCSV.clicked.connect(self.importTab.select_file)
+        self.ui.pushButtonLoadCSV.clicked.connect(self.importTab.importCsvFile)
         self.ui.pushButtonSaveDB.clicked.connect(self.importTab.saveDB)
         self.ui.pushButtonUpdateDB.clicked.connect(self.importTab.updateDB)
         self.ui.pushButtonImportFitsDir.clicked.connect(

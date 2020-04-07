@@ -5,30 +5,12 @@ from PyQt5 import QtCore as qtc
 import csv
 
 
-class CsvTableModel(qtc.QAbstractTableModel):
-    """The model for a CSV table."""
+class ImportTableModel(qtc.QAbstractTableModel):
 
-    def __init__(self, csv_file):
+    def __init__(self, data, headers):
         super().__init__()
-        self.filename = csv_file
-        with open(self.filename) as fh:
-            csvreader = csv.reader(fh)
-            self._dataTemp = list(csvreader)
-
-        # First rows of the CSV file doesn't contain images.
-        checkCsv = False
-        self._data = []
-        for i in range(len(self._dataTemp)):
-            if self._dataTemp[i][0] == 'Subframe Scale':
-                pass
-
-            if checkCsv == True:
-                self._data.append(self._dataTemp[i])
-
-            # Headers row
-            if self._dataTemp[i][0] == 'Index':
-                self._headers = list(self._dataTemp[i])
-                checkCsv = True
+        self._data = data
+        self._headers = headers
 
     def rowCount(self, parent):
         return len(self._data)

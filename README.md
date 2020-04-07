@@ -16,10 +16,10 @@ With the Charts tool you can discover important information from your data, e.g.
 - Outputs charts with several information. See image 2 below.
 
 # Screenshot
-Main windows with search criteria and results:
+Main window with search criteria and results:
 
 ![image 1](/docs/test.gif?raw=true)
 
-Charts plotted for a subset of images:
+Charts plotted for a subset of images (colors map different filters):
 ![image 2](/docs/ADcharts.png?raw=true)
 

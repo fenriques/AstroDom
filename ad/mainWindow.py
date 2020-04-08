@@ -33,6 +33,7 @@ class MainWindow(QDialog):
         self.ui.pushButtonLoadCSV.clicked.connect(self.importTab.importCsvFile)
         self.ui.pushButtonSaveDB.clicked.connect(self.importTab.saveDB)
         self.ui.pushButtonUpdateDB.clicked.connect(self.importTab.updateDB)
+        self.ui.pushButtonDeleteRows.clicked.connect(self.importTab.deleteRows)
         self.ui.pushButtonImportFitsDir.clicked.connect(
             self.importTab.importFitsDir)
         self.ui.pushButtonGraph.clicked.connect(self.dialogChart)
@@ -112,8 +113,9 @@ class MainWindow(QDialog):
             noiseM = np.append(
                 noiseM, self.imageListModel.data(self.imageListModel.index(i, 28)))
 
+        self.ui.lineEditTotImages.setText(str(rowCount))
         exposure = str(np.round(np.sum(exposureM, axis=0)/3600, 1))
-        self.ui.lineEditTotExposure.setText(exposure)
+        self.ui.lineEditTotExposure.setText(exposure+"hrs")
 
         alt = str(np.round(np.mean(altM, axis=0), 2))
         self.ui.lineEditMeanAlt.setText(alt)

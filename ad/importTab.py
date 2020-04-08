@@ -131,7 +131,7 @@ class ImportTab():
                             r = self.app.db.exec(sqlStatement)
                             r.next()
                             if r.value(0):
-                                item = "Corresponding FITS file found"
+                                item = hashItem
                             else:
                                 item = "FITS file not found"
                         filteredRow.insert(col,  str(item))
@@ -180,64 +180,82 @@ class ImportTab():
         hash = hasher.hexdigest()
         return hash
 
+    def deleteRows(self):
+        selected = self.mainW.ui.tableViewImport.selectedIndexes()
+        if selected:
+            self.model.removeRows(selected[0].row(), 1, None)
+
     def saveDB(self):
 
-        row = 0
-        col = 0
         separator = ','
         fieldInsert = self.app.filterDictToList('fitsHeader', 'keys')
         sqlInsert = separator.join(fieldInsert)
 
-        for r in range(self.mainW.ui.tableWidgetData.rowCount()):
+        rows = self.model.rowCount(self.mainW.ui.tableViewImport.rootIndex())
+
+        for row in range(rows):
             query = "INSERT INTO images ( " +\
                 sqlInsert + ") VALUES("
 
-            for cl in range(len(fieldInsert)):
-                item = self.mainW.ui.tableWidgetData.item(row, col)
+            for col in range(len(fieldInsert)):
+                currentIndex = self.model.index(row, col)
+                item = self.model.data(currentIndex, QtCore.Qt.DisplayRole)
                 if item is not None:
-                    query += "'"+item.text()+"',"
+                    query += "'"+str(item)+"',"
                 else:
                     query += "'',"
-                col += 1
-            col = 0
-            row += 1
             query = query[:-1]
             query += ");"
             try:
-                self.app.db.exec(query)
+                ret = self.app.db.exec(query)
+                if ret.lastError().number() == 19:
+                    self.model.setData(
+                        self.model.index(row, 1), "Error: FITS file already exists in database", QtCore.Qt.EditRole)
+                elif ret.lastError().number() > 0:
+                    print(ret.lastError().text()+" " +
+                          str(ret.lastError().number()))
+                else:
+                    self.model.setData(
+                        self.model.index(row, 1), "OK: FITS file saved", QtCore.Qt.EditRole)
+
             except Exception as e:
                 print(f'Insert error: {e}')
 
-        self.mainW.ui.tableWidgetData.clear()
+            self.model.layoutChanged.emit()
 
     def updateDB(self):
-        if self.model:
-            self.model.save_data()
-
-    def updateDB2(self):
-
-        row = 0
-        col = 0
 
         fieldUpdate = self.app.filterDictToList('pix_csv', 'keys')
+        rows = self.model.rowCount(self.mainW.ui.tableViewImport.rootIndex())
 
-        for r in range(self.mainW.ui.tableWidgetData.rowCount()):
+        for row in range(rows):
             query = "UPDATE images SET "
 
-            for field in range(len(fieldUpdate)):
-
-                item = self.mainW.ui.tableWidgetData.item(row, col)
+            for col in range(len(fieldUpdate)):
+                currentIndex = self.model.index(row, col)
+                item = self.model.data(currentIndex, QtCore.Qt.DisplayRole)
                 if item is not None:
-                    query += str(fieldUpdate[field]) + "= '"+item.text()+"',"
-                    if fieldUpdate[field] == "csvFile":
-                        csvHash = item.text()
+                    query += str(fieldUpdate[col]) + "= '"+str(item)+"',"
+                    if fieldUpdate[col] == "csvFile":
+                        csvHash = str(item)
                 else:
                     query += "'',"
-                col += 1
-            col = 0
-            row += 1
             query = query[:-1]
             query += " WHERE hash = '"+csvHash + "';"
-            self.app.db.exec(query)
 
-        self.mainW.ui.tableWidgetData.clear()
+            try:
+                ret = self.app.db.exec(query)
+                if ret.lastError().number() == 19:
+                    self.model.setData(
+                        self.model.index(row, 5), "Error: FITS file already exists in database", QtCore.Qt.EditRole)
+                elif ret.lastError().number() > 0:
+                    print(ret.lastError().text()+" " +
+                          str(ret.lastError().number()))
+                else:
+                    self.model.setData(
+                        self.model.index(row, 5), "OK: FITS file updated", QtCore.Qt.EditRole)
+
+            except Exception as e:
+                print(f'Insert error: {e}')
+
+            self.model.layoutChanged.emit()

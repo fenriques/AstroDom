@@ -77,6 +77,7 @@ class ImportTableModel(qtc.QAbstractTableModel):
         for i in range(rows):
             del(self._data[position])
         self.endRemoveRows()
+        self.layoutChanged.emit()
 
     def removeColumns(self, position, cols, parent):
         self.beginRemoveColumns(

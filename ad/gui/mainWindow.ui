@@ -632,7 +632,7 @@
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">text-decoration: overline;</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>FWHM</string>
@@ -860,81 +860,163 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>15</y>
-       <width>151</width>
+       <y>10</y>
+       <width>551</width>
        <height>91</height>
       </rect>
      </property>
      <property name="title">
-      <string>File operations</string>
+      <string>FITS File Import</string>
      </property>
-     <widget class="QPushButton" name="pushButtonSaveDB">
+     <widget class="QPushButton" name="pushButtonSaveFits">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>60</y>
-        <width>90</width>
+        <x>450</x>
+        <y>30</y>
+        <width>95</width>
         <height>26</height>
        </rect>
       </property>
       <property name="text">
-       <string>Save DB</string>
+       <string>Insert DB</string>
       </property>
       <property name="icon">
        <iconset theme="save">
         <normaloff>../../</normaloff>../../</iconset>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButtonImportFitsDir">
+     <widget class="QPushButton" name="pushButtonChooseFitsDir">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>232</x>
         <y>30</y>
-        <width>90</width>
+        <width>95</width>
         <height>26</height>
        </rect>
       </property>
       <property name="text">
-       <string>Scan Dir</string>
+       <string>Choose Dir</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEditFitsDir">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>221</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButtonLoadFits">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>30</y>
+        <width>95</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Load Files</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButtonDeleteFitsRow">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>60</y>
+        <width>95</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Delete row</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEditOverrideTarget">
+      <property name="geometry">
+       <rect>
+        <x>263</x>
+        <y>60</y>
+        <width>171</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelOverrideTarget">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>63</y>
+        <width>251</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Override Target Name on Insert</string>
       </property>
      </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>15</y>
-       <width>151</width>
+       <x>621</x>
+       <y>10</y>
+       <width>451</width>
        <height>91</height>
       </rect>
      </property>
      <property name="title">
-      <string>PixInsight Import</string>
+      <string>PixInsight SubFrameSelector CSV Import</string>
      </property>
-     <widget class="QPushButton" name="pushButtonLoadCSV">
+     <widget class="QPushButton" name="pushButtonChooseCsv">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>232</x>
         <y>30</y>
-        <width>90</width>
+        <width>95</width>
         <height>26</height>
        </rect>
       </property>
       <property name="text">
-       <string>Load CSV</string>
+       <string>Choose CSV</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButtonUpdateDB">
+     <widget class="QPushButton" name="pushButtonSaveCsv">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>60</y>
-        <width>90</width>
+        <x>350</x>
+        <y>30</y>
+        <width>95</width>
         <height>26</height>
        </rect>
       </property>
       <property name="text">
-       <string>Update DB</string>
+       <string>Insert DB</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEditCsv">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>221</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButtonDeleteCsvRow">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>95</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Delete row</string>
       </property>
      </widget>
     </widget>
@@ -942,23 +1024,23 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>120</y>
+       <y>110</y>
        <width>1611</width>
-       <height>691</height>
+       <height>701</height>
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButtonDeleteRows">
+    <widget class="Line" name="line">
      <property name="geometry">
       <rect>
-       <x>370</x>
-       <y>40</y>
-       <width>101</width>
-       <height>26</height>
+       <x>580</x>
+       <y>10</y>
+       <width>20</width>
+       <height>91</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Delete row</string>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
     </widget>
    </widget>
@@ -1372,11 +1454,11 @@
        <x>340</x>
        <y>430</y>
        <width>261</width>
-       <height>121</height>
+       <height>171</height>
       </rect>
      </property>
      <property name="title">
-      <string>DataBase</string>
+      <string>Config</string>
      </property>
      <widget class="QLabel" name="labelDbname">
       <property name="geometry">
@@ -1402,6 +1484,54 @@
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBoxDebug">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>90</y>
+        <width>121</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>DEBUG</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>INFO</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>WARNING</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ERROR</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>CRITICAL</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>7</x>
+        <y>94</y>
+        <width>101</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Debug Level</string>
       </property>
      </widget>
     </widget>

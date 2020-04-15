@@ -1,0 +1,3 @@
+2020-04-15 16:31:23,173 Read Config File <_io.TextIOWrapper name='/home/ferrante/pyqt/AstroDom/ad/config/config.json' mode='r' encoding='UTF-8'>
+2020-04-15 16:31:23,173 Read Config Filters File <_io.TextIOWrapper name='/home/ferrante/pyqt/AstroDom/ad/config/configFilters.json' mode='r' encoding='UTF-8'>
+2020-04-15 16:31:23,173 Config Db File <_io.TextIOWrapper name='/home/ferrante/pyqt/AstroDom/ad/config/configDb.json' mode='r' encoding='UTF-8'>

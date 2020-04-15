@@ -8,11 +8,11 @@
 import sys
 import os
 import ntpath
-
+import logging
 
 from datetime import datetime
 from PyQt5 import QtSql
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from PyQt5 import QtWidgets
 
 from dateutil.relativedelta import relativedelta
@@ -21,6 +21,8 @@ from dateutil.relativedelta import relativedelta
 
 
 class ImageListTab():
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, mainW, app):
         super().__init__()
@@ -38,7 +40,7 @@ class ImageListTab():
 
         self.imageSourceModel.select()
         self.imageSourceModel.fetchMore()
-
+        self.logger.info("set source")
         # Proxy model used for filtering and sorting.
         self.mainW.imageListModel.setDynamicSortFilter(True)
         self.mainW.imageListModel.setSourceModel(self.imageSourceModel)
@@ -53,6 +55,9 @@ class ImageListTab():
         self.mainW.ui.tableViewImages.setAlternatingRowColors(True)
         self.mainW.ui.tableViewImages.setModel(self.mainW.imageListModel)
         self.mainW.ui.tableViewImages.setTextElideMode(QtCore.Qt.ElideLeft)
+        self.mainW.ui.tableViewImages.setEditTriggers(
+            QtGui.QAbstractItemView.NoEditTriggers)
+
         fd = FileDelegate(self.mainW.ui.tableViewImages)
         self.mainW.ui.tableViewImages.setItemDelegateForColumn(1, fd)
         dd = DateDelegate(self.mainW.ui.tableViewImages)

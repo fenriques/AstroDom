@@ -2,6 +2,7 @@ import sys
 import os
 import ntpath
 import numpy as np
+import logging
 
 from PyQt5.QtWidgets import QDialog, QApplication, QTableWidgetItem, QFileDialog
 from .imageListTab import *
@@ -13,8 +14,8 @@ from .chartWindow import *
 
 
 class MainWindow(QDialog):
+    logger = logging.getLogger(__name__)
 
-    model = None
     model = None
 
     def __init__(self, app):
@@ -28,14 +29,53 @@ class MainWindow(QDialog):
         self.imageListTab = ImageListTab(self, app)
         self.importTab = ImportTab(self, app)
         self.settingsTab = SettingsTab(self, app)
+        # Import dir thread
+        self.importDir = ImportDir(app)
+        self.importDirThread = qtc.QThread()
+        self.importDir.moveToThread(self.importDirThread)
+        self.importDir.finished.connect(self.importDirThread.quit)
+        self.ui.pushButtonLoadFits.clicked.connect(
+            self.importDirThread.start)
+        self.ui.pushButtonLoadFits.clicked.connect(
+            self.importDir.do_search)
+        self.importDir.match_found.connect(self.importTab.addResultsToModel)
 
         self.setWindowTitle("AstroDom")
-        self.ui.pushButtonLoadCSV.clicked.connect(self.importTab.importCsvFile)
-        self.ui.pushButtonSaveDB.clicked.connect(self.importTab.saveDB)
-        self.ui.pushButtonUpdateDB.clicked.connect(self.importTab.updateDB)
-        self.ui.pushButtonDeleteRows.clicked.connect(self.importTab.deleteRows)
-        self.ui.pushButtonImportFitsDir.clicked.connect(
+        self.ui.pushButtonChooseCsv.clicked.connect(
+            self.importTab.importCsvFile)
+        self.ui.pushButtonSaveFits.clicked.connect(self.importTab.saveFits)
+        self.ui.pushButtonSaveCsv.clicked.connect(self.importTab.saveCsv)
+        self.ui.pushButtonDeleteFitsRow.clicked.connect(
+            self.importTab.deleteRows)
+        self.ui.pushButtonDeleteCsvRow.clicked.connect(
+            self.importTab.deleteRows)
+        # Disable some Fits buttons
+        self.ui.pushButtonLoadFits.setDisabled(True)
+        self.ui.pushButtonDeleteFitsRow.setDisabled(True)
+        self.ui.lineEditFitsDir.textChanged.connect(
+            lambda: self.ui.pushButtonLoadFits.setEnabled(True))
+        self.ui.lineEditFitsDir.textChanged.connect(
+            lambda: self.ui.pushButtonSaveFits.setDisabled(True))
+        self.ui.lineEditFitsDir.textChanged.connect(
+            lambda: self.ui.pushButtonDeleteFitsRow.setDisabled(True))
+        self.ui.pushButtonSaveFits.setDisabled(True)
+        self.importDir.finished.connect(
+            lambda: self.ui.pushButtonSaveFits.setEnabled(True))
+        self.importDir.finished.connect(
+            lambda: self.ui.pushButtonLoadFits.setDisabled(True))
+        self.importDir.finished.connect(
+            lambda: self.ui.pushButtonDeleteFitsRow.setEnabled(True))
+        self.ui.pushButtonChooseFitsDir.clicked.connect(
             self.importTab.importFitsDir)
+
+        # Disable some Csv import buttons
+        self.ui.pushButtonSaveCsv.setDisabled(True)
+        self.ui.pushButtonDeleteCsvRow.setDisabled(True)
+        self.ui.lineEditCsv.textChanged.connect(
+            lambda: self.ui.pushButtonSaveCsv.setEnabled(True))
+        self.ui.lineEditCsv.textChanged.connect(
+            lambda: self.ui.pushButtonDeleteCsvRow.setEnabled(True))
+
         self.ui.pushButtonGraph.clicked.connect(self.dialogChart)
 
         self.ui.lineEditTarget.textChanged.connect(
@@ -84,7 +124,6 @@ class MainWindow(QDialog):
 
     def dialogChart(self):
         self.chartWindow = ChartWindow(self.app)
-
         self.chartWindow.plot(self.imageListModel)
 
     def filterRegExpChanged(self):

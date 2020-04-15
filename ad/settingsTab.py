@@ -1,12 +1,13 @@
 import sys
 import os
 import json
-
+import logging
 from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog
 from PyQt5 import QtSql, QtGui
 
 
 class SettingsTab():
+    logger = logging.getLogger(__name__)
 
     def __init__(self, mainW, app):
         super().__init__()
@@ -62,7 +63,10 @@ class SettingsTab():
         self.mainW.ui.lineEditFilterLpr.setText(
             ','.join(self.app.confFilters['LPR']))
 
-        self.mainW.ui.lineEditDbname.setText(self.app.confDb['dbname'])
+        self.mainW.ui.lineEditDbname.setText(self.app.config['dbname'])
+        self.mainW.ui.comboBoxDebug.setItemText(10, "DEBUG")
+        self.mainW.ui.comboBoxDebug.setCurrentText(
+            self.app.config['debug'])
 
     def saveSettings(self):
         self.app.conf['file']['fitsHeader'] = self.mainW.ui.lineEditFitsFile.text()
@@ -81,8 +85,9 @@ class SettingsTab():
         self.app.conf['gain']['fitsHeader'] = self.mainW.ui.lineEditFitsGain.text()
         self.app.conf['offset']['fitsHeader'] = self.mainW.ui.lineEditFitsOffset.text()
 
-        with open(os.path.join(self.app.directory, 'config', 'config.json'), 'w') as outfile:
+        with open(os.path.join(self.app.directory, 'config', 'configFields.json'), 'w') as outfile:
             json.dump(self.app.conf, outfile)
+            self.logger.debug(self.app.conf)
 
         self.app.confFilters['L'] = self.mainW.ui.lineEditFilterL.text().split(
             ',')
@@ -102,7 +107,10 @@ class SettingsTab():
             ',')
         with open(os.path.join(self.app.directory, 'config', 'configFilters.json'), 'w') as outfile2:
             json.dump(self.app.confFilters, outfile2)
+            self.logger.debug(self.app.confFilters)
 
-        self.app.confDb['dbname'] = self.mainW.ui.lineEditDbname.text()
-        with open(os.path.join(self.app.directory, 'config', 'configDb.json'), 'w') as outfile3:
-            json.dump(self.app.confDb, outfile3)
+        self.app.config['dbname'] = self.mainW.ui.lineEditDbname.text()
+        self.app.config['debug'] = self.mainW.ui.comboBoxDebug.currentText()
+        with open(os.path.join(self.app.directory, 'config', 'config.json'), 'w') as outfile3:
+            json.dump(self.app.config, outfile3)
+            self.logger.debug(self.app.config)

@@ -3,6 +3,7 @@ import pyqtgraph as pg
 import datetime
 import time
 import numpy as np
+import logging
 
 from PyQt5.QtWidgets import QDialog
 from .gui.chartWindowGui import *
@@ -10,6 +11,8 @@ from .pg_time_axis import DateAxisItem
 
 
 class ChartWindow(QDialog):
+    logger = logging.getLogger(__name__)
+
     def __init__(self, app):
         super().__init__()
         self.ui = Ui_Dialog2()

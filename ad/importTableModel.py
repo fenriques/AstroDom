@@ -1,4 +1,5 @@
 import sys
+import logging
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 
@@ -6,6 +7,7 @@ import csv
 
 
 class ImportTableModel(qtc.QAbstractTableModel):
+    logger = logging.getLogger(__name__)
 
     def __init__(self, data, headers):
         super().__init__()

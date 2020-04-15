@@ -4,7 +4,7 @@ import os
 import csv
 import hashlib
 import ntpath
-
+import logging
 
 from pathlib import Path
 from os.path import expanduser
@@ -17,30 +17,30 @@ from datetime import datetime
 from .importTableModel import *
 
 
-class ImportTab():
+class ImportDir(QtCore.QObject):
+    logger = logging.getLogger(__name__)
 
-    def __init__(self, mainW, app):
+    match_found = QtCore.pyqtSignal(list)
+    finished = QtCore.pyqtSignal()
+
+    def __init__(self, app):
         super().__init__()
-        self.mainW = mainW
         self.app = app
 
-    def importFitsDir(self):
+    def set_file(self, fileList):
+        self.fileList = fileList
 
-        # List .fits file contained in chosen dir
-        fileList = []
+    @qtc.pyqtSlot()
+    def do_search(self):
+
+        self._search(self.fileList)
+        self.finished.emit()
+
+    def _search(self, fileList):
+
         fitsParameter = {}
-
-        # Choose dir and filter .fits files
-        input_dir = QtWidgets.QFileDialog.getExistingDirectory(
-            None, 'Select a folder:', expanduser("~"))
-        fileList = list(Path(input_dir).rglob("*.[Ff][Ii][Tt][Ss]"))
-
         fitsKeyList = self.app.filterDictToList('fitsHeader', 'keys')
-        self._headers = self.app.filterDictToList(
-            'fitsHeader', 'description')
-        self._data = []
 
-        # Populate tableview
         for f in fileList:
             row = []
             # Parse FITS header for given file
@@ -71,9 +71,57 @@ class ImportTab():
 
             row[fitsKeyList.index('alt')] = strAlt
             row[fitsKeyList.index('az')] = strAz
+            self.match_found.emit(row)
 
-            self._data.append(row)
+    def parseFitsHeader(self, fitsFile):
+        returnDifferentParameter = {}
+        hdu = fits.open(fitsFile)
+        hdr = hdu[0].header
+        for fitsParameter in self.app.filterDictToList('fitsHeader'):
+            if fitsParameter in hdr:
+                returnDifferentParameter[fitsParameter] = hdr[fitsParameter]
+            else:
+                returnDifferentParameter[fitsParameter] = ''
 
+        return returnDifferentParameter
+
+    def hashFile(self, fileName):
+        with open(fileName, 'rb') as afile:
+            hasher = hashlib.md5()
+            buf = afile.read(self.app.BLOCKSIZE)
+            for i in range(5):
+                hasher.update(buf)
+                buf = afile.read(self.app.BLOCKSIZE)
+        hash = hasher.hexdigest()
+        return hash
+
+
+class ImportTab():
+    logger = logging.getLogger(__name__)
+
+    def __init__(self, mainW, app):
+        super().__init__()
+        self.mainW = mainW
+        self.app = app
+
+    def addResultsToModel(self, row):
+        self._data.append(row)
+        self.model.layoutChanged.emit()
+
+    def importFitsDir(self):
+
+        # Choose dir and filter .fits files
+        input_dir = QtWidgets.QFileDialog.getExistingDirectory(
+            None, 'Select a folder:', expanduser("~"))
+        fileList = list(Path(input_dir).rglob("*.[Ff][Ii][Tt][Ss]"))
+
+        self.mainW.ui.lineEditFitsDir.setText(input_dir)
+        self.mainW.importDir.set_file(fileList)
+        self._headers = self.app.filterDictToList(
+            'fitsHeader', 'description')
+        self._data = []
+
+        # Populate tableview
         self.model = ImportTableModel(self._data, self._headers)
         self.mainW.ui.tableViewImport.setSortingEnabled(True)
         self.mainW.ui.tableViewImport.setAlternatingRowColors(True)
@@ -92,6 +140,7 @@ class ImportTab():
             with open(filename) as fh:
                 csvreader = csv.reader(fh)
                 dataTemp = list(csvreader)
+            self.mainW.ui.lineEditCsv.setText(filename)
 
         csvList = self.app.filterDictToList('pix_csv')
 
@@ -158,17 +207,10 @@ class ImportTab():
         print("svheaders "+csvHeaders)
         return csvHeaders in csvList
 
-    def parseFitsHeader(self, fitsFile):
-        returnDifferentParameter = {}
-        hdu = fits.open(fitsFile)
-        hdr = hdu[0].header
-        for fitsParameter in self.app.filterDictToList('fitsHeader'):
-            if fitsParameter in hdr:
-                returnDifferentParameter[fitsParameter] = hdr[fitsParameter]
-            else:
-                returnDifferentParameter[fitsParameter] = ''
-
-        return returnDifferentParameter
+    def deleteRows(self):
+        selected = self.mainW.ui.tableViewImport.selectedIndexes()
+        if selected:
+            self.model.removeRows(selected[0].row(), 1, None)
 
     def hashFile(self, fileName):
         with open(fileName, 'rb') as afile:
@@ -180,19 +222,15 @@ class ImportTab():
         hash = hasher.hexdigest()
         return hash
 
-    def deleteRows(self):
-        selected = self.mainW.ui.tableViewImport.selectedIndexes()
-        if selected:
-            self.model.removeRows(selected[0].row(), 1, None)
-
-    def saveDB(self):
+    def saveFits(self):
 
         separator = ','
         fieldInsert = self.app.filterDictToList('fitsHeader', 'keys')
         sqlInsert = separator.join(fieldInsert)
 
         rows = self.model.rowCount(self.mainW.ui.tableViewImport.rootIndex())
-
+        targetOverride = self.mainW.ui.lineEditOverrideTarget.text()
+        print(targetOverride)
         for row in range(rows):
             query = "INSERT INTO images ( " +\
                 sqlInsert + ") VALUES("
@@ -201,6 +239,10 @@ class ImportTab():
                 currentIndex = self.model.index(row, col)
                 item = self.model.data(currentIndex, QtCore.Qt.DisplayRole)
                 if item is not None:
+                    if col == 2 and targetOverride:
+                        item = targetOverride
+                        self.model.setData(
+                            self.model.index(row, col), item, QtCore.Qt.EditRole)
                     query += "'"+str(item)+"',"
                 else:
                     query += "'',"
@@ -223,7 +265,7 @@ class ImportTab():
 
             self.model.layoutChanged.emit()
 
-    def updateDB(self):
+    def saveCsv(self):
 
         fieldUpdate = self.app.filterDictToList('pix_csv', 'keys')
         rows = self.model.rowCount(self.mainW.ui.tableViewImport.rootIndex())

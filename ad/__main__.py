@@ -18,13 +18,14 @@ def main():
     palette.setColor(QtGui.QPalette.Button, QtGui.QColor(53, 53, 53))
     palette.setColor(QtGui.QPalette.ButtonText, QtCore.Qt.white)
     palette.setColor(QtGui.QPalette.BrightText, QtCore.Qt.red)
-
     palette.setColor(QtGui.QPalette.Highlight,
                      QtGui.QColor(6, 122, 204).lighter())
     palette.setColor(QtGui.QPalette.HighlightedText, QtCore.Qt.black)
+    palette.setColor(QtGui.QPalette.Disabled,
+                     QtGui.QPalette.ButtonText, QtCore.Qt.black)
     app.setPalette(palette)
 
-    astroDom()
+    w = astroDom()
     sys.exit(app.exec_())
 
 

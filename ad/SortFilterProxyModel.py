@@ -86,7 +86,7 @@ class SortFilterProxyModel(QSortFilterProxyModel):
             else:
                 bReturn = False
 
-        if self.ui.doubleSpinBoxEccentricity.value() and dataEccentricity > 0 and bReturn == True:
+        if self.ui.doubleSpinBoxEccentricity.value() and bReturn == True:
             if (operatorEccentricity == '=' and self.ui.doubleSpinBoxEccentricity.value() == dataEccentricity):
                 bReturn = True
             elif (operatorEccentricity == '<' and self.ui.doubleSpinBoxEccentricity.value() > dataEccentricity):
@@ -106,7 +106,7 @@ class SortFilterProxyModel(QSortFilterProxyModel):
             else:
                 bReturn = False
 
-        if self.ui.doubleSpinBoxSnrweight.value() and dataSnrweight > 0 and bReturn == True:
+        if self.ui.doubleSpinBoxSnrweight.value() and bReturn == True:
             if (operatorSnrweight == '=' and self.ui.doubleSpinBoxSnrweight.value() == dataSnrweight):
                 bReturn = True
             elif (operatorSnrweight == '<' and self.ui.doubleSpinBoxSnrweight.value() > dataSnrweight):
@@ -116,7 +116,7 @@ class SortFilterProxyModel(QSortFilterProxyModel):
             else:
                 bReturn = False
 
-        if self.ui.doubleSpinBoxNoise.value() and dataNoise > 0 and bReturn == True:
+        if self.ui.doubleSpinBoxNoise.value() and bReturn == True:
             if (operatorNoise == '=' and self.ui.doubleSpinBoxNoise.value() == dataNoise):
                 bReturn = True
             elif (operatorNoise == '<' and self.ui.doubleSpinBoxNoise.value() > dataNoise):

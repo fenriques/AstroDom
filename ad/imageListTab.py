@@ -39,7 +39,8 @@ class ImageListTab():
         self.imageSourceModel.setSort(3, QtCore.Qt.DescendingOrder)
 
         self.imageSourceModel.select()
-        self.imageSourceModel.fetchMore()
+        while (self.imageSourceModel.canFetchMore()):
+            self.imageSourceModel.fetchMore()
         self.logger.info("set source")
         # Proxy model used for filtering and sorting.
         self.mainW.imageListModel.setDynamicSortFilter(True)
@@ -51,6 +52,7 @@ class ImageListTab():
 
         self.mainW.ui.tableViewImages.horizontalHeader().setStretchLastSection(True)
         self.mainW.ui.tableViewImages.setWordWrap(False)
+        self.mainW.ui.tableViewImages.verticalHeader().hide()
         self.mainW.ui.tableViewImages.setSortingEnabled(True)
         self.mainW.ui.tableViewImages.setAlternatingRowColors(True)
         self.mainW.ui.tableViewImages.setModel(self.mainW.imageListModel)
@@ -62,6 +64,16 @@ class ImageListTab():
         self.mainW.ui.tableViewImages.setItemDelegateForColumn(1, fd)
         dd = DateDelegate(self.mainW.ui.tableViewImages)
         self.mainW.ui.tableViewImages.setItemDelegateForColumn(16, dd)
+        rd = RoundDelegate(self.mainW.ui.tableViewImages)
+
+        self.mainW.ui.tableViewImages.setItemDelegateForColumn(12, rd)
+        self.mainW.ui.tableViewImages.setItemDelegateForColumn(13, rd)
+        self.mainW.ui.tableViewImages.setItemDelegateForColumn(14, rd)
+        self.mainW.ui.tableViewImages.setItemDelegateForColumn(15, rd)
+        self.mainW.ui.tableViewImages.setItemDelegateForColumn(25, rd)
+        self.mainW.ui.tableViewImages.setItemDelegateForColumn(26, rd)
+        self.mainW.ui.tableViewImages.setItemDelegateForColumn(27, rd)
+        self.mainW.ui.tableViewImages.setItemDelegateForColumn(28, rd)
 
         self.mainW.ui.tableViewImages.hideColumn(0)  # Hide ID
         self.mainW.ui.tableViewImages.hideColumn(2)  # Hide HASH
@@ -80,6 +92,12 @@ class FileDelegate(QtWidgets.QStyledItemDelegate):
     def displayText(self, value, locale):
         value = ntpath.basename(value)
         return super(FileDelegate, self).displayText(value, locale)
+
+
+class RoundDelegate(QtWidgets.QStyledItemDelegate):
+    def displayText(self, value, locale):
+        value = round(float(value), 2)
+        return super(RoundDelegate, self).displayText(value, locale)
 
 
 class DateDelegate(QtWidgets.QStyledItemDelegate):

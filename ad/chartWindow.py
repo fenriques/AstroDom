@@ -23,6 +23,22 @@ class ChartWindow(QDialog):
     def plot(self, imageListModel):
         self.imageListModel = imageListModel
         self.show()
+        self.ui.labelColorL.setStyleSheet(
+            "color:rgb(244, 244, 244);font-weight:bold")
+        self.ui.labelColorR.setStyleSheet(
+            "color:rgb(255,0,0);font-weight:bold")
+        self.ui.labelColorG.setStyleSheet(
+            "color:rgb(0, 140, 55);font-weight:bold")
+        self.ui.labelColorB.setStyleSheet(
+            "color:rgb(0,0,255);font-weight:bold")
+        self.ui.labelColorHa.setStyleSheet(
+            "color:rgb(190, 255, 0);font-weight:bold")
+        self.ui.labelColorOiii.setStyleSheet(
+            "color:rgb(150, 200, 255);font-weight:bold")
+        self.ui.labelColorSii.setStyleSheet(
+            "color:rgb(255, 120, 190);font-weight:bold")
+        self.ui.labelColorN.setStyleSheet(
+            "color:rgb(120,120,120);font-weight:bold")
 
         frame = []
         filters = []
@@ -61,24 +77,16 @@ class ChartWindow(QDialog):
             indexSnrweight = imageListModel.index(row, 27)
             indexNoise = imageListModel.index(row, 28)
 
-            if imageListModel.data(indexFilters):
-                filters.append((str(imageListModel.data(indexFilters))))
-            if imageListModel.data(indexAlt):
-                alt.append((float(imageListModel.data(indexAlt))))
-            if imageListModel.data(indexAz):
-                az.append((float(imageListModel.data(indexAz))))
-            if imageListModel.data(indexDatetimestr):
-                datetimestr.append(
-                    (str(imageListModel.data(indexDatetimestr))))
-            if imageListModel.data(indexFwhm):
-                fwhm.append((float(imageListModel.data(indexFwhm))))
-            if imageListModel.data(indexEccentricity):
-                eccentricity.append(
-                    (float(imageListModel.data(indexEccentricity))))
-            if imageListModel.data(indexSnrweight):
-                snrweight.append((float(imageListModel.data(indexSnrweight))))
-            if imageListModel.data(indexNoise):
-                noise.append((float(imageListModel.data(indexNoise))))
+            filters.append((str(imageListModel.data(indexFilters))))
+            alt.append((float(imageListModel.data(indexAlt))))
+            az.append((float(imageListModel.data(indexAz))))
+            datetimestr.append(
+                (str(imageListModel.data(indexDatetimestr))))
+            fwhm.append((float(imageListModel.data(indexFwhm))))
+            eccentricity.append(
+                (float(imageListModel.data(indexEccentricity))))
+            snrweight.append((float(imageListModel.data(indexSnrweight))))
+            noise.append((float(imageListModel.data(indexNoise))))
 
             # pg only works with timestamps
             date_time_obj = datetime.datetime.strptime(
@@ -97,12 +105,12 @@ class ChartWindow(QDialog):
                 colors.append(pg.mkBrush(0, 140, 55, 255))
             elif filters[row] in self.app.confFilters['Ha']:
                 colors.append(pg.mkBrush(190, 255, 0, 255))
-            elif filters[row] in self.app.confFilters['Sii']:
-                colors.append(pg.mkBrush(255, 120, 190, 255))
             elif filters[row] in self.app.confFilters['Oiii']:
                 colors.append(pg.mkBrush(150, 200, 255, 255))
+            elif filters[row] in self.app.confFilters['Sii']:
+                colors.append(pg.mkBrush(255, 120, 190, 255))
             else:
-                colors.append(pg.mkBrush(244, 244, 244, 255))
+                colors.append(pg.mkBrush(120, 120, 120, 255))
 
             # create data sets
             g1.append(

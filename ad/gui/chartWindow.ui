@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1283</width>
-    <height>1101</height>
+    <width>1276</width>
+    <height>1184</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>7</x>
-     <y>10</y>
+     <y>80</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -27,7 +27,7 @@
    <property name="geometry">
     <rect>
      <x>437</x>
-     <y>10</y>
+     <y>80</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -37,7 +37,7 @@
    <property name="geometry">
     <rect>
      <x>870</x>
-     <y>10</y>
+     <y>80</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -47,7 +47,7 @@
    <property name="geometry">
     <rect>
      <x>7</x>
-     <y>230</y>
+     <y>300</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -57,7 +57,7 @@
    <property name="geometry">
     <rect>
      <x>437</x>
-     <y>230</y>
+     <y>300</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -67,7 +67,7 @@
    <property name="geometry">
     <rect>
      <x>870</x>
-     <y>230</y>
+     <y>300</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -77,7 +77,7 @@
    <property name="geometry">
     <rect>
      <x>437</x>
-     <y>450</y>
+     <y>520</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -87,7 +87,7 @@
    <property name="geometry">
     <rect>
      <x>870</x>
-     <y>450</y>
+     <y>520</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -97,7 +97,7 @@
    <property name="geometry">
     <rect>
      <x>7</x>
-     <y>450</y>
+     <y>520</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -107,7 +107,7 @@
    <property name="geometry">
     <rect>
      <x>437</x>
-     <y>670</y>
+     <y>740</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -117,7 +117,7 @@
    <property name="geometry">
     <rect>
      <x>7</x>
-     <y>670</y>
+     <y>740</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -127,7 +127,7 @@
    <property name="geometry">
     <rect>
      <x>870</x>
-     <y>670</y>
+     <y>740</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -137,7 +137,7 @@
    <property name="geometry">
     <rect>
      <x>7</x>
-     <y>890</y>
+     <y>960</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -147,7 +147,7 @@
    <property name="geometry">
     <rect>
      <x>437</x>
-     <y>890</y>
+     <y>960</y>
      <width>400</width>
      <height>200</height>
     </rect>
@@ -157,11 +157,128 @@
    <property name="geometry">
     <rect>
      <x>870</x>
-     <y>890</y>
+     <y>960</y>
      <width>400</width>
      <height>200</height>
     </rect>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>9</y>
+     <width>491</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Filter Colors</string>
+   </property>
+   <widget class="QLabel" name="labelColorL">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>91</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Luminance</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelColorR">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>30</y>
+      <width>51</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Red</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelColorHa">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>30</y>
+      <width>61</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Halpha</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelColorOiii">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>30</y>
+      <width>41</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Oiii</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelColorSii">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>30</y>
+      <width>41</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sii</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelColorN">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>30</y>
+      <width>81</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Other/NA</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelColorG">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>30</y>
+      <width>51</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Green</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelColorB">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>30</y>
+      <width>51</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Blue</string>
+    </property>
+   </widget>
   </widget>
   <zorder>graphWidget6</zorder>
   <zorder>graphWidget9</zorder>
@@ -178,6 +295,7 @@
   <zorder>graphWidget13</zorder>
   <zorder>graphWidget14</zorder>
   <zorder>graphWidget15</zorder>
+  <zorder>groupBox</zorder>
  </widget>
  <customwidgets>
   <customwidget>

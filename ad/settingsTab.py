@@ -15,6 +15,7 @@ class SettingsTab():
         self.app = app
 
         self.mainW.ui.pushButtonSaveSettings.clicked.connect(self.saveSettings)
+        # FITS Headers keywords
         self.mainW.ui.lineEditFitsFile.setText(
             self.app.conf['file']['fitsHeader'])
         self.mainW.ui.lineEditFitsTarget.setText(
@@ -45,7 +46,38 @@ class SettingsTab():
             self.app.conf['gain']['fitsHeader'])
         self.mainW.ui.lineEditFitsOffset.setText(
             self.app.conf['offset']['fitsHeader'])
-
+        # FITS header defaults
+        self.mainW.ui.lineEditFitsFileDefault.setText(
+            self.app.conf['file']['fitsDefault'])
+        self.mainW.ui.lineEditFitsTargetDefault.setText(
+            self.app.conf['target']['fitsDefault'])
+        self.mainW.ui.lineEditFitsFrameDefault.setText(
+            self.app.conf['frame']['fitsDefault'])
+        self.mainW.ui.lineEditFitsFilterDefault.setText(
+            self.app.conf['filter']['fitsDefault'])
+        self.mainW.ui.lineEditFitsExposureDefault.setText(
+            self.app.conf['exposure']['fitsDefault'])
+        self.mainW.ui.lineEditFitsTempDefault.setText(
+            self.app.conf['temp']['fitsDefault'])
+        self.mainW.ui.lineEditFitsXbinningDefault.setText(
+            self.app.conf['xbinning']['fitsDefault'])
+        self.mainW.ui.lineEditFitsYbinningDefault.setText(
+            self.app.conf['ybinning']['fitsDefault'])
+        self.mainW.ui.lineEditFitsSitelatDefault.setText(
+            self.app.conf['sitelat']['fitsDefault'])
+        self.mainW.ui.lineEditFitsSitelongDefault.setText(
+            self.app.conf['sitelong']['fitsDefault'])
+        self.mainW.ui.lineEditFitsRaDefault.setText(
+            self.app.conf['ra']['fitsDefault'])
+        self.mainW.ui.lineEditFitsDecDefault.setText(
+            self.app.conf['dec']['fitsDefault'])
+        self.mainW.ui.lineEditFitsDateDefault.setText(
+            self.app.conf['date']['fitsDefault'])
+        self.mainW.ui.lineEditFitsGainDefault.setText(
+            self.app.conf['gain']['fitsDefault'])
+        self.mainW.ui.lineEditFitsOffsetDefault.setText(
+            self.app.conf['offset']['fitsDefault'])
+        # Filters Keywords
         self.mainW.ui.lineEditFilterL.setText(
             ','.join(self.app.confFilters['L']))
         self.mainW.ui.lineEditFilterR.setText(
@@ -63,6 +95,7 @@ class SettingsTab():
         self.mainW.ui.lineEditFilterLpr.setText(
             ','.join(self.app.confFilters['LPR']))
 
+        # Other settings
         self.mainW.ui.lineEditDbname.setText(self.app.config['dbname'])
         self.mainW.ui.comboBoxDebug.setItemText(10, "DEBUG")
         self.mainW.ui.comboBoxDebug.setCurrentText(
@@ -84,6 +117,22 @@ class SettingsTab():
         self.app.conf['date']['fitsHeader'] = self.mainW.ui.lineEditFitsDate.text()
         self.app.conf['gain']['fitsHeader'] = self.mainW.ui.lineEditFitsGain.text()
         self.app.conf['offset']['fitsHeader'] = self.mainW.ui.lineEditFitsOffset.text()
+
+        self.app.conf['file']['fitsDefault'] = self.mainW.ui.lineEditFitsFileDefault.text()
+        self.app.conf['target']['fitsDefault'] = self.mainW.ui.lineEditFitsTargetDefault.text()
+        self.app.conf['frame']['fitsDefault'] = self.mainW.ui.lineEditFitsFrameDefault.text()
+        self.app.conf['filter']['fitsDefault'] = self.mainW.ui.lineEditFitsFilterDefault.text()
+        self.app.conf['exposure']['fitsDefault'] = self.mainW.ui.lineEditFitsExposureDefault.text()
+        self.app.conf['temp']['fitsDefault'] = self.mainW.ui.lineEditFitsTempDefault.text()
+        self.app.conf['xbinning']['fitsDefault'] = self.mainW.ui.lineEditFitsXbinningDefault.text()
+        self.app.conf['ybinning']['fitsDefault'] = self.mainW.ui.lineEditFitsYbinningDefault.text()
+        self.app.conf['sitelat']['fitsDefault'] = self.mainW.ui.lineEditFitsSitelatDefault.text()
+        self.app.conf['sitelong']['fitsDefault'] = self.mainW.ui.lineEditFitsSitelongDefault.text()
+        self.app.conf['ra']['fitsDefault'] = self.mainW.ui.lineEditFitsRaDefault.text()
+        self.app.conf['dec']['fitsDefault'] = self.mainW.ui.lineEditFitsDecDefault.text()
+        self.app.conf['date']['fitsDefault'] = self.mainW.ui.lineEditFitsDateDefault.text()
+        self.app.conf['gain']['fitsDefault'] = self.mainW.ui.lineEditFitsGainDefault.text()
+        self.app.conf['offset']['fitsDefault'] = self.mainW.ui.lineEditFitsOffsetDefault.text()
 
         with open(os.path.join(self.app.directory, 'config', 'configFields.json'), 'w') as outfile:
             json.dump(self.app.conf, outfile)

@@ -174,6 +174,19 @@ class ImportTab():
                         item = dataTemp[row][col]
                         # Check if the file (hash) exists in the database
                         if col == 8:
+                            '''
+                            filenameMatch = ntpath.splitext(
+                                ntpath.basename(item))[0]
+                            print(filenameMatch)
+                            sqlStatementF = "SELECT file FROM images where file like '%"+filenameMatch+"'%"
+
+                            rF = self.app.db.exec(sqlStatementF)
+                            rF.next()
+                            if rF.value(0):
+                                print("trovato")
+                            else:
+                                print("FITS file not found")
+                            '''
                             hashItem = self.hashFile(item)
                             sqlStatement = "SELECT hash FROM images where hash = '"+hashItem+"'"
 
@@ -226,26 +239,33 @@ class ImportTab():
 
         separator = ','
         fieldInsert = self.app.filterDictToList('fitsHeader', 'keys')
+        fitsDefault = self.app.filterDictToList('fitsDefault', 'keys')
         sqlInsert = separator.join(fieldInsert)
 
         rows = self.model.rowCount(self.mainW.ui.tableViewImport.rootIndex())
         targetOverride = self.mainW.ui.lineEditOverrideTarget.text()
-        print(targetOverride)
+
         for row in range(rows):
             query = "INSERT INTO images ( " +\
                 sqlInsert + ") VALUES("
 
-            for col in range(len(fieldInsert)):
+            for col, val in enumerate(fieldInsert):
                 currentIndex = self.model.index(row, col)
                 item = self.model.data(currentIndex, QtCore.Qt.DisplayRole)
-                if item is not None:
+                if len(str(item)) > 0:
+                    # Override target name if asked to
                     if col == 2 and targetOverride:
                         item = targetOverride
                         self.model.setData(
                             self.model.index(row, col), item, QtCore.Qt.EditRole)
                     query += "'"+str(item)+"',"
                 else:
-                    query += "'',"
+                    # if no value is read in FIT header try default value
+                    if val in fitsDefault:
+                        item = self.app.conf[val]['fitsDefault']
+                        query += "'"+str(item)+"',"
+                    else:
+                        query += "'',"
             query = query[:-1]
             query += ");"
             try:

@@ -5,18 +5,21 @@ import numpy as np
 import logging
 
 from PyQt5.QtWidgets import QDialog, QApplication, QTableWidgetItem, QFileDialog
-from .imageListTab import *
-from .importTab import *
-from .settingsTab import *
-from .gui.mainWindowGui import *
-from .SortFilterProxyModel import *
+
 from .chartWindow import *
+from .imageDetailWindow import *
+from .SortFilterProxyModel import *
+from .settingsTab import *
+from .importTab import *
+from .imageListTab import *
+from .gui.mainWindowGui import *
 
 
 class MainWindow(QDialog):
     logger = logging.getLogger(__name__)
 
     model = None
+    imageListModel = None
 
     def __init__(self, app):
         super().__init__()
@@ -29,6 +32,9 @@ class MainWindow(QDialog):
         self.imageListTab = ImageListTab(self, app)
         self.importTab = ImportTab(self, app)
         self.settingsTab = SettingsTab(self, app)
+        self.chartWindow = ChartWindow(self.app)
+        self.imageDetailWindow = ImageDetailWindow(self.imageListModel)
+
         # Import dir thread
         self.importDir = ImportDir(app)
         self.importDirThread = qtc.QThread()
@@ -122,8 +128,13 @@ class MainWindow(QDialog):
             self.filterRegExpChanged)
         self.filterRegExpChanged()
 
+        self.ui.tableViewImages.doubleClicked.connect(
+            self.imageDetailWindow.plot)
+
+    def imageDetail(self):
+        self.imageDetailWindow.plot(self.imageListModel)
+
     def dialogChart(self):
-        self.chartWindow = ChartWindow(self.app)
         self.chartWindow.plot(self.imageListModel)
 
     def filterRegExpChanged(self):

@@ -312,6 +312,7 @@ class ImportTab():
                 self.logger.error(f"Insert error {e}")
 
             self.model.layoutChanged.emit()
+        # Force image list reload data
         self.mainW.imageSourceModel.select()
         while (self.mainW.imageSourceModel.canFetchMore()):
             self.mainW.imageSourceModel.fetchMore()
@@ -358,6 +359,7 @@ class ImportTab():
                 self.logger.error(f"Update error {e}")
 
             self.model.layoutChanged.emit()
+        # Force image list reload data
         self.mainW.imageSourceModel.select()
         while (self.mainW.imageSourceModel.canFetchMore()):
             self.mainW.imageSourceModel.fetchMore()

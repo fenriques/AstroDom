@@ -2,6 +2,7 @@ import sys
 import logging
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
+from PyQt5.QtGui import *
 
 import csv
 
@@ -21,14 +22,16 @@ class ImportTableModel(qtc.QAbstractTableModel):
         return len(self._headers)
 
     def data(self, index, role):
-        # original if statement:
-        # if role == qtc.Qt.DisplayRole:
-        # Add EditRole so that the cell is not cleared when editing
+        data = self._data[index.row()][index.column()]
+
         if role in (qtc.Qt.DisplayRole, qtc.Qt.EditRole):
-            return self._data[index.row()][index.column()]
+            return data
+        if role == qtc.Qt.BackgroundRole and (data == 'Error: FITS file already exists in database' or data == ''):
+            return QBrush(qtc.Qt.red)
+        if role == qtc.Qt.BackgroundRole and data == 'OK: FITS file saved':
+            return QBrush(qtc.Qt.green)
 
     # Additional features methods:
-
     def headerData(self, section, orientation, role):
 
         if orientation == qtc.Qt.Horizontal and role == qtc.Qt.DisplayRole:
@@ -80,16 +83,6 @@ class ImportTableModel(qtc.QAbstractTableModel):
             del(self._data[position])
         self.endRemoveRows()
         self.layoutChanged.emit()
-
-    def removeColumns(self, position, cols, parent):
-        self.beginRemoveColumns(
-            parent or qtc.QModelIndex(),
-            position,
-            position + cols - 1
-        )
-        for i in range(cols):
-            del(self._data[position])
-        self.endRemoveColumns()
 
     # method for saving
     def save_data(self):

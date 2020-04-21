@@ -34,17 +34,17 @@ class ImageListTab():
     def displayImageList(self):
 
         # Table Source model
-        self.imageSourceModel = QtSql.QSqlTableModel()
-        self.imageSourceModel.setTable('images')
-        self.imageSourceModel.setSort(3, QtCore.Qt.DescendingOrder)
+        self.mainW.imageSourceModel = QtSql.QSqlTableModel()
+        self.mainW.imageSourceModel.setTable('images')
+        self.mainW.imageSourceModel.setSort(3, QtCore.Qt.DescendingOrder)
 
-        self.imageSourceModel.select()
-        while (self.imageSourceModel.canFetchMore()):
-            self.imageSourceModel.fetchMore()
+        self.mainW.imageSourceModel.select()
+        while (self.mainW.imageSourceModel.canFetchMore()):
+            self.mainW.imageSourceModel.fetchMore()
         self.logger.info("set source")
         # Proxy model used for filtering and sorting.
         self.mainW.imageListModel.setDynamicSortFilter(True)
-        self.mainW.imageListModel.setSourceModel(self.imageSourceModel)
+        self.mainW.imageListModel.setSourceModel(self.mainW.imageSourceModel)
 
         for i, label in enumerate(self.app.filterDictToList('description')):
             self.mainW.imageListModel.setHeaderData(

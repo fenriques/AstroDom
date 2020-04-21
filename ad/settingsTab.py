@@ -2,7 +2,7 @@ import sys
 import os
 import json
 import logging
-from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog
+from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog, QMessageBox
 from PyQt5 import QtSql, QtGui
 
 
@@ -163,3 +163,6 @@ class SettingsTab():
         with open(os.path.join(self.app.directory, 'config', 'config.json'), 'w') as outfile3:
             json.dump(self.app.config, outfile3)
             self.logger.debug(self.app.config)
+
+        QMessageBox.about(
+            None, "Message", "Configuration saved. Please close and restart AstroDom")

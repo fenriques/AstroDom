@@ -40,9 +40,12 @@ class ImportDir(QtCore.QObject):
 
         fitsParameter = {}
         fitsKeyList = self.app.filterDictToList('fitsHeader', 'keys')
+        fitsDefault = self.app.filterDictToList('fitsDefault', 'keys')
 
         for f in fileList:
+            self.logger.info(f"importing {f}")
             row = []
+
             # Parse FITS header for given file
             fitsParameters = self.parseFitsHeader(f)
             for fitsParameter in fitsKeyList:
@@ -71,6 +74,17 @@ class ImportDir(QtCore.QObject):
 
             row[fitsKeyList.index('alt')] = strAlt
             row[fitsKeyList.index('az')] = strAz
+
+            # if no value is read in FIT header try default value
+            for keyD, valD in enumerate(fitsDefault):
+
+                if len(row[fitsKeyList.index(valD)]) == 0:
+                    defaultValue = self.app.conf[valD]['fitsDefault']
+                    defaultField = self.app.conf[valD]['description']
+                    self.logger.debug(
+                        f"Inserted {defaultValue} for {defaultField}")
+                    row[fitsKeyList.index(
+                        valD)] = defaultValue
             self.match_found.emit(row)
 
     def parseFitsHeader(self, fitsFile):
@@ -125,7 +139,7 @@ class ImportTab():
         self.model = ImportTableModel(self._data, self._headers)
         self.mainW.ui.tableViewImport.setSortingEnabled(True)
         self.mainW.ui.tableViewImport.setAlternatingRowColors(True)
-        self.mainW.ui.tableViewImport.hideColumn(2)  # Hide HASH
+        # self.mainW.ui.tableViewImport.hideColumn(1)  # Hide HASH
 
         self.mainW.ui.tableViewImport.setModel(self.model)
 
@@ -141,6 +155,7 @@ class ImportTab():
                 csvreader = csv.reader(fh)
                 dataTemp = list(csvreader)
             self.mainW.ui.lineEditCsv.setText(filename)
+            self.logger.info(f"Opened {filename}")
 
         csvList = self.app.filterDictToList('pix_csv')
 
@@ -174,6 +189,8 @@ class ImportTab():
                         item = dataTemp[row][col]
                         # Check if the file (hash) exists in the database
                         if col == 8:
+                            filenameMatch = ntpath.splitext(
+                                ntpath.basename(item))[0]
                             '''
                             filenameMatch = ntpath.splitext(
                                 ntpath.basename(item))[0]
@@ -194,14 +211,15 @@ class ImportTab():
                             r.next()
                             if r.value(0):
                                 item = hashItem
+                                self.logger.debug(
+                                    f"File {filenameMatch} found")
                             else:
                                 item = "FITS file not found"
+                                self.logger.debug(
+                                    f"File {filenameMatch} not found")
+
                         filteredRow.insert(col,  str(item))
-                        """
-                        print("row "+str(row) +
-                              " col " + str(col) +
-                              " item "+str(item))
-                        """
+
                 self._data.append(filteredRow)
 
             # Headers row
@@ -246,6 +264,7 @@ class ImportTab():
         targetOverride = self.mainW.ui.lineEditOverrideTarget.text()
 
         for row in range(rows):
+            emptyCellCheck = True
             query = "INSERT INTO images ( " +\
                 sqlInsert + ") VALUES("
 
@@ -265,7 +284,10 @@ class ImportTab():
                         item = self.app.conf[val]['fitsDefault']
                         query += "'"+str(item)+"',"
                     else:
-                        query += "'',"
+                        emptyCellCheck = False
+
+            if emptyCellCheck == False:
+                continue
             query = query[:-1]
             query += ");"
             try:
@@ -273,17 +295,26 @@ class ImportTab():
                 if ret.lastError().number() == 19:
                     self.model.setData(
                         self.model.index(row, 1), "Error: FITS file already exists in database", QtCore.Qt.EditRole)
+                    error = ret.lastError().text()
+                    self.logger.error(f"{error}")
+                    self.logger.error(f"{query}")
                 elif ret.lastError().number() > 0:
-                    print(ret.lastError().text()+" " +
-                          str(ret.lastError().number()))
+                    error = ret.lastError().text()
+                    self.logger.error(f"{error}")
+                    self.logger.error(f"{query}")
                 else:
                     self.model.setData(
                         self.model.index(row, 1), "OK: FITS file saved", QtCore.Qt.EditRole)
+                    self.logger.debug(
+                        f"OK: FITS file saved with query {query}")
 
             except Exception as e:
-                print(f'Insert error: {e}')
+                self.logger.error(f"Insert error {e}")
 
             self.model.layoutChanged.emit()
+        self.mainW.imageSourceModel.select()
+        while (self.mainW.imageSourceModel.canFetchMore()):
+            self.mainW.imageSourceModel.fetchMore()
 
     def saveCsv(self):
 
@@ -310,14 +341,23 @@ class ImportTab():
                 if ret.lastError().number() == 19:
                     self.model.setData(
                         self.model.index(row, 5), "Error: FITS file already exists in database", QtCore.Qt.EditRole)
+                    error = ret.lastError().text()
+                    self.logger.error(f"{error}")
+                    self.logger.error(f"{query}")
                 elif ret.lastError().number() > 0:
-                    print(ret.lastError().text()+" " +
-                          str(ret.lastError().number()))
+                    error = ret.lastError().text()
+                    self.logger.error(f"{error}")
+                    self.logger.error(f"{query}")
                 else:
                     self.model.setData(
                         self.model.index(row, 5), "OK: FITS file updated", QtCore.Qt.EditRole)
+                    self.logger.debug(
+                        f"OK: FITS file updated with query {query}")
 
             except Exception as e:
-                print(f'Insert error: {e}')
+                self.logger.error(f"Update error {e}")
 
             self.model.layoutChanged.emit()
+        self.mainW.imageSourceModel.select()
+        while (self.mainW.imageSourceModel.canFetchMore()):
+            self.mainW.imageSourceModel.fetchMore()

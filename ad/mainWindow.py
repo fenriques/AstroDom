@@ -36,7 +36,7 @@ class MainWindow(QDialog):
         self.imageDetailWindow = ImageDetailWindow(self.imageListModel)
 
         # Import dir thread
-        self.importDir = ImportDir(app)
+        self.importDir = ImportDir(self.app)
         self.importDirThread = qtc.QThread()
         self.importDir.moveToThread(self.importDirThread)
         self.importDir.finished.connect(self.importDirThread.quit)

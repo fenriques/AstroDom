@@ -37,7 +37,6 @@ class MatplotlibWidget(Canvas):
             im = self.axes.imshow(image, cmap='gray', norm=LogNorm())
         except Exception as e:
             self.logger.error(e)
-            self.axes.set_title('Loaded Matrix')
         self.canvas.draw()
 
     def setFileName(self, fileName):

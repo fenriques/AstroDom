@@ -317,6 +317,7 @@ class ImportTab():
         while (self.mainW.imageSourceModel.canFetchMore()):
             self.mainW.imageSourceModel.fetchMore()
 
+    # Data from PI csv (FWHM, Noise etc) are imported in db
     def saveCsv(self):
 
         fieldUpdate = self.app.filterDictToList('pix_csv', 'keys')

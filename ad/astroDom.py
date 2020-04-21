@@ -33,6 +33,7 @@ class astroDom():
         with open(os.path.join(self.directory, 'config', 'configFields.json'), 'r') as configFields:
             self.conf = json.load(configFields)
             self.logger.debug('Read Config Fits File '+str(configFields))
+            
         with open(os.path.join(self.directory, 'config', 'configFilters.json'), 'r') as configFileFilters:
             self.confFilters = json.load(configFileFilters)
             self.logger.debug('Read Config Filters File ' +

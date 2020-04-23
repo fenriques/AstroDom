@@ -2,7 +2,7 @@
 # Astronomy Domine:
 #
 # (C) 2020 Ferrante Enriques, ferrante.enriques@gmail.com
-# Released under GNU Public License (GPL)
+# Released under MIT License
 # -----------------------------------------------------------
 
 import sys
@@ -15,13 +15,17 @@ from datetime import date
 from .mainWindow import *
 
 
-class astroDom():
+class AstroDom():
     directory = os.path.dirname(__file__)
     with open(os.path.join(directory, 'config', 'config.json'), 'r') as config:
         config = json.load(config)
-
+   
+    logDir = os.path.join(directory, 'logs')
+    if not os.path.exists(logDir):
+        os.makedirs(logDir)
+    
     logging.basicConfig(
-        filename='logs/'+str(date.today())+'.log',
+        filename = os.path.join(logDir, str(date.today())+'.log'),
         level=config['debug'],
         datefmt='%Y-%m-%d %H:%M:%S',
         format='%(asctime)s %(name)s - %(levelname)s - %(message)s')

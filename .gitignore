@@ -1,4 +1,5 @@
 venv/**
-logs/**
+astrodom/logs/**
 __pycache__/
-
+dist**
+astrodom.egg-info/**

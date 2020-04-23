@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QApplication
-from .astroDom import astroDom
+from .astroDom import AstroDom
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
                      QtGui.QPalette.ButtonText, QtCore.Qt.black)
     app.setPalette(palette)
 
-    w = astroDom()
+    w = AstroDom()
     sys.exit(app.exec_())
 
 

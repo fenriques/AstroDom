@@ -32,8 +32,6 @@ class MainWindow(QDialog):
         self.imageListTab = ImageListTab(self, app)
         self.importTab = ImportTab(self, app)
         self.settingsTab = SettingsTab(self, app)
-        self.chartWindow = ChartWindow(self.app)
-        self.imageDetailWindow = ImageDetailWindow(self.imageListModel)
 
         # Import dir thread
         self.importDir = ImportDir(self.app)
@@ -118,23 +116,40 @@ class MainWindow(QDialog):
             self.filterRegExpChanged)
         self.ui.comboBoxNoise.currentIndexChanged.connect(
             self.filterRegExpChanged)
-        self.ui.dateEditStartDate.setDateTime(
-            QtCore.QDateTime.currentDateTime().addMonths(-3))
-        self.ui.dateEditStartDate.dateChanged.connect(
+        
+        dsh = self.ui.spinBoxDefaultTimeStart.value()
+        dst = QtCore.QDateTime(QtCore.QDate.currentDate().addMonths(-3), QtCore.QTime(dsh,0,0))
+        self.ui.dateEditStartDate.setDateTime(dst)
+        self.ui.dateEditStartDate.dateTimeChanged.connect(
             self.filterRegExpChanged)
-        self.ui.dateEditEndDate.setDateTime(
-            QtCore.QDateTime.currentDateTime().addDays(1))
-        self.ui.dateEditEndDate.dateChanged.connect(
+        deh = self.ui.spinBoxDefaultTimeEnd.value()
+        det = QtCore.QDateTime(QtCore.QDate.currentDate().addDays(1), QtCore.QTime(deh,0,0))
+        self.ui.dateEditEndDate.setDateTime(det)
+        self.ui.dateEditEndDate.dateTimeChanged.connect(
             self.filterRegExpChanged)
         self.filterRegExpChanged()
 
         self.ui.tableViewImages.doubleClicked.connect(
-            self.imageDetailWindow.plot)
+            self.imageDetail)
 
-    def imageDetail(self):
-        self.imageDetailWindow.plot(self.imageListModel)
+    def imageDetail(self, modelIndex):
+        self.imageDetailWindow = ImageDetailWindow(self.imageListModel)
+        self.imageDetailWindow.plot(modelIndex)
 
+    def closeEvent(self, event):
+        try:
+            self.imageDetailWindow.close()
+        except Exception as e:
+            self.logger.debug(f"Closing not existing window {e}")
+        try:
+            self.chartWindow.close()
+        except Exception as e:
+            self.logger.debug(f"Closing not existing window {e}")
+        self.close()
+        event.accept()
+        
     def dialogChart(self):
+        self.chartWindow = ChartWindow(self.app)
         self.chartWindow.plot(self.imageListModel)
 
     def filterRegExpChanged(self):

@@ -47,8 +47,8 @@ class AstroDom():
         self.DBDRIVER = "QSQLITE"
         # Create db connection
         if not self.createConnection():
-            sys.exit(-1)
-
+            QMessageBox.about(
+                None, "Message", "Cannot connect to database.")
         self.setUpDb()
         self.mainWindow = MainWindow(self)
 

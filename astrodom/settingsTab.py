@@ -100,6 +100,10 @@ class SettingsTab():
         self.mainW.ui.comboBoxDebug.setItemText(10, "DEBUG")
         self.mainW.ui.comboBoxDebug.setCurrentText(
             self.app.config['debug'])
+        self.mainW.ui.spinBoxDefaultTimeStart.setValue(
+            self.app.config['defaultTimeStart'])
+        self.mainW.ui.spinBoxDefaultTimeEnd.setValue(
+            self.app.config['defaultTimeEnd'])
 
     def saveSettings(self):
         self.app.conf['file']['fitsHeader'] = self.mainW.ui.lineEditFitsFile.text()
@@ -160,9 +164,13 @@ class SettingsTab():
 
         self.app.config['dbname'] = self.mainW.ui.lineEditDbname.text()
         self.app.config['debug'] = self.mainW.ui.comboBoxDebug.currentText()
+        self.app.config['defaultTimeStart'] = self.mainW.ui.spinBoxDefaultTimeStart.value()
+        self.app.config['defaultTimeEnd'] = self.mainW.ui.spinBoxDefaultTimeEnd.value()
         with open(os.path.join(self.app.directory, 'config', 'config.json'), 'w') as outfile3:
             json.dump(self.app.config, outfile3)
             self.logger.debug(self.app.config)
 
         QMessageBox.about(
-            None, "Message", "Configuration saved. Please close and restart AstroDom")
+            None, "Message", "Configuration saved. AstroDom will now close, please restart.")
+        sys.exit(-1)
+

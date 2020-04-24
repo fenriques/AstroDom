@@ -11,11 +11,14 @@
 ###########################################################
 from setuptools import setup, find_packages
 
-with open("README.md", "r") as readme_file:
-    long_description = readme_file.read()
+from os import path
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+    
 setup(
     name='astrodom',
-    version='0.1.6',
+    version='0.1.8',
     packages=find_packages(),
     python_requires='~=3.6',
     install_requires=[
@@ -32,7 +35,7 @@ setup(
     author_email='ferrante.enriques@gmail.com',
     description='Astroimaging Catalogue Software',
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type='text/markdown',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: X11 Applications :: Qt',

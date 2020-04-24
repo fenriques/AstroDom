@@ -1,6 +1,6 @@
-include *.md *.txt LICENSE requirements.txt 
-recursive-include icons *.png 
-recursive-include config *.json 
+include *.md *.txt LICENSE requirements.txt *.db
+graft astrodom/icons
+graft astrodom/config
 recursive-exclude * __pycache__
 recursive-exclude * *.pyc
 recursive-exclude * *.pyo

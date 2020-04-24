@@ -146,8 +146,8 @@ class SortFilterProxyModel(QSortFilterProxyModel):
             else:
                 bReturn = False
 
-        if self.ui.dateEditStartDate.date() and self.ui.dateEditEndDate.date() and dataDate and bReturn == True:
-            if (self.ui.dateEditStartDate.date() < dataDate and self.ui.dateEditEndDate.date() > dataDate):
+        if self.ui.dateEditStartDate.dateTime() and self.ui.dateEditEndDate.dateTime() and dataDate and bReturn == True:
+            if (self.ui.dateEditStartDate.dateTime() < dataDate and self.ui.dateEditEndDate.dateTime() > dataDate):
                 bReturn = True
             else:
                 bReturn = False

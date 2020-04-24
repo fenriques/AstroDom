@@ -244,14 +244,22 @@ class ImportTab():
             self.model.removeRows(selected[0].row(), 1, None)
 
     def hashFile(self, fileName):
-        with open(fileName, 'rb') as afile:
-            hasher = hashlib.md5()
-            buf = afile.read(self.app.BLOCKSIZE)
-            for i in range(5):
-                hasher.update(buf)
+        try:
+            with open(fileName, 'rb') as afile:
+                hasher = hashlib.md5()
                 buf = afile.read(self.app.BLOCKSIZE)
-        hash = hasher.hexdigest()
-        return hash
+                for i in range(5):
+                    hasher.update(buf)
+                    buf = afile.read(self.app.BLOCKSIZE)
+            hash = hasher.hexdigest()
+            return hash
+        except Exception as e:
+            self.logger.error(f"CSV match, Fits file not found:  {fileName}")
+        return ""
+
+
+       
+       
 
     def saveFits(self):
 

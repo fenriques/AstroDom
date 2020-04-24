@@ -20,6 +20,10 @@ class ChartWindow(QDialog):
         self.setWindowTitle("Charts")
         self.app = app
 
+ 
+    def closeEvent(self, event):
+        event.accept()
+        
     def plot(self, imageListModel):
         self.imageListModel = imageListModel
         self.show()

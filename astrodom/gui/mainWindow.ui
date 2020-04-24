@@ -53,7 +53,7 @@
     <widget class="QPushButton" name="pushButtonGraph">
      <property name="geometry">
       <rect>
-       <x>1090</x>
+       <x>1130</x>
        <y>40</y>
        <width>95</width>
        <height>26</height>
@@ -438,22 +438,6 @@
       <string>SNR</string>
      </property>
     </widget>
-    <widget class="QDateEdit" name="dateEditStartDate">
-     <property name="geometry">
-      <rect>
-       <x>930</x>
-       <y>10</y>
-       <width>121</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="labelStartDate">
      <property name="geometry">
       <rect>
@@ -478,22 +462,6 @@
      </property>
      <property name="text">
       <string>End</string>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="dateEditEndDate">
-     <property name="geometry">
-      <rect>
-       <x>930</x>
-       <y>39</y>
-       <width>121</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="doubleSpinBoxNoise">
@@ -848,6 +816,32 @@
       <string>Total Hours</string>
      </property>
      <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QDateTimeEdit" name="dateEditStartDate">
+     <property name="geometry">
+      <rect>
+       <x>930</x>
+       <y>10</y>
+       <width>151</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QDateTimeEdit" name="dateEditEndDate">
+     <property name="geometry">
+      <rect>
+       <x>930</x>
+       <y>40</y>
+       <width>151</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="calendarPopup">
       <bool>true</bool>
      </property>
     </widget>
@@ -1672,7 +1666,7 @@
        <x>456</x>
        <y>430</y>
        <width>261</width>
-       <height>171</height>
+       <height>231</height>
       </rect>
      </property>
      <property name="title">
@@ -1750,6 +1744,51 @@
       </property>
       <property name="text">
        <string>Debug Level</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelDefaultTime">
+      <property name="geometry">
+       <rect>
+        <x>7</x>
+        <y>127</y>
+        <width>111</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Obs Time Hrs</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBoxDefaultTimeStart">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>120</y>
+        <width>54</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>24</number>
+      </property>
+      <property name="value">
+       <number>20</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBoxDefaultTimeEnd">
+      <property name="geometry">
+       <rect>
+        <x>187</x>
+        <y>120</y>
+        <width>54</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>24</number>
+      </property>
+      <property name="value">
+       <number>8</number>
       </property>
      </widget>
     </widget>
@@ -1975,7 +2014,7 @@
      <property name="geometry">
       <rect>
        <x>620</x>
-       <y>606</y>
+       <y>670</y>
        <width>95</width>
        <height>26</height>
       </rect>
@@ -1987,8 +2026,8 @@
     <widget class="QPushButton" name="pushButton">
      <property name="geometry">
       <rect>
-       <x>456</x>
-       <y>606</y>
+       <x>460</x>
+       <y>670</y>
        <width>95</width>
        <height>26</height>
       </rect>

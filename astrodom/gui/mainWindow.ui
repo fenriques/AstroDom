@@ -44,7 +44,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tabImages">
     <attribute name="title">
@@ -855,7 +855,7 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>551</width>
+       <width>561</width>
        <height>91</height>
       </rect>
      </property>
@@ -867,7 +867,7 @@
        <rect>
         <x>450</x>
         <y>30</y>
-        <width>95</width>
+        <width>105</width>
         <height>26</height>
        </rect>
       </property>
@@ -884,7 +884,7 @@
        <rect>
         <x>232</x>
         <y>30</y>
-        <width>95</width>
+        <width>105</width>
         <height>26</height>
        </rect>
       </property>
@@ -907,7 +907,7 @@
        <rect>
         <x>340</x>
         <y>30</y>
-        <width>95</width>
+        <width>105</width>
         <height>26</height>
        </rect>
       </property>
@@ -920,7 +920,7 @@
        <rect>
         <x>450</x>
         <y>60</y>
-        <width>95</width>
+        <width>105</width>
         <height>26</height>
        </rect>
       </property>
@@ -933,7 +933,7 @@
        <rect>
         <x>263</x>
         <y>60</y>
-        <width>171</width>
+        <width>181</width>
         <height>26</height>
        </rect>
       </property>
@@ -955,9 +955,9 @@
     <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
-       <x>621</x>
+       <x>630</x>
        <y>10</y>
-       <width>451</width>
+       <width>461</width>
        <height>91</height>
       </rect>
      </property>
@@ -967,9 +967,9 @@
      <widget class="QPushButton" name="pushButtonChooseCsv">
       <property name="geometry">
        <rect>
-        <x>232</x>
+        <x>240</x>
         <y>30</y>
-        <width>95</width>
+        <width>105</width>
         <height>26</height>
        </rect>
       </property>
@@ -982,7 +982,7 @@
        <rect>
         <x>350</x>
         <y>30</y>
-        <width>95</width>
+        <width>105</width>
         <height>26</height>
        </rect>
       </property>
@@ -1005,7 +1005,7 @@
        <rect>
         <x>350</x>
         <y>60</y>
-        <width>95</width>
+        <width>105</width>
         <height>26</height>
        </rect>
       </property>
@@ -1027,7 +1027,7 @@
     <widget class="Line" name="line">
      <property name="geometry">
       <rect>
-       <x>580</x>
+       <x>590</x>
        <y>10</y>
        <width>20</width>
        <height>91</height>
@@ -2021,19 +2021,6 @@
      </property>
      <property name="text">
       <string>Save</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
-       <y>670</y>
-       <width>95</width>
-       <height>26</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Default</string>
      </property>
     </widget>
    </widget>

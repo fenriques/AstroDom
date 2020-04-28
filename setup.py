@@ -18,9 +18,9 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     
 setup(
     name='astrodom',
-    version='0.1.8',
+    version='0.1.11',
     packages=find_packages(),
-    python_requires='~=3.6',
+    python_requires='>=3.6, <3.8',
     install_requires=[
         'astropy==4.0',
         'matplotlib==3.1.3',

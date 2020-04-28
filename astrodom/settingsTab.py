@@ -14,7 +14,6 @@ class SettingsTab():
         self.mainW = mainW
         self.app = app
 
-        self.mainW.ui.pushButtonSaveSettings.clicked.connect(self.saveSettings)
         # FITS Headers keywords
         self.mainW.ui.lineEditFitsFile.setText(
             self.app.conf['file']['fitsHeader'])

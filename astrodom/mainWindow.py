@@ -33,6 +33,8 @@ class MainWindow(QDialog):
         self.importTab = ImportTab(self, app)
         self.settingsTab = SettingsTab(self, app)
 
+        self.setWindowTitle("AstroDom")
+
         # Import dir thread
         self.importDir = ImportDir(self.app)
         self.importDirThread = qtc.QThread()
@@ -44,7 +46,6 @@ class MainWindow(QDialog):
             self.importDir.do_search)
         self.importDir.match_found.connect(self.importTab.addResultsToModel)
 
-        self.setWindowTitle("AstroDom")
         self.ui.pushButtonChooseCsv.clicked.connect(
             self.importTab.importCsvFile)
         self.ui.pushButtonSaveFits.clicked.connect(self.importTab.saveFits)
@@ -53,6 +54,20 @@ class MainWindow(QDialog):
             self.importTab.deleteRows)
         self.ui.pushButtonDeleteCsvRow.clicked.connect(
             self.importTab.deleteRows)
+        self.ui.pushButtonSaveSettings.clicked.connect(self.settingsTab.saveSettings)
+
+        # Button icons
+        self.ui.pushButtonGraph.setIcon(QtGui.QIcon('astrodom/icons/chart-up.png'))
+        self.ui.pushButtonDeleteFitsRow.setIcon(QtGui.QIcon('astrodom/icons/cross.png'))
+        self.ui.pushButtonDeleteCsvRow.setIcon(QtGui.QIcon('astrodom/icons/cross.png'))
+        self.ui.pushButtonSaveFits.setIcon(QtGui.QIcon('astrodom/icons/disk.png'))
+        self.ui.pushButtonSaveCsv.setIcon(QtGui.QIcon('astrodom/icons/disk.png'))
+        self.ui.pushButtonLoadFits.setIcon(QtGui.QIcon('astrodom/icons/gear.png'))
+        self.ui.pushButtonSaveSettings.setIcon(QtGui.QIcon('astrodom/icons/disk.png'))
+        self.ui.pushButtonChooseFitsDir.setIcon(QtGui.QIcon('astrodom/icons/folder-open.png'))
+        self.ui.pushButtonChooseCsv.setIcon(QtGui.QIcon('astrodom/icons/folder-open.png'))
+
+
         # Disable some Fits buttons
         self.ui.pushButtonLoadFits.setDisabled(True)
         self.ui.pushButtonDeleteFitsRow.setDisabled(True)
@@ -81,7 +96,6 @@ class MainWindow(QDialog):
             lambda: self.ui.pushButtonDeleteCsvRow.setEnabled(True))
 
         self.ui.pushButtonGraph.clicked.connect(self.dialogChart)
-
         self.ui.lineEditTarget.textChanged.connect(
             self.filterRegExpChanged)
         self.ui.lineEditFilter.textChanged.connect(
@@ -136,6 +150,10 @@ class MainWindow(QDialog):
         self.imageDetailWindow = ImageDetailWindow(self.imageListModel)
         self.imageDetailWindow.plot(modelIndex)
 
+    def dialogChart(self):
+        self.chartWindow = ChartWindow(self.app)
+        self.chartWindow.plot(self.imageListModel)
+
     def closeEvent(self, event):
         try:
             self.imageDetailWindow.close()
@@ -148,10 +166,6 @@ class MainWindow(QDialog):
         self.close()
         event.accept()
         
-    def dialogChart(self):
-        self.chartWindow = ChartWindow(self.app)
-        self.chartWindow.plot(self.imageListModel)
-
     def filterRegExpChanged(self):
         regExp = QRegExp('*', Qt.CaseInsensitive, QRegExp.Wildcard)
         self.imageListModel.setFilterRegExp(regExp)

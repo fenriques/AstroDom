@@ -1,6 +1,7 @@
 include *.md *.txt LICENSE requirements.txt *.db
 graft astrodom/icons
 graft astrodom/config
+exclude astrodom *.db
 recursive-exclude * __pycache__
 recursive-exclude * *.pyc
 recursive-exclude * *.pyo

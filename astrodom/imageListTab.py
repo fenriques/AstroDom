@@ -17,9 +17,17 @@ from PyQt5 import QtWidgets
 
 from dateutil.relativedelta import relativedelta
 
-# local imports
-
-
+'''
+The table view containing the image list. It reads
+the database and set it as a source model. Then
+the model's view is handled through a proxy model.
+So main objects in this class are:
+- The source model:  imageSourceModel (SqlTableModel)
+- The proxy model: imageListModel (instance of SortFilterProxyModel)
+- The table view: tableViewImages
+Keep in mind that some methods are defined in the parent 
+MainW class
+''' 
 class ImageListTab():
 
     logger = logging.getLogger(__name__)

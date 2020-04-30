@@ -9,7 +9,17 @@ from PyQt5.QtWidgets import QDialog
 from .gui.chartWindowGui import *
 from .pg_time_axis import DateAxisItem
 
-
+'''
+Charts are plotted using pyqtgrpah library.
+Data are read directly from the image list 
+model (imageListModel) so charts plot exactly 
+what is shown in the image list table view.
+Improvements needed:
+- Filter colors should be moved in Settings
+so that users can customize them.
+- A factory to build plots, they are now 
+build directly.
+'''
 class ChartWindow(QDialog):
     logger = logging.getLogger(__name__)
 

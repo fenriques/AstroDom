@@ -2,10 +2,20 @@ import sys
 import os
 import json
 import logging
+import ntpath
 from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog, QMessageBox
-from PyQt5 import QtSql, QtGui
+from PyQt5 import QtSql, QtGui, QtCore
 
-
+'''
+Application settings are stored in 3 json files. 
+- configFields.json stores FITS keyword that users can
+customize. Moreover an optional default value allows
+users to fill FITS header that are missing.
+- configFilters: filter keyword could be stored in FITS
+header with different names. In order to match them all,
+a list of comma separated value is allowed
+- config.json: additional AstroDom configuration
+'''
 class SettingsTab():
     logger = logging.getLogger(__name__)
 
@@ -103,7 +113,20 @@ class SettingsTab():
             self.app.config['defaultTimeStart'])
         self.mainW.ui.spinBoxDefaultTimeEnd.setValue(
             self.app.config['defaultTimeEnd'])
-
+        
+    def selectDb(self):
+        dbName, _ = QFileDialog.getOpenFileName(
+            self.mainW,
+            'Select a SQLite file to open…',
+            QtCore.QDir.homePath(),
+            'SQLite Files (*.db) ;; All Files (*)'
+        )
+        if dbName:
+            with open(dbName) as fh:
+                dbName = os.path.splitext(ntpath.basename(dbName))[0]
+                self.mainW.ui.lineEditDbname.setText(dbName)
+                self.logger.info(f"Selected {dbName}")
+            
     def saveSettings(self):
         self.app.conf['file']['fitsHeader'] = self.mainW.ui.lineEditFitsFile.text()
         self.app.conf['target']['fitsHeader'] = self.mainW.ui.lineEditFitsTarget.text()

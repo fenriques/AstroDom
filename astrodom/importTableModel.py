@@ -6,7 +6,11 @@ from PyQt5.QtGui import *
 
 import csv
 
-
+'''
+Generic class that extends QAbstractTableModel.
+Used in importTab to show and manage data read
+from FITS or CSV files.
+'''
 class ImportTableModel(qtc.QAbstractTableModel):
     logger = logging.getLogger(__name__)
 

@@ -12,36 +12,15 @@ from matplotlib.figure import Figure
 
 from .gui.imageDetailWindowGui import *
 
-
-class MatplotlibWidget(Canvas):
-    logger = logging.getLogger(__name__)
-
-    def __init__(self, parent=None, title='Title', width=5, height=5, dpi=100, hold=True):
-        super(MatplotlibWidget, self).__init__(Figure())
-
-        self.setParent(parent)
-        self.figure = Figure(figsize=(width, height), dpi=dpi)
-        self.figure.patch.set_facecolor('xkcd:black')
-
-        self.canvas = Canvas(self.figure)
-
-    def plot(self):
-        self.figure.clear()
-
-        self.axes = self.figure.add_subplot(1, 1, 1)
-        self.figure.tight_layout()
-        self.axes.axis('off')
-
-        try:
-            image = fits.getdata(self.fileName, ext=0)
-            im = self.axes.imshow(image, cmap='gray', norm=LogNorm())
-        except Exception as e:
-            self.logger.error(e)
-        self.canvas.draw()
-
-    def setFileName(self, fileName):
-        self.fileName = fileName
-
+'''
+When an image is double clicked on the image list
+view, a mapper is used to show all informations about
+that image.
+Mapping a model implies that here the model can be 
+edited / saved.
+Matplot lib is used to show a not so well stretched 
+preview of the image.
+'''
 
 class ImageDetailWindow(QDialog):
     logger = logging.getLogger(__name__)
@@ -91,3 +70,32 @@ class ImageDetailWindow(QDialog):
         self.mplwidget.setFileName(t)
         self.mplwidget.plot()
         self.show()
+
+class MatplotlibWidget(Canvas):
+    logger = logging.getLogger(__name__)
+
+    def __init__(self, parent=None, title='Title', width=5, height=5, dpi=100, hold=True):
+        super(MatplotlibWidget, self).__init__(Figure())
+
+        self.setParent(parent)
+        self.figure = Figure(figsize=(width, height), dpi=dpi)
+        self.figure.patch.set_facecolor('xkcd:black')
+
+        self.canvas = Canvas(self.figure)
+
+    def plot(self):
+        self.figure.clear()
+
+        self.axes = self.figure.add_subplot(1, 1, 1)
+        self.figure.tight_layout()
+        self.axes.axis('off')
+
+        try:
+            image = fits.getdata(self.fileName, ext=0)
+            im = self.axes.imshow(image, cmap='gray', norm=LogNorm())
+        except Exception as e:
+            self.logger.error(e)
+        self.canvas.draw()
+
+    def setFileName(self, fileName):
+        self.fileName = fileName

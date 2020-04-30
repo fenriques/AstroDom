@@ -14,7 +14,13 @@ from datetime import date
 
 from .mainWindow import *
 
-
+'''
+AstroDom application class. It inizializes logs,
+sets up database connection, reads config files,
+eventually creates a new db, defines some useful 
+methods and calls the mainWindow GUI. In children 
+classes it is referenced as 'app'.
+''' 
 class AstroDom():
     directory = os.path.dirname(__file__)
     with open(os.path.join(directory, 'config', 'config.json'), 'r') as config:
@@ -33,7 +39,7 @@ class AstroDom():
 
     def __init__(self):
 
-        # Read configuration from json file
+        # Read configurations from json file
         with open(os.path.join(self.directory, 'config', 'configFields.json'), 'r') as configFields:
             self.conf = json.load(configFields)
             self.logger.debug('Read Config Fits File '+str(configFields))
@@ -43,8 +49,11 @@ class AstroDom():
             self.logger.debug('Read Config Filters File ' +
                               str(configFileFilters))
 
+        # For hashing files
         self.BLOCKSIZE = 1024768
+        
         self.DBDRIVER = "QSQLITE"
+        
         # Create db connection
         if not self.createConnection():
             QMessageBox.about(
@@ -52,6 +61,7 @@ class AstroDom():
         self.setUpDb()
         self.mainWindow = MainWindow(self)
 
+    # Mainly used to extract a list from configurations
     def filterDictToList(self, filter, returnDifferentParameter=None):
         returnList = []
         for key, dictInfo in self.conf.items():
@@ -72,12 +82,13 @@ class AstroDom():
 
         self.db = QtSql.QSqlDatabase.addDatabase(self.DBDRIVER)
         self.db.setDatabaseName(os.path.join(
-            self.directory, '', self.config["dbname"]+".db"))
+            self.directory, 'config', self.config["dbname"]+".db"))
         if not self.db.open():
             self.logger.critical('Failed to set up db connection')
             return False
         return True
 
+    # the database structure is stored in a json config file
     def setUpDb(self):
         separator = ','
         sqlString = separator.join(self.filterDictToList('fieldType'))

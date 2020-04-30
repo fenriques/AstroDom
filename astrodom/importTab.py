@@ -16,100 +16,16 @@ from datetime import datetime
 
 from .importTableModel import *
 
-
-class ImportDir(QtCore.QObject):
-    logger = logging.getLogger(__name__)
-
-    match_found = QtCore.pyqtSignal(list)
-    finished = QtCore.pyqtSignal()
-
-    def __init__(self, app):
-        super().__init__()
-        self.app = app
-
-    def set_file(self, fileList):
-        self.fileList = fileList
-
-    @qtc.pyqtSlot()
-    def do_search(self):
-
-        self._search(self.fileList)
-        self.finished.emit()
-
-    def _search(self, fileList):
-
-        fitsParameter = {}
-        fitsKeyList = self.app.filterDictToList('fitsHeader', 'keys')
-        fitsDefault = self.app.filterDictToList('fitsDefault', 'keys')
-
-        for f in fileList:
-            self.logger.info(f"importing {f}")
-            row = []
-
-            # Parse FITS header for given file
-            fitsParameters = self.parseFitsHeader(f)
-            for fitsParameter in fitsKeyList:
-                oneitem = str(
-                    fitsParameters[self.app.conf[fitsParameter]['fitsHeader']])
-                row.insert(self.app.conf[fitsParameter]['order'], oneitem)
-
-            row[fitsKeyList.index('file')] = str(f)
-            row[fitsKeyList.index('hash')] = self.hashFile(f)
-
-            # Calculate Alt, Az coordinates
-            strAlt = ''
-            strAz = ''
-            AstropyCalcObj = AstropyCalc()
-
-            altAz = AstropyCalcObj.getAltAzCoord(
-                fitsParameters['RA'],
-                fitsParameters['DEC'],
-                fitsParameters['DATE-OBS'],
-                fitsParameters['SITELONG'],
-                fitsParameters['SITELAT'])
-
-            if altAz:
-                strAlt = str("{0.alt:.4f}".format(altAz))[:-4]
-                strAz = str("{0.az:.4f}".format(altAz))[:-4]
-
-            row[fitsKeyList.index('alt')] = strAlt
-            row[fitsKeyList.index('az')] = strAz
-
-            # if no value is read in FIT header try default value
-            for keyD, valD in enumerate(fitsDefault):
-
-                if len(row[fitsKeyList.index(valD)]) == 0:
-                    defaultValue = self.app.conf[valD]['fitsDefault']
-                    defaultField = self.app.conf[valD]['description']
-                    self.logger.debug(
-                        f"Inserted {defaultValue} for {defaultField}")
-                    row[fitsKeyList.index(
-                        valD)] = defaultValue
-            self.match_found.emit(row)
-
-    def parseFitsHeader(self, fitsFile):
-        returnDifferentParameter = {}
-        hdu = fits.open(fitsFile)
-        hdr = hdu[0].header
-        for fitsParameter in self.app.filterDictToList('fitsHeader'):
-            if fitsParameter in hdr:
-                returnDifferentParameter[fitsParameter] = hdr[fitsParameter]
-            else:
-                returnDifferentParameter[fitsParameter] = ''
-
-        return returnDifferentParameter
-
-    def hashFile(self, fileName):
-        with open(fileName, 'rb') as afile:
-            hasher = hashlib.md5()
-            buf = afile.read(self.app.BLOCKSIZE)
-            for i in range(5):
-                hasher.update(buf)
-                buf = afile.read(self.app.BLOCKSIZE)
-        hash = hasher.hexdigest()
-        return hash
-
-
+'''
+This class manages imports: first step is to import
+FITS files and their headers scanning dirs. Then we
+can add information like FWHM, noise etc importing
+a CSV file as the output from SubFrameSelector from
+Pixinsight. There are read and save method for both
+operations (FITS import and CSV import).
+The models (both FITS and CSV) are managed by 
+ImportTableModel.
+'''
 class ImportTab():
     logger = logging.getLogger(__name__)
 
@@ -192,6 +108,7 @@ class ImportTab():
                             filenameMatch = ntpath.splitext(
                                 ntpath.basename(item))[0]
                             '''
+                            TO BE COMPLETED:
                             filenameMatch = ntpath.splitext(
                                 ntpath.basename(item))[0]
                             print(filenameMatch)
@@ -256,10 +173,6 @@ class ImportTab():
         except Exception as e:
             self.logger.error(f"CSV match, Fits file not found:  {fileName}")
         return ""
-
-
-       
-       
 
     def saveFits(self):
 
@@ -372,3 +285,104 @@ class ImportTab():
         self.mainW.imageSourceModel.select()
         while (self.mainW.imageSourceModel.canFetchMore()):
             self.mainW.imageSourceModel.fetchMore()
+
+'''
+ImportDir is the thread reading FITS files. Should be
+moved to a separate files but is kept here just for
+convenience. 
+'''
+class ImportDir(QtCore.QObject):
+    logger = logging.getLogger(__name__)
+
+    # notifies main thread when a full row is read
+    match_found = QtCore.pyqtSignal(list)
+    # notifies when import finished
+    finished = QtCore.pyqtSignal()
+
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+
+    def set_file(self, fileList):
+        self.fileList = fileList
+
+    @qtc.pyqtSlot()
+    def do_search(self):
+
+        self._search(self.fileList)
+        self.finished.emit()
+
+    def _search(self, fileList):
+
+        fitsParameter = {}
+        fitsKeyList = self.app.filterDictToList('fitsHeader', 'keys')
+        fitsDefault = self.app.filterDictToList('fitsDefault', 'keys')
+
+        for f in fileList:
+            self.logger.info(f"importing {f}")
+            row = []
+
+            # Parse FITS header for given file
+            fitsParameters = self.parseFitsHeader(f)
+            for fitsParameter in fitsKeyList:
+                oneitem = str(
+                    fitsParameters[self.app.conf[fitsParameter]['fitsHeader']])
+                row.insert(self.app.conf[fitsParameter]['order'], oneitem)
+
+            row[fitsKeyList.index('file')] = str(f)
+            row[fitsKeyList.index('hash')] = self.hashFile(f)
+
+            # Calculate Alt, Az coordinates
+            strAlt = ''
+            strAz = ''
+            AstropyCalcObj = AstropyCalc()
+
+            altAz = AstropyCalcObj.getAltAzCoord(
+                fitsParameters['RA'],
+                fitsParameters['DEC'],
+                fitsParameters['DATE-OBS'],
+                fitsParameters['SITELONG'],
+                fitsParameters['SITELAT'])
+
+            if altAz:
+                strAlt = str("{0.alt:.4f}".format(altAz))[:-4]
+                strAz = str("{0.az:.4f}".format(altAz))[:-4]
+
+            row[fitsKeyList.index('alt')] = strAlt
+            row[fitsKeyList.index('az')] = strAz
+
+            # if no value is read in FIT header try default value
+            for keyD, valD in enumerate(fitsDefault):
+
+                if len(row[fitsKeyList.index(valD)]) == 0:
+                    defaultValue = self.app.conf[valD]['fitsDefault']
+                    defaultField = self.app.conf[valD]['description']
+                    self.logger.debug(
+                        f"Inserted {defaultValue} for {defaultField}")
+                    row[fitsKeyList.index(
+                        valD)] = defaultValue
+            self.match_found.emit(row)
+
+    def parseFitsHeader(self, fitsFile):
+        returnDifferentParameter = {}
+        hdu = fits.open(fitsFile)
+        hdr = hdu[0].header
+        for fitsParameter in self.app.filterDictToList('fitsHeader'):
+            if fitsParameter in hdr:
+                returnDifferentParameter[fitsParameter] = hdr[fitsParameter]
+            else:
+                returnDifferentParameter[fitsParameter] = ''
+
+        return returnDifferentParameter
+
+    def hashFile(self, fileName):
+        with open(fileName, 'rb') as afile:
+            hasher = hashlib.md5()
+            buf = afile.read(self.app.BLOCKSIZE)
+            for i in range(5):
+                hasher.update(buf)
+                buf = afile.read(self.app.BLOCKSIZE)
+        hash = hasher.hexdigest()
+        return hash
+
+

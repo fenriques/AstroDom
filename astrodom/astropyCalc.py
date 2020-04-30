@@ -3,7 +3,15 @@ from astropy.time import Time
 import astropy.units as u
 import numpy as np
 
-
+'''
+Some useful calculation are made here using AstroPy.
+- 'getAltAzCoord' is used when importing FITS header to
+calculate alt/az coord given the target coord and 
+time/location.
+- (TBD) 'moonPath' will be used to show the moon path
+in charts.
+- (TBD) 'WcsCoord': overlaps wcs to image detail.
+'''
 class AstropyCalc:
 
     def __init__(self):

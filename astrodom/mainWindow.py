@@ -14,7 +14,12 @@ from .importTab import *
 from .imageListTab import *
 from .gui.mainWindowGui import *
 
-
+'''
+AstroDom main window. It contains three different
+tabs that are implemented as separate xxxTab classes.
+More or less all gui controls and connects are set 
+here.
+'''
 class MainWindow(QDialog):
     logger = logging.getLogger(__name__)
 
@@ -55,6 +60,7 @@ class MainWindow(QDialog):
         self.ui.pushButtonDeleteCsvRow.clicked.connect(
             self.importTab.deleteRows)
         self.ui.pushButtonSaveSettings.clicked.connect(self.settingsTab.saveSettings)
+        self.ui.pushButtonSelectDb.clicked.connect(self.settingsTab.selectDb)
 
         # Button icons
         self.ui.pushButtonGraph.setIcon(QtGui.QIcon('astrodom/icons/chart-up.png'))
@@ -66,6 +72,7 @@ class MainWindow(QDialog):
         self.ui.pushButtonSaveSettings.setIcon(QtGui.QIcon('astrodom/icons/disk.png'))
         self.ui.pushButtonChooseFitsDir.setIcon(QtGui.QIcon('astrodom/icons/folder-open.png'))
         self.ui.pushButtonChooseCsv.setIcon(QtGui.QIcon('astrodom/icons/folder-open.png'))
+        self.ui.pushButtonSelectDb.setIcon(QtGui.QIcon('astrodom/icons/folder-open.png'))
 
 
         # Disable some Fits buttons

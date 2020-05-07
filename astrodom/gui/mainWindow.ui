@@ -39,7 +39,7 @@
     <rect>
      <x>5</x>
      <y>10</y>
-     <width>1631</width>
+     <width>1641</width>
      <height>851</height>
     </rect>
    </property>
@@ -53,7 +53,7 @@
     <widget class="QPushButton" name="pushButtonGraph">
      <property name="geometry">
       <rect>
-       <x>1130</x>
+       <x>1110</x>
        <y>40</y>
        <width>95</width>
        <height>26</height>
@@ -845,17 +845,30 @@
       <bool>true</bool>
      </property>
     </widget>
+    <widget class="QPushButton" name="pushButtonLastNight">
+     <property name="geometry">
+      <rect>
+       <x>1110</x>
+       <y>10</y>
+       <width>95</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Select Night</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QWidget" name="tabImport">
+   <widget class="QWidget" name="tabImportFits">
     <attribute name="title">
-     <string>Import</string>
+     <string>Import FITS</string>
     </attribute>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupBoxFitsImport">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>561</width>
+       <width>721</width>
        <height>91</height>
       </rect>
      </property>
@@ -876,7 +889,7 @@
       </property>
       <property name="icon">
        <iconset theme="save">
-        <normaloff>../../</normaloff>../../</iconset>
+        <normaloff>../../../../</normaloff>../../../../</iconset>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButtonChooseFitsDir">
@@ -918,8 +931,8 @@
      <widget class="QPushButton" name="pushButtonDeleteFitsRow">
       <property name="geometry">
        <rect>
-        <x>450</x>
-        <y>60</y>
+        <x>560</x>
+        <y>30</y>
         <width>105</width>
         <height>26</height>
        </rect>
@@ -931,9 +944,9 @@
      <widget class="QLineEdit" name="lineEditOverrideTarget">
       <property name="geometry">
        <rect>
-        <x>263</x>
+        <x>10</x>
         <y>60</y>
-        <width>181</width>
+        <width>221</width>
         <height>26</height>
        </rect>
       </property>
@@ -941,7 +954,7 @@
      <widget class="QLabel" name="labelOverrideTarget">
       <property name="geometry">
        <rect>
-        <x>12</x>
+        <x>240</x>
         <y>63</y>
         <width>251</width>
         <height>20</height>
@@ -952,13 +965,41 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QTableView" name="tableViewImportFits">
      <property name="geometry">
       <rect>
-       <x>630</x>
-       <y>10</y>
-       <width>461</width>
+       <x>10</x>
+       <y>110</y>
+       <width>1621</width>
+       <height>601</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPlainTextEdit" name="plainTextEditLogFits">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>720</y>
+       <width>1621</width>
        <height>91</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tabImportCsv">
+    <attribute name="title">
+     <string>Import CSV</string>
+    </attribute>
+    <widget class="QGroupBox" name="groupBoxCsv">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>651</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="title">
@@ -1003,8 +1044,8 @@
      <widget class="QPushButton" name="pushButtonDeleteCsvRow">
       <property name="geometry">
        <rect>
-        <x>350</x>
-        <y>60</y>
+        <x>460</x>
+        <y>30</y>
         <width>105</width>
         <height>26</height>
        </rect>
@@ -1014,27 +1055,27 @@
       </property>
      </widget>
     </widget>
-    <widget class="QTableView" name="tableViewImport">
+    <widget class="QTableView" name="tableViewImportCsv">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>110</y>
-       <width>1611</width>
-       <height>701</height>
+       <y>90</y>
+       <width>1621</width>
+       <height>621</height>
       </rect>
      </property>
     </widget>
-    <widget class="Line" name="line">
+    <widget class="QPlainTextEdit" name="plainTextEditLogCsv">
      <property name="geometry">
       <rect>
-       <x>590</x>
-       <y>10</y>
-       <width>20</width>
+       <x>10</x>
+       <y>720</y>
+       <width>1621</width>
        <height>91</height>
       </rect>
      </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>
@@ -1045,20 +1086,20 @@
     <widget class="QGroupBox" name="groupBox_3">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>391</width>
-       <height>641</height>
+       <x>470</x>
+       <y>10</y>
+       <width>421</width>
+       <height>801</height>
       </rect>
      </property>
      <property name="title">
-      <string>FITS Header Keywords</string>
+      <string>FITS Profiles</string>
      </property>
      <widget class="QLineEdit" name="lineEditFitsFile">
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>50</y>
+        <y>100</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1068,7 +1109,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>54</y>
+        <y>104</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1081,7 +1122,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>94</y>
+        <y>144</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1094,7 +1135,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>90</y>
+        <y>140</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1107,7 +1148,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>134</y>
+        <y>184</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1120,7 +1161,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>130</y>
+        <y>180</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1133,7 +1174,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>171</y>
+        <y>221</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1146,7 +1187,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>175</y>
+        <y>225</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1159,7 +1200,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>214</y>
+        <y>264</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1172,7 +1213,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>210</y>
+        <y>260</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1185,7 +1226,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>254</y>
+        <y>304</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1198,7 +1239,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>250</y>
+        <y>300</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1211,7 +1252,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>294</y>
+        <y>344</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1224,7 +1265,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>290</y>
+        <y>340</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1237,7 +1278,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>334</y>
+        <y>384</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1250,7 +1291,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>330</y>
+        <y>380</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1263,7 +1304,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>370</y>
+        <y>420</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1276,7 +1317,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>374</y>
+        <y>424</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1289,7 +1330,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>408</y>
+        <y>458</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1302,7 +1343,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>412</y>
+        <y>462</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1315,7 +1356,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>454</y>
+        <y>504</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1328,7 +1369,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>450</y>
+        <y>500</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1341,7 +1382,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>494</y>
+        <y>544</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1354,7 +1395,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>490</y>
+        <y>540</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1367,7 +1408,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>534</y>
+        <y>584</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1380,7 +1421,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>530</y>
+        <y>580</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1393,7 +1434,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>568</y>
+        <y>618</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1406,7 +1447,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>572</y>
+        <y>622</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1419,7 +1460,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>606</y>
+        <y>656</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1432,7 +1473,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>610</y>
+        <y>660</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1445,7 +1486,7 @@
       <property name="geometry">
        <rect>
         <x>133</x>
-        <y>28</y>
+        <y>78</y>
         <width>121</width>
         <height>18</height>
        </rect>
@@ -1458,7 +1499,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>50</y>
+        <y>100</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1468,7 +1509,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>90</y>
+        <y>140</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1481,7 +1522,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>130</y>
+        <y>180</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1494,7 +1535,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>170</y>
+        <y>220</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1507,7 +1548,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>210</y>
+        <y>260</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1520,7 +1561,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>250</y>
+        <y>300</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1533,7 +1574,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>290</y>
+        <y>340</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1546,7 +1587,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>330</y>
+        <y>380</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1559,7 +1600,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>370</y>
+        <y>420</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1572,7 +1613,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>408</y>
+        <y>458</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1585,7 +1626,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>450</y>
+        <y>500</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1598,7 +1639,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>490</y>
+        <y>540</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1611,7 +1652,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>530</y>
+        <y>580</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1624,7 +1665,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>568</y>
+        <y>618</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1637,7 +1678,7 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>606</y>
+        <y>656</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -1650,7 +1691,7 @@
       <property name="geometry">
        <rect>
         <x>259</x>
-        <y>28</y>
+        <y>78</y>
         <width>121</width>
         <height>18</height>
        </rect>
@@ -1659,14 +1700,380 @@
        <string>Default Value</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButtonSaveProfile">
+      <property name="geometry">
+       <rect>
+        <x>274</x>
+        <y>770</y>
+        <width>95</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEditProfileName">
+      <property name="geometry">
+       <rect>
+        <x>124</x>
+        <y>732</y>
+        <width>246</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsFile">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>101</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>374</x>
+        <y>78</y>
+        <width>41</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Hide</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsTarget">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>140</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsFrame">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>180</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsFilter">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>221</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsTemp">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>301</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsYbinning">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>381</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsXbinning">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>341</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsExposure">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>261</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsSitelong">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>459</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsDec">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>541</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsRa">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>501</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsSitelat">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>422</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsGain">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>619</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsOffset">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>657</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBoxFitsDate">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>581</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+C, Ctrl+V</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_4">
      <property name="geometry">
       <rect>
-       <x>456</x>
-       <y>430</y>
-       <width>261</width>
-       <height>231</height>
+       <x>20</x>
+       <y>10</y>
+       <width>391</width>
+       <height>241</height>
       </rect>
      </property>
      <property name="title">
@@ -1676,7 +2083,7 @@
       <property name="geometry">
        <rect>
         <x>7</x>
-        <y>61</y>
+        <y>49</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -1689,8 +2096,8 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>57</y>
-        <width>91</width>
+        <y>45</y>
+        <width>211</width>
         <height>26</height>
        </rect>
       </property>
@@ -1702,8 +2109,8 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>90</y>
-        <width>121</width>
+        <y>83</y>
+        <width>251</width>
         <height>26</height>
        </rect>
       </property>
@@ -1737,7 +2144,7 @@
       <property name="geometry">
        <rect>
         <x>7</x>
-        <y>94</y>
+        <y>87</y>
         <width>101</width>
         <height>18</height>
        </rect>
@@ -1750,7 +2157,7 @@
       <property name="geometry">
        <rect>
         <x>7</x>
-        <y>127</y>
+        <y>124</y>
         <width>111</width>
         <height>18</height>
        </rect>
@@ -1762,9 +2169,9 @@
      <widget class="QSpinBox" name="spinBoxDefaultTimeStart">
       <property name="geometry">
        <rect>
-        <x>120</x>
+        <x>172</x>
         <y>120</y>
-        <width>54</width>
+        <width>71</width>
         <height>27</height>
        </rect>
       </property>
@@ -1778,9 +2185,9 @@
      <widget class="QSpinBox" name="spinBoxDefaultTimeEnd">
       <property name="geometry">
        <rect>
-        <x>187</x>
+        <x>300</x>
         <y>120</y>
-        <width>54</width>
+        <width>71</width>
         <height>27</height>
        </rect>
       </property>
@@ -1794,8 +2201,8 @@
      <widget class="QPushButton" name="pushButtonSelectDb">
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>57</y>
+        <x>340</x>
+        <y>45</y>
         <width>31</width>
         <height>26</height>
        </rect>
@@ -1804,14 +2211,101 @@
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButtonSaveConfig">
+      <property name="geometry">
+       <rect>
+        <x>274</x>
+        <y>200</y>
+        <width>95</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>123</x>
+        <y>124</y>
+        <width>51</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>From</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>125</y>
+        <width>31</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>To</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelMonthsFilter">
+      <property name="geometry">
+       <rect>
+        <x>7</x>
+        <y>161</y>
+        <width>111</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Filter Months</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBoxMonthsFilter">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>158</y>
+        <width>251</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>12</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>24</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>48</string>
+       </property>
+      </item>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
-       <x>456</x>
-       <y>20</y>
-       <width>261</width>
-       <height>381</height>
+       <x>20</x>
+       <y>300</y>
+       <width>391</width>
+       <height>391</height>
       </rect>
      </property>
      <property name="title">
@@ -1861,7 +2355,7 @@
        <rect>
         <x>120</x>
         <y>310</y>
-        <width>121</width>
+        <width>251</width>
         <height>26</height>
        </rect>
       </property>
@@ -1900,7 +2394,7 @@
        <rect>
         <x>120</x>
         <y>70</y>
-        <width>121</width>
+        <width>251</width>
         <height>26</height>
        </rect>
       </property>
@@ -1913,7 +2407,7 @@
        <rect>
         <x>120</x>
         <y>30</y>
-        <width>121</width>
+        <width>251</width>
         <height>26</height>
        </rect>
       </property>
@@ -1923,7 +2417,7 @@
        <rect>
         <x>120</x>
         <y>230</y>
-        <width>121</width>
+        <width>251</width>
         <height>26</height>
        </rect>
       </property>
@@ -1936,7 +2430,7 @@
        <rect>
         <x>120</x>
         <y>110</y>
-        <width>121</width>
+        <width>251</width>
         <height>26</height>
        </rect>
       </property>
@@ -1988,7 +2482,7 @@
        <rect>
         <x>120</x>
         <y>270</y>
-        <width>121</width>
+        <width>251</width>
         <height>26</height>
        </rect>
       </property>
@@ -2001,7 +2495,7 @@
        <rect>
         <x>120</x>
         <y>151</y>
-        <width>121</width>
+        <width>251</width>
         <height>26</height>
        </rect>
       </property>
@@ -2014,7 +2508,7 @@
        <rect>
         <x>120</x>
         <y>190</y>
-        <width>121</width>
+        <width>251</width>
         <height>26</height>
        </rect>
       </property>
@@ -2022,18 +2516,151 @@
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButtonSaveFilter">
+      <property name="geometry">
+       <rect>
+        <x>274</x>
+        <y>350</y>
+        <width>95</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+     </widget>
     </widget>
-    <widget class="QPushButton" name="pushButtonSaveSettings">
+    <widget class="QComboBox" name="comboBoxProfile">
      <property name="geometry">
       <rect>
-       <x>620</x>
-       <y>670</y>
-       <width>95</width>
+       <x>594</x>
+       <y>44</y>
+       <width>246</width>
        <height>26</height>
       </rect>
      </property>
+    </widget>
+    <widget class="QLabel" name="labelProfile">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>49</y>
+       <width>111</width>
+       <height>18</height>
+      </rect>
+     </property>
      <property name="text">
-      <string>Save</string>
+      <string>Choose Profile</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBoxCoordFormat">
+     <property name="geometry">
+      <rect>
+       <x>594</x>
+       <y>703</y>
+       <width>246</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Decimal</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hour Angle</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="labelCoordFormat">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>707</y>
+       <width>111</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Coord Format</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelCoordFormat_2">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>746</y>
+       <width>101</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Profile Name</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="fitsHeaderTab">
+    <attribute name="title">
+     <string>FITS Header</string>
+    </attribute>
+    <widget class="QPlainTextEdit" name="plainTextEditFitsHeader">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>1621</width>
+       <height>621</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBoxFitsHeader">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>471</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>FITS File Header Parser</string>
+     </property>
+     <widget class="QPushButton" name="pushButtonFitsHeader">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>30</y>
+        <width>105</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Choose File</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEditFitsHeader">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>311</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QPlainTextEdit" name="plainTextEditMsg">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>740</y>
+       <width>1621</width>
+       <height>70</height>
+      </rect>
      </property>
     </widget>
    </widget>

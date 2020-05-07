@@ -17,7 +17,7 @@ from PyQt5 import QtWidgets
 
 from dateutil.relativedelta import relativedelta
 
-'''
+"""
 The table view containing the image list. It reads
 the database and set it as a source model. Then
 the model's view is handled through a proxy model.
@@ -27,8 +27,10 @@ So main objects in this class are:
 - The table view: tableViewImages
 Keep in mind that some methods are defined in the parent 
 MainW class
-''' 
-class ImageListTab():
+"""
+
+
+class ImageListTab:
 
     logger = logging.getLogger(__name__)
 
@@ -43,20 +45,19 @@ class ImageListTab():
 
         # Table Source model
         self.mainW.imageSourceModel = QtSql.QSqlTableModel()
-        self.mainW.imageSourceModel.setTable('images')
+        self.mainW.imageSourceModel.setTable("images")
         self.mainW.imageSourceModel.setSort(3, QtCore.Qt.DescendingOrder)
 
         self.mainW.imageSourceModel.select()
-        while (self.mainW.imageSourceModel.canFetchMore()):
+        while self.mainW.imageSourceModel.canFetchMore():
             self.mainW.imageSourceModel.fetchMore()
         self.logger.info("set source")
         # Proxy model used for filtering and sorting.
         self.mainW.imageListModel.setDynamicSortFilter(True)
         self.mainW.imageListModel.setSourceModel(self.mainW.imageSourceModel)
 
-        for i, label in enumerate(self.app.filterDictToList('description')):
-            self.mainW.imageListModel.setHeaderData(
-                i, QtCore.Qt.Horizontal, label)
+        for i, label in enumerate(self.app.filterDictToList("description")):
+            self.mainW.imageListModel.setHeaderData(i, QtCore.Qt.Horizontal, label)
 
         self.mainW.ui.tableViewImages.horizontalHeader().setStretchLastSection(True)
 
@@ -67,7 +68,8 @@ class ImageListTab():
         self.mainW.ui.tableViewImages.setModel(self.mainW.imageListModel)
         self.mainW.ui.tableViewImages.setTextElideMode(QtCore.Qt.ElideLeft)
         self.mainW.ui.tableViewImages.setEditTriggers(
-            QtGui.QAbstractItemView.NoEditTriggers)
+            QtGui.QAbstractItemView.NoEditTriggers
+        )
 
         fd = FileDelegate(self.mainW.ui.tableViewImages)
         self.mainW.ui.tableViewImages.setItemDelegateForColumn(1, fd)
@@ -83,18 +85,10 @@ class ImageListTab():
         self.mainW.ui.tableViewImages.setItemDelegateForColumn(26, rd)
         self.mainW.ui.tableViewImages.setItemDelegateForColumn(27, rd)
         self.mainW.ui.tableViewImages.setItemDelegateForColumn(28, rd)
-
-        self.mainW.ui.tableViewImages.hideColumn(0)  # Hide ID
-        self.mainW.ui.tableViewImages.hideColumn(2)  # Hide HASH
-        self.mainW.ui.tableViewImages.hideColumn(9)  # Hide Bin Y
-        self.mainW.ui.tableViewImages.hideColumn(10)  # Hide Site position
-        self.mainW.ui.tableViewImages.hideColumn(11)  # Hide Site position
-        self.mainW.ui.tableViewImages.hideColumn(19)
-        self.mainW.ui.tableViewImages.hideColumn(20)
-        self.mainW.ui.tableViewImages.hideColumn(21)
-        self.mainW.ui.tableViewImages.hideColumn(22)
-        self.mainW.ui.tableViewImages.hideColumn(23)
-        self.mainW.ui.tableViewImages.hideColumn(24)
+        hideColList = self.app.filterDictToList("hide", "hide")
+        for col, val in enumerate(hideColList):
+            if val > 0:
+                self.mainW.ui.tableViewImages.hideColumn(col)
 
 
 class FileDelegate(QtWidgets.QStyledItemDelegate):
@@ -111,6 +105,6 @@ class RoundDelegate(QtWidgets.QStyledItemDelegate):
 
 class DateDelegate(QtWidgets.QStyledItemDelegate):
     def displayText(self, value, locale):
-        utcDate = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f')
+        utcDate = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
         value = utcDate.strftime("%Y-%m-%d  %H:%M:%S")
         return super(DateDelegate, self).displayText(value, locale)

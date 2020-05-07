@@ -13,9 +13,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(762, 1052)
+        Dialog.resize(762, 1015)
         self.groupBox = QtWidgets.QGroupBox(Dialog)
-        self.groupBox.setGeometry(QtCore.QRect(10, 470, 741, 571))
+        self.groupBox.setGeometry(QtCore.QRect(10, 440, 741, 571))
         self.groupBox.setObjectName("groupBox")
         self.lineEditFile = QtWidgets.QLineEdit(self.groupBox)
         self.lineEditFile.setGeometry(QtCore.QRect(130, 30, 591, 26))
@@ -186,7 +186,7 @@ class Ui_Dialog(object):
         self.lineEditDataUnit.setGeometry(QtCore.QRect(520, 354, 201, 26))
         self.lineEditDataUnit.setObjectName("lineEditDataUnit")
         self.MplWidget = QtWidgets.QWidget(Dialog)
-        self.MplWidget.setGeometry(QtCore.QRect(39, 4, 711, 441))
+        self.MplWidget.setGeometry(QtCore.QRect(30, 0, 691, 441))
         self.MplWidget.setObjectName("MplWidget")
 
         self.retranslateUi(Dialog)

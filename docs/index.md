@@ -11,15 +11,15 @@ Astro(nomy) Dom(ine) is a catalogue tool for deep sky images. It scans the direc
 
 AstroDom was tested with FITS files written by MaximDL (v4 and v6), Ekos/INDI, SGP but any other software is supported through custom profiles.
 
-## Basic operation workflow
-After installation you will find data from a demo database of images.  AstroDom these are the suggested steps to follow:
+## Basic configuration workflow
+After installation you can have a loot at a demo database of images or build your own following these steps:
 
 1. Check that your software FITS keywords are matched with AstroDom's ([here](fitsHeader.md))   
 2. Fix unmatched FITS keyword and default values ([here](settings.md))
 3. Import FITS file from any directory on your PC ([here](importFits.md))
 4. Optionally add information about FWHM, Eccentricity, Noise and SNR ([here](importCsv.md))
 
-Thats'it, you can then browse through your images, 
+Thats'it, you can now browse through your images.
 
 ## Documentation Index
 - [Installation](install.md)

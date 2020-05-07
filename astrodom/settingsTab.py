@@ -349,6 +349,15 @@ class SettingsTab:
             self.logger.debug(self.app.confFilters)
 
     def saveConfig(self):
+
+        if len(self.mainW.ui.lineEditDbname.text()) == 0:
+            QMessageBox.about(
+                None,
+                "Message",
+                "Enter a name to create a new database or choose an existing one.",
+            )
+            return
+
         self.app.config["dbname"] = self.mainW.ui.lineEditDbname.text()
         self.app.config["debug"] = self.mainW.ui.comboBoxDebug.currentText()
         self.app.config["profile"] = self.mainW.ui.lineEditProfileName.text()

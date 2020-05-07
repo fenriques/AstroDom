@@ -76,6 +76,93 @@ class MainWindow(QDialog):
         self.ui.comboBoxProfile.currentTextChanged.connect(
             self.settingsTab.selectionchange
         )
+        # Settings input validation
+        self.ui.lineEditDbname.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveConfig.setEnabled(
+                self.ui.lineEditDbname.text() != ""
+            )
+        )
+        self.ui.lineEditFitsFile.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsFile.text() != ""
+            )
+        )
+        self.ui.lineEditFitsTarget.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsTarget.text() != ""
+            )
+        )
+        self.ui.lineEditFitsFrame.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsFrame.text() != ""
+            )
+        )
+        self.ui.lineEditFitsFilter.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsFilter.text() != ""
+            )
+        )
+        self.ui.lineEditFitsExposure.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsExposure.text() != ""
+            )
+        )
+        self.ui.lineEditFitsTemp.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsTemp.text() != ""
+            )
+        )
+        self.ui.lineEditFitsXbinning.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsXbinning.text() != ""
+            )
+        )
+        self.ui.lineEditFitsYbinning.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsYbinning.text() != ""
+            )
+        )
+        self.ui.lineEditFitsSitelat.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsSitelat.text() != ""
+            )
+        )
+        self.ui.lineEditFitsSitelong.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsSitelong.text() != ""
+            )
+        )
+        self.ui.lineEditFitsRa.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsRa.text() != ""
+            )
+        )
+        self.ui.lineEditFitsDec.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsDec.text() != ""
+            )
+        )
+        self.ui.lineEditFitsDate.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsDate.text() != ""
+            )
+        )
+        self.ui.lineEditFitsGain.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsGain.text() != ""
+            )
+        )
+        self.ui.lineEditFitsOffset.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditFitsOffset.text() != ""
+            )
+        )
+        self.ui.lineEditProfileName.textChanged[str].connect(
+            lambda: self.ui.pushButtonSaveProfile.setEnabled(
+                self.ui.lineEditProfileName.text() != ""
+            )
+        )
+
         # Fits Header Tab Connects
         self.ui.pushButtonFitsHeader.clicked.connect(self.fitsHeaderTab.readHeaders)
 

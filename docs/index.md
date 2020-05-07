@@ -14,7 +14,7 @@ AstroDom was tested with FITS files written by MaximDL (v4 and v6), Ekos/INDI, S
 ## Basic operation workflow
 After installation you will find data from a demo database of images.  AstroDom these are the suggested steps to follow:
 
- 1. Check that your software FITS keywords are matched with AstroDom's ([here](fitsHeader.md))   
+1. Check that your software FITS keywords are matched with AstroDom's ([here](fitsHeader.md))   
 2. Fix unmatched FITS keyword and default values ([here](settings.md))
 3. Import FITS file from any directory on your PC ([here](importFits.md))
 4. Optionally add information about FWHM, Eccentricity, Noise and SNR ([here](importCsv.md))
@@ -22,14 +22,14 @@ After installation you will find data from a demo database of images.  AstroDom 
 Thats'it, you can then browse through your images, 
 
 ## Documentation Index
-[Installation](install.md)
-[FITS Header Parser](fitsHeader.md)
-[Configuration and Settings](settings.md)
-[PixInsight's SubFrameSelector CSV Import](importCsv.md)
-[Import FITS files](importFits.md)
-[Image List](imageList.md)
-[Charts](chart.md)
-[Image Details](imageDetails.md)
+- [Installation](install.md)
+- [FITS Header Parser](fitsHeader.md)
+- [Configuration and Settings](settings.md)
+- [PixInsight's SubFrameSelector CSV Import](importCsv.md)
+- [Import FITS files](importFits.md)
+- [Image List](imageList.md)
+- [Charts](chart.md)
+- [Image Details](imageDetails.md)
 
 ## Roadmap
 ### TODO:

@@ -10,7 +10,7 @@ With the Charts tool you can discover important information about your data, e.g
 -   How many hours for each filter
 
 AstroDom was tested with FITS files written by MaximDL (v4 and v6), Ekos/INDI, SGP but any other software is supported through custom profiles.
-Check the documentation here: [Documentation](index.md)
+Check the documentation here: [Documentation](/docs/index.md)
 
 # Features
 - Scans recursively filesystem directories searching for FITS files.

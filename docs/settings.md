@@ -5,7 +5,7 @@ Here you can configure AstroDom settings using these three boxes:
 - Filter Keywords
 - FITS Profiles
 
-![Settings Tab](settings.png)
+![Settings Tab](settings.png?raw=true)
 
 ## Config 
 

@@ -26,7 +26,7 @@ Thats'it, you can now browse through your images.
 - [PixInsight's SubFrameSelector CSV Import](importCsv.md)
 - [Import FITS files](importFits.md)
 - [Image List](imageList.md)
-- [Charts](chart.md)
+- [Charts](charts.md)
 - [Image Details](imageDetails.md)
 
 ## Roadmap

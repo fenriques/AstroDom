@@ -21,13 +21,13 @@ Thats'it, you can now browse through your images.
 
 ## Documentation Index
 - [Installation](install.md)
-- [FITS Header Parser](fitsHeader.md)
-- [Configuration and Settings](settings.md)
-- [PixInsight's SubFrameSelector CSV Import](importCsv.md)
-- [Import FITS files](importFits.md)
 - [Image List](imageList.md)
 - [Charts](charts.md)
-- [Image Details](imageDetails.md)
+- [Import FITS files](importFits.md)
+- [PixInsight's SubFrameSelector CSV Import](importCsv.md)
+- [Configuration and Settings](settings.md)
+- [FITS Header Parser](fitsHeader.md)
+- [Image Details](imageDetail.md)
 
 ## Roadmap
 ### TODO:

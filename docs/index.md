@@ -60,6 +60,7 @@ Thats'it, you can now browse through your images.
 - Import: Log messages to GUI (https://docs.python.org/3/howto/logging-cookbook.html)
 - Settings: Save profile
 
+
 **v0.1**
 - Image List: months interval in Settings
 - Select Database

@@ -12,7 +12,7 @@ When the directory is opened, clicking **Load Files** populates the main windows
 
 ![Loading FITS data](importFits2.png?raw=true)
 
-Both the log frame and the data table will highlight issues, the log will be more descriptive in the message.
+Both the log frame and the data table will highlight issues, the log will print a  more descriptive  message.
 To correct these problems try to:
 - Review  keywords and default values as explained in [Settings](settings.md), see image below.
 - Edit single cell values and press 'enter'
@@ -21,7 +21,7 @@ To correct these problems try to:
 
 Fits file missing some keywords (Frame type and Gain):![Errors in some keywords](importFits4.png?raw=true)
 
-Same situation with corrected values (Frame Type matched correct keyword and Gain was given a default value:
+Same situation with corrected values (Frame Type matched correct keyword and Gain was given a default value):
 ![Corrected values](importFits5.png?raw=true)
 
 Pressing **Insert DB** will save data into the database:
@@ -30,6 +30,8 @@ Pressing **Insert DB** will save data into the database:
 If images are already found in the database they will not be saved. AstroDom doesn't read the filename, it computes an hash (a fingerprint) of the image.
 ![already inserted](importFits7.png?raw=true)
 
+# Recap
+This tool manages FITS data imports and saves them to the database. Afterwards, data are available in [Image List](imageList.md) or [PixInsight's SubFrameSelector CSV Import](importCsv.md) can be optionally added. 
 
 
 

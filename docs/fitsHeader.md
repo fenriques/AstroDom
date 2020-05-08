@@ -14,7 +14,7 @@ In the log, keywords that are set by default values are shown in blue.
 
 ![FITS File Headers](fitsHeader.png?raw=true)
 
-## Conclusion
+## Recap
 Before trying to import FITS file you should check with this tool that all keywords are ok through matching or default values. 
 
 

@@ -24,6 +24,7 @@ classes it is referenced as 'app'.
 
 
 class AstroDom:
+    astrodomDir = os.getcwd()
     directory = os.path.dirname(__file__)
     with open(os.path.join(directory, "config", "config.json"), "r") as config:
         config = json.load(config)

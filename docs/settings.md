@@ -8,6 +8,8 @@ Here you can configure AstroDom settings using these three boxes:
 ![Settings Tab](settings.png?raw=true)
 
 ## Config 
+- **AstroDom Dir**: prints the path where AstroDom is installed. Knowing the directory is useful when you have to select a  database .db file or access logs.
+ 
 
 - **Database**: is the name of your local AstroDom storage  based on a SQLite rdbms. Db files (with .db extension) are located in /astrodom/config directory.
 Entering a text in the form will create a new database; you can have as many databases as you want and this will help organizing your data. AstroDom has been tested with thousands of records. But if you see filters and searches slowing down it could be the case of segregate some data in a new database. 

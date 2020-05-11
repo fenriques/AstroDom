@@ -68,7 +68,8 @@ class MainWindow(QDialog):
         self.ui.groupBoxFitsHeader.setTitle(
             "Fits file header parser (profile: " + self.app.config["profile"] + ")"
         )
-        # Setting tab connetcs
+        # Setting tab
+        self.ui.lineEditModuleDir.setText(self.app.astrodomDir)
         self.ui.pushButtonSaveFilter.clicked.connect(self.settingsTab.saveFilter)
         self.ui.pushButtonSaveConfig.clicked.connect(self.settingsTab.saveConfig)
         self.ui.pushButtonSaveProfile.clicked.connect(self.settingsTab.saveProfile)

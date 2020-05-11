@@ -187,7 +187,7 @@ class SettingsTab:
         dbName, _ = QFileDialog.getOpenFileName(
             self.mainW,
             "Select a SQLite file to open…",
-            QtCore.QDir.homePath(),
+            os.path.join(self.app.directory, "config"),
             "SQLite Files (*.db) ;; All Files (*)",
         )
         if dbName:

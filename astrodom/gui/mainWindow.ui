@@ -2073,7 +2073,7 @@
        <x>20</x>
        <y>10</y>
        <width>391</width>
-       <height>241</height>
+       <height>281</height>
       </rect>
      </property>
      <property name="title">
@@ -2083,7 +2083,7 @@
       <property name="geometry">
        <rect>
         <x>7</x>
-        <y>49</y>
+        <y>92</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -2096,7 +2096,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>45</y>
+        <y>88</y>
         <width>211</width>
         <height>26</height>
        </rect>
@@ -2109,7 +2109,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>83</y>
+        <y>126</y>
         <width>251</width>
         <height>26</height>
        </rect>
@@ -2144,7 +2144,7 @@
       <property name="geometry">
        <rect>
         <x>7</x>
-        <y>87</y>
+        <y>130</y>
         <width>101</width>
         <height>18</height>
        </rect>
@@ -2157,7 +2157,7 @@
       <property name="geometry">
        <rect>
         <x>7</x>
-        <y>124</y>
+        <y>167</y>
         <width>111</width>
         <height>18</height>
        </rect>
@@ -2170,7 +2170,7 @@
       <property name="geometry">
        <rect>
         <x>172</x>
-        <y>120</y>
+        <y>163</y>
         <width>71</width>
         <height>27</height>
        </rect>
@@ -2186,7 +2186,7 @@
       <property name="geometry">
        <rect>
         <x>300</x>
-        <y>120</y>
+        <y>163</y>
         <width>71</width>
         <height>27</height>
        </rect>
@@ -2202,7 +2202,7 @@
       <property name="geometry">
        <rect>
         <x>340</x>
-        <y>45</y>
+        <y>88</y>
         <width>31</width>
         <height>26</height>
        </rect>
@@ -2215,7 +2215,7 @@
       <property name="geometry">
        <rect>
         <x>274</x>
-        <y>200</y>
+        <y>243</y>
         <width>95</width>
         <height>26</height>
        </rect>
@@ -2228,7 +2228,7 @@
       <property name="geometry">
        <rect>
         <x>123</x>
-        <y>124</y>
+        <y>167</y>
         <width>51</width>
         <height>18</height>
        </rect>
@@ -2241,7 +2241,7 @@
       <property name="geometry">
        <rect>
         <x>270</x>
-        <y>125</y>
+        <y>168</y>
         <width>31</width>
         <height>18</height>
        </rect>
@@ -2254,7 +2254,7 @@
       <property name="geometry">
        <rect>
         <x>7</x>
-        <y>161</y>
+        <y>204</y>
         <width>111</width>
         <height>18</height>
        </rect>
@@ -2267,7 +2267,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>158</y>
+        <y>201</y>
         <width>251</width>
         <height>26</height>
        </rect>
@@ -2297,6 +2297,32 @@
         <string>48</string>
        </property>
       </item>
+     </widget>
+     <widget class="QLineEdit" name="lineEditModuleDir">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>50</y>
+        <width>251</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>7</x>
+        <y>54</y>
+        <width>101</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>AstrDom Dir</string>
+      </property>
      </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_5">

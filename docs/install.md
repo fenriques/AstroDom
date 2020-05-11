@@ -19,8 +19,9 @@ To install AstroDom, create a directory on your system where you will store Astr
 Any name is ok, but let's say '**astrodom**'. 
 Download one of the following script to 'astrodom':
 
-Linux: https://github.com/fenriques/resources/astrodom_linux_install.sh
-Windows: https://github.com/fenriques/resources/astrodom_windows_install.bat
+Linux: https://github.com/fenriques/AstroDom/blob/master/resources/astrodom_linux_install.sh
+
+Windows: https://github.com/fenriques/AstroDom/blob/master/resources/astrodom_windows_install.bat
 
 Run the script from the terminal. The script is automating the following steps that you can enter manually if you prefer:
 On Linux:
@@ -40,8 +41,9 @@ On Linux:
 ## Run AstroDom
  Download one of the following script to 'astrodom':
 
-Linux: https://github.com/fenriques/resources/astrodom_linux_run.sh
-Windows: https://github.com/fenriques/resources/astrodom_windows_run.bat
+Linux: https://github.com/fenriques/AstroDom/blob/master/resources/astrodom_linux_run.sh
+
+Windows: https://github.com/fenriques/AstroDom/blob/master/resources/astrodom_windows_run.bat
 
 Run the script from the terminal. Else follow these steps:
 On Linux:

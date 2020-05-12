@@ -2,12 +2,14 @@
 # Installation
 ## Requirements
 AstroDom is developed using Python's QT bindings (PyQT) and thus can be installed on Linux, Windows and MacOS platforms.
-AstrDom is all about presenting data, so it needs high definition displays (1920x1080). 
+AstroDom is all about presenting data, so it needs high definition display (1920x1080 or higher). 
+
 FITS header data are read from astro imaging software like Astro Photography Tool, Sequence Generator Pro, BackyardEOS, MaximDL, Nebulosity, N.I.N.A., CCDCiel and INDI/Ekos. 
 All these softwares are supported even though it has been tested extensively on INDI/Ekos and MaximDL only.
 
 ## Prerequisites: Python and Venv
 AstroDom installs either in a virtual environment or over the main python installation;  Setting up a python virtual environment is recommended not to mess up your other Python apps. 
+
 Installation of Python and venv is not the main purpose of this document; you can search for many resource that have step by step instruction for your platform.
 On a terminal window check  which Python and Virtualenv are installed.
 
@@ -21,12 +23,12 @@ To install AstroDom, create a directory on your system where you will store Astr
 Any name is ok, but let's say '**astrodom**'. 
 ### Script based installation
 Download one of the following script to 'astrodom':
+
 Linux: https://github.com/fenriques/AstroDom/blob/master/resources/astrodom_linux.zip
 
 Windows: https://github.com/fenriques/AstroDom/blob/master/resources/astrodom_windows.zip
 
 Extract the content to 'astrodom' and run the .sh (Linux) or .bat (Win) install script from a terminal window. 
-On Linux remember to make script executables: chmod +x *.sh
 
 Then to run AstroDom, execute the run script. 
 Do not move the run script outside of the 'astrodom' directory; rather  create a desktop icon to launch this script.
@@ -60,4 +62,9 @@ Install on Windows:
     venv\Scripts\activate 
     cd venv\Lib\site-packages
     python -m astrodom
+
+### Installation Notes:
+On Linux remember to make script executables: chmod +x *.sh
+On Linux depending on the python version you could need to update commands both in the manual and script installation. For example ' cd ./venv/lib/python3.7/site-packages' instead of ' cd ./venv/lib/python3.6/site-packages'.
+On Windows you could need to change DPI settings if the character are too small.
 

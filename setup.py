@@ -19,9 +19,9 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="astrodom",
-    version="0.2.0",
+    version="0.2.1",
     packages=find_packages(),
-    python_requires=">=3.6, <3.9",
+    python_requires=">=3.6, <3.8",
     install_requires=[
         "astropy==4.0",
         "matplotlib==3.1.3",
@@ -43,7 +43,6 @@ setup(
         "Environment :: Other Environment",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3 :: Only",
-        "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows :: Windows 10",
         "Operating System :: POSIX :: Linux",
         "Intended Audience :: Education",

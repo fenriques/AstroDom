@@ -718,7 +718,7 @@ class Ui_Dialog(object):
         self.tabWidget.addTab(self.fitsHeaderTab, "")
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):

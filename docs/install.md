@@ -26,8 +26,9 @@ Linux: https://github.com/fenriques/AstroDom/blob/master/resources/astrodom_linu
 Windows: https://github.com/fenriques/AstroDom/blob/master/resources/astrodom_windows.zip
 
 Extract the content to 'astrodom' and run the .sh (Linux) or .bat (Win) install script from a terminal window. 
+On Linux remember to make script executables: chmod +x *.sh
 
-To run AstroDom, execute the run script. 
+Then to run AstroDom, execute the run script. 
 Do not move the run script outside of the 'astrodom' directory; rather  create a desktop icon to launch this script.
 
 ### Manual installation
@@ -59,3 +60,4 @@ Install on Windows:
     venv\Scripts\activate 
     cd venv\Lib\site-packages
     python -m astrodom
+

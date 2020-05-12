@@ -10,7 +10,7 @@ The catalogue can be used to keep track of your imaging sessions and to benchmar
 AstroDom was tested with FITS files written by MaximDL (v4 and v6), Ekos/INDI, SGP but any other software is supported through custom profiles.
 
 ## Basic configuration workflow
-After installation you can have a look at a demo database of images or build your own following these steps:
+After [Installation](install.md) you can have a look at a demo database of images or build your own following these steps:
 
 1. Check that your software FITS keywords are matched with AstroDom's ([here](fitsHeader.md))   
 2. Fix unmatched FITS keyword and default values ([here](settings.md))

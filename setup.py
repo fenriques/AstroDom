@@ -10,16 +10,31 @@
 #
 ###########################################################
 from setuptools import setup, find_packages
+import codecs
+import os
 
-from os import path
 
-this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
-    long_description = f.read()
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with codecs.open(os.path.join(here, rel_path), "r") as fp:
+        return fp.read()
+
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith("__version__"):
+            # __version__ = "0.9"
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
+
+long_description = read("README.md")
 
 setup(
     name="astrodom",
-    version="0.2.1",
+    version=get_version("astrodom/__init__.py"),
     packages=find_packages(),
     python_requires=">=3.6, <3.9",
     install_requires=[

@@ -9,6 +9,7 @@ import sys
 import os
 import json
 import logging
+import codecs
 from PyQt5 import QtSql
 from datetime import date
 
@@ -68,7 +69,7 @@ class AstroDom:
             logging.ERROR: "red",
             logging.CRITICAL: "purple",
         }
-
+        self.version = self.get_version("__init__.py")
         # Create db connection
         if not self.createConnection():
             QMessageBox.about(None, "Message", "Cannot connect to database.")
@@ -124,3 +125,17 @@ class AstroDom:
             self.logger.warning(str(ret.lastError().text()))
 
         self.logger.info("DB setup complete")
+
+    def read(self, rel_path):
+        here = os.path.abspath(os.path.dirname(__file__))
+        with codecs.open(os.path.join(here, rel_path), "r") as fp:
+            return fp.read()
+
+    def get_version(self, rel_path):
+        for line in self.read(rel_path).splitlines():
+            if line.startswith("__version__"):
+                # __version__ = "0.9"
+                delim = '"' if '"' in line else "'"
+                return line.split(delim)[1]
+        else:
+            raise RuntimeError("Unable to find version string.")

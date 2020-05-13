@@ -37,7 +37,6 @@ class MainWindow(QDialog):
         self.ui.setupUi(self)
         self.show()
 
-
         self.imageListModel = SortFilterProxyModel(self.ui)
         self.imageListTab = ImageListTab(self, app)
         self.importFitsTab = ImportFitsTab(self, app)
@@ -45,7 +44,7 @@ class MainWindow(QDialog):
         self.settingsTab = SettingsTab(self, app)
         self.fitsHeaderTab = FitsHeaderTab(self, app)
 
-        self.setWindowTitle("AstroDom")
+        self.setWindowTitle("AstroDom " + self.app.version)
 
         # Import dir thread
         self.importDir = ImportDir(self.app)

@@ -55,7 +55,7 @@ class ImportCsvTab():
                 csvreader = csv.reader(fh)
                 dataTemp = list(csvreader)
             self.mainW.ui.lineEditCsv.setText(filename)
-            self.logger.info(f"Opened {filename}")
+            self.logger.info(f"Reading {filename}")
 
         csvList = self.app.filterDictToList('pix_csv')
 
@@ -63,6 +63,7 @@ class ImportCsvTab():
         checkCsv = False
         self._data = []
         self._headers = []
+        i = 1
         for row, val in enumerate(dataTemp):
             if dataTemp[row][0] == 'Subframe Scale':
                 subframeScale = str(dataTemp[row][1])
@@ -82,6 +83,8 @@ class ImportCsvTab():
                 dataTemp[row].insert(3, scaleUnit)
                 dataTemp[row].insert(4, dataUnit)
 
+                self.logger.info(f"Row n {i}")
+                i+=1
                 # Items (columns) for each row
                 filteredRow = []
                 for col in range(len(val)):
@@ -112,35 +115,31 @@ class ImportCsvTab():
                             if r.value(0):
                                 strStatus = "File found"
                                 self.logger.info(
-                                    f"File {filenameMatch} found")
+                                    f"File {filenameMatch} found in the database")
                             else:
                                 strStatus = "File not found"
                                 self.logger.error(
-                                    f"File {filenameMatch} not found")
+                                    f"File {filenameMatch} not found in the database")
 
                         filteredRow.insert(col, str(item))
                 
                 # Append info about matching fits file found/not found
                 filteredRow.insert(len(filteredRow), strStatus)
-                        
                 self._data.append(filteredRow)
 
-            # Headers row
+            # Headers row are read after 'index' in csv file.
             if dataTemp[row][0] == 'Index':
                 self._headers = self.app.filterDictToList(
                     'pix_csv', 'description')
                 self._headers.append('Matching FITS File')
                 checkCsv = True
-
+                
+        if checkCsv == True:
             self.model = ImportTableModel(self._data, self._headers)
             self.mainW.ui.tableViewImportCsv.setModel(self.model)
-            self.mainW.ui.tableViewImportCsv.setSortingEnabled(True)
-
-    def filterHeaders(self, csvHeaders):
-        csvList = self.app.filterDictToList('pix_csv')
-        print("svList "+csvList)
-        print("svheaders "+csvHeaders)
-        return csvHeaders in csvList
+            self.mainW.ui.tableViewImportCsv.setSortingEnabled(False)
+        else:
+            self.logger.error("Invalid CSV format")
 
     def deleteRows(self):
         selected = self.mainW.ui.tableViewImportCsv.selectedIndexes()
@@ -158,7 +157,7 @@ class ImportCsvTab():
             hash = hasher.hexdigest()
             return hash
         except Exception as e:
-            self.logger.error(f"CSV match, Fits file not found:  {fileName}")
+            self.logger.error(f"Hash file: fits not found:  {fileName}")
         return ""
 
     # Data from PI csv (FWHM, Noise etc) are imported in db
@@ -168,6 +167,7 @@ class ImportCsvTab():
         rows = self.model.rowCount(self.mainW.ui.tableViewImportCsv.rootIndex())
         self.logger.info(f"Saving {rows} CSV rows")
         
+        # Each row from table view is an SQL update statement
         for row in range(rows):
             query = "UPDATE images SET "
             csvHash = ''
@@ -195,7 +195,7 @@ class ImportCsvTab():
                         self.logger.error(f"{fileName} not found")
                     else:
                         self.model.setData(
-                            self.model.index(row, 5), "OK: FITS file updated", QtCore.Qt.EditRole)
+                            self.model.index(row, 10), "OK: FITS file updated", QtCore.Qt.EditRole)
                         self.logger.info(f"{fileName} updated")
                         self.logger.debug(
                             f"OK: FITS file updated with query {query}")
@@ -204,12 +204,12 @@ class ImportCsvTab():
                 self.logger.error(f"Update error {e}")
 
             self.model.layoutChanged.emit()
-        self.logger.info("Records updated")
         
         # Force image list data reload
         self.mainW.imageSourceModel.select()
         while (self.mainW.imageSourceModel.canFetchMore()):
             self.mainW.imageSourceModel.fetchMore()
+        self.mainW.filterRegExpChanged()
 
 
 """

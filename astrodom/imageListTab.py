@@ -51,7 +51,7 @@ class ImageListTab:
         self.mainW.imageSourceModel.select()
         while self.mainW.imageSourceModel.canFetchMore():
             self.mainW.imageSourceModel.fetchMore()
-        self.logger.info("set source")
+
         # Proxy model used for filtering and sorting.
         self.mainW.imageListModel.setDynamicSortFilter(True)
         self.mainW.imageListModel.setSourceModel(self.mainW.imageSourceModel)

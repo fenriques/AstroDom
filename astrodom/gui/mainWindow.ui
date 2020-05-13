@@ -40,7 +40,7 @@
      <x>5</x>
      <y>10</y>
      <width>1641</width>
-     <height>851</height>
+     <height>861</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -971,7 +971,7 @@
        <x>10</x>
        <y>110</y>
        <width>1621</width>
-       <height>601</height>
+       <height>561</height>
       </rect>
      </property>
     </widget>
@@ -979,9 +979,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>720</y>
+       <y>680</y>
        <width>1621</width>
-       <height>91</height>
+       <height>141</height>
       </rect>
      </property>
      <property name="readOnly">
@@ -1061,7 +1061,7 @@
        <x>10</x>
        <y>90</y>
        <width>1621</width>
-       <height>621</height>
+       <height>581</height>
       </rect>
      </property>
     </widget>
@@ -1069,9 +1069,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>720</y>
+       <y>680</y>
        <width>1621</width>
-       <height>91</height>
+       <height>141</height>
       </rect>
      </property>
      <property name="readOnly">

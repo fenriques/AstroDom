@@ -157,6 +157,7 @@ class ImportFitsTab:
         self.mainW.imageSourceModel.select()
         while self.mainW.imageSourceModel.canFetchMore():
             self.mainW.imageSourceModel.fetchMore()
+        self.mainW.filterRegExpChanged()
 
 
 """
@@ -192,8 +193,8 @@ class ImportDir(QtCore.QObject):
         fitsKeyList = self.app.filterDictToList("fitsHeader", "keys")
         fitsDefault = self.app.filterDictToList("fitsDefault", "keys")
 
-        for f in fileList:
-            self.logger.info(f"Start reading file {f}")
+        for i, f in enumerate(fileList):
+            self.logger.info(f"{i+1}-Start reading file {f}")
             row = []
 
             # Parse FITS header for given file
@@ -269,7 +270,7 @@ class ImportDir(QtCore.QObject):
                     )
 
             self.logger.debug(row)
-            self.logger.info(f"End reading file {f}")
+            self.logger.info(f"{i+1}-End reading file {f}")
             self.match_found.emit(row)
 
     def parseFitsHeader(self, fitsFile):

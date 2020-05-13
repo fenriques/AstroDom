@@ -44,15 +44,18 @@ class ImportFitsTab:
         h.setLevel(logging.INFO)
         self.logger.addHandler(h)
 
+    # Slot used by ImportDir parser class
     def addResultsToModel(self, row):
         self._data.append(row)
         self.model.layoutChanged.emit()
 
+    # Slot for printing log message in the main thread
     def printLogMessage(self, msg, record):
         color = self.app.COLORS.get(record.levelno, "black")
         s = '<pre><font color="%s">%s</font></pre>' % (color, msg)
         self.mainW.ui.plainTextEditLogFits.appendHtml(s)
 
+    # Directory parser (main thread)
     def importFitsDir(self):
 
         # Choose dir and filter .fits files
@@ -77,20 +80,7 @@ class ImportFitsTab:
         if selected:
             self.model.removeRows(selected[0].row(), 1, None)
 
-    def hashFile(self, fileName):
-        try:
-            with open(fileName, "rb") as afile:
-                hasher = hashlib.md5()
-                buf = afile.read(self.app.BLOCKSIZE)
-                for i in range(5):
-                    hasher.update(buf)
-                    buf = afile.read(self.app.BLOCKSIZE)
-            hash = hasher.hexdigest()
-            return hash
-        except Exception as e:
-            self.logger.error(f"CSV match, Fits file not found:  {fileName}")
-        return ""
-
+    # Saves each row in the tableview into the database
     def saveFits(self):
 
         separator = ","
@@ -100,7 +90,7 @@ class ImportFitsTab:
 
         rows = self.model.rowCount(self.mainW.ui.tableViewImportFits.rootIndex())
         targetOverride = self.mainW.ui.lineEditOverrideTarget.text()
-
+        self.logger.info(f"Start saving {rows} files")
         for row in range(rows):
             emptyCellCheck = True
             query = "INSERT INTO images ( " + sqlInsert + ") VALUES("
@@ -116,15 +106,21 @@ class ImportFitsTab:
                             self.model.index(row, col), item, QtCore.Qt.EditRole
                         )
                     query += "'" + str(item) + "',"
+                    if col == 0:
+                        fileName = str(item)
                 else:
                     # if no value is read in FIT header try default value
                     if val in fitsDefault:
+                        self.logger.error(
+                            "Should not be in here because default values are already set"
+                        )
                         item = self.app.conf[val]["fitsDefault"]
                         query += "'" + str(item) + "',"
                     else:
                         emptyCellCheck = False
 
             if emptyCellCheck == False:
+                self.logger.error(f"File not inserted: {fileName}")
                 continue
             query = query[:-1]
             query += ");"
@@ -149,12 +145,14 @@ class ImportFitsTab:
                         "OK: FITS file saved",
                         QtCore.Qt.EditRole,
                     )
-                    self.logger.debug(f"OK: FITS file saved with query {query}")
+                    self.logger.info(f"Saved file {fileName}")
+                    self.logger.debug(f"FITS file saved with query {query}")
 
             except Exception as e:
                 self.logger.error(f"Insert error {e}")
 
             self.model.layoutChanged.emit()
+        self.logger.info(f"Saving completed")
         # Force image list reload data
         self.mainW.imageSourceModel.select()
         while self.mainW.imageSourceModel.canFetchMore():
@@ -164,7 +162,7 @@ class ImportFitsTab:
 """
 ImportDir is the thread reading FITS files. Should be
 moved to a separate files but is kept here just for
-convenience. 
+convenience. Thread is created in mainWindow.py
 """
 
 
@@ -195,7 +193,7 @@ class ImportDir(QtCore.QObject):
         fitsDefault = self.app.filterDictToList("fitsDefault", "keys")
 
         for f in fileList:
-            self.logger.info(f"importing {f}")
+            self.logger.info(f"Start reading file {f}")
             row = []
 
             # Parse FITS header for given file
@@ -208,8 +206,10 @@ class ImportDir(QtCore.QObject):
                 )
                 row.insert(self.app.conf[dbFitsParameters]["order"], oneitem)
 
+            # Then some values in the row are added or overwritten
             row[fitsKeyList.index("file")] = str(f)
             row[fitsKeyList.index("hash")] = self.hashFile(f)
+
             # RA/DEC coord conversion
             AstropyCalcObj = AstropyCalc(self.app)
             c = AstropyCalcObj.coordConversion(
@@ -254,9 +254,22 @@ class ImportDir(QtCore.QObject):
                 if len(row[fitsKeyList.index(valD)]) == 0:
                     defaultValue = self.app.conf[valD]["fitsDefault"]
                     defaultField = self.app.conf[valD]["description"]
-                    self.logger.debug(f"Inserted {defaultValue} for {defaultField}")
+                    self.logger.warning(
+                        f"Inserted default value {defaultValue} for {defaultField} keyword"
+                    )
                     row[fitsKeyList.index(valD)] = defaultValue
+
+            # check for null value that prevents db insert
+            for k, v in enumerate(row):
+                if not v:
+                    self.logger.error(
+                        f"Null value for {fitsKeyList[k]} keyword: in Settings "
+                        "fix keyword name or set a default value else the file "
+                        "cannot be inserted into the database"
+                    )
+
             self.logger.debug(row)
+            self.logger.info(f"End reading file {f}")
             self.match_found.emit(row)
 
     def parseFitsHeader(self, fitsFile):

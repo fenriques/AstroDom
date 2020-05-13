@@ -6,7 +6,6 @@ from .astroDom import AstroDom
 
 def main():
 
-
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     palette = QtGui.QPalette()

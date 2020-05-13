@@ -37,6 +37,7 @@ class MainWindow(QDialog):
         self.ui.setupUi(self)
         self.show()
 
+
         self.imageListModel = SortFilterProxyModel(self.ui)
         self.imageListTab = ImageListTab(self, app)
         self.importFitsTab = ImportFitsTab(self, app)

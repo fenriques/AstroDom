@@ -7,6 +7,7 @@ import glob
 from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog, QMessageBox
 from PyQt5 import QtSql, QtGui, QtCore
 
+
 """
 Application settings are stored in 3 json files. 
 - configFields.json stores FITS keyword that users can
@@ -361,6 +362,9 @@ class SettingsTab:
         self.app.config["dbname"] = self.mainW.ui.lineEditDbname.text()
         self.app.config["debug"] = self.mainW.ui.comboBoxDebug.currentText()
         self.app.config["profile"] = self.mainW.ui.lineEditProfileName.text()
+        self.mainW.changeProfileSig.emit(self.mainW.ui.lineEditProfileName.text())
+        self.mainW.changeDbSig.emit(self.mainW.ui.lineEditDbname.text())
+
         self.app.config[
             "monthsFilter"
         ] = self.mainW.ui.comboBoxMonthsFilter.currentText()
@@ -376,9 +380,20 @@ class SettingsTab:
             json.dump(self.app.config, outfile3)
             self.logger.debug(self.app.config)
 
-        QMessageBox.about(
-            None,
-            "Message",
-            "Configuration saved. AstroDom will now close, please restart.",
+        # Connect to selected database
+        self.app.db.close()
+        self.app.db.setDatabaseName(
+            os.path.join(
+                self.app.directory, "config", self.app.config["dbname"] + ".db"
+            )
         )
-        sys.exit(-1)
+
+        if not self.app.db.open():
+            self.logger.critical("Failed to set up db connection")
+        self.app.setUpDb()
+
+        # Force image list to reload data
+        self.mainW.imageSourceModel.select()
+        while self.mainW.imageSourceModel.canFetchMore():
+            self.mainW.imageSourceModel.fetchMore()
+        self.mainW.filterRegExpChanged()

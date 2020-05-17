@@ -858,6 +858,19 @@
       <string>Select Night</string>
      </property>
     </widget>
+    <widget class="QLabel" name="labelCurrentDb">
+     <property name="geometry">
+      <rect>
+       <x>1060</x>
+       <y>791</y>
+       <width>441</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Current DB:</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tabImportFits">
     <attribute name="title">

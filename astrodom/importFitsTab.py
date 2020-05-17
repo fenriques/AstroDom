@@ -232,7 +232,7 @@ class ImportDir(QtCore.QObject):
             s = AstropyCalcObj.longLatConversion(
                 row[fitsKeyList.index("sitelong")], row[fitsKeyList.index("sitelat")]
             )
-            if s:
+            if s and c:
                 row[fitsKeyList.index("sitelong")] = str(round(s.ra.degree, 3))
                 row[fitsKeyList.index("sitelat")] = str(round(s.dec.degree, 3))
                 altAz = AstropyCalcObj.getAltAzCoord(

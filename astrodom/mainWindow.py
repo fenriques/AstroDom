@@ -29,6 +29,8 @@ class MainWindow(QDialog):
 
     model = None
     imageListModel = None
+    changeProfileSig = QtCore.pyqtSignal(str)
+    changeDbSig = QtCore.pyqtSignal(str)
 
     def __init__(self, app):
         super().__init__()
@@ -68,6 +70,9 @@ class MainWindow(QDialog):
         self.ui.groupBoxFitsHeader.setTitle(
             "Fits file header parser (profile: " + self.app.config["profile"] + ")"
         )
+        self.changeProfileSig.connect(self.changeGroupBoxTitle)
+        self.ui.labelCurrentDb.setText("Current Database: " + self.app.config["dbname"])
+        self.changeDbSig.connect(self.changeLabelDb)
         # Setting tab
         self.ui.lineEditModuleDir.setText(self.app.astrodomDir)
         self.ui.pushButtonSaveFilter.clicked.connect(self.settingsTab.saveFilter)
@@ -284,6 +289,17 @@ class MainWindow(QDialog):
             self.logger.debug(f"Closing not existing window {e}")
         self.close()
         event.accept()
+
+    # Slot that updates profile name when a new profile is selected and saved
+
+    def changeGroupBoxTitle(self, title):
+        self.ui.groupBoxFitsImport.setTitle("Fits file import (profile: " + title + ")")
+        self.ui.groupBoxFitsHeader.setTitle(
+            "Fits file header parser (profile: " + title + ")"
+        )
+
+    def changeLabelDb(self, title):
+        self.ui.labelCurrentDb.setText("Current Database: " + title)
 
     """
     if 'selected night' button is pressed, start/end date filters are

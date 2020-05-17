@@ -1,5 +1,5 @@
 # AstroDom
-Astro(nomy) Dom(ine) is a catalogue tool for deep sky images. It scans the directories where images (FITS format only) are stored and reads information from FITS headers. Additional parameter like FWHM, Eccentricity, Noise can be added from Pixinsight CSV export from SubFrameSelector. 
+Astro(nomy) Dom(ine) is a catalogue tool for deep sky images. It scans the directories where images (FITS format only) are stored and reads information from FITS headers. Additional parameter like FWHM, Eccentricity, Noise can be imported from Pixinsight CSV export from SubFrameSelector. 
 The catalogue can be used to keep track of your imaging sessions and to benchmark your images. With the Charts tool you can discover important information about your data, e.g.:
 
 -   How much Alt affects FWHM
@@ -43,24 +43,28 @@ Thats'it, you can now browse through your images.
 - Image list: Delete / Edit rows
 - Image list: Export data as csv
 - INDI listner
-- Startup script for Mac and Win
-- Inputs validation
+- Input validation
+- Upgrade doesn't overwrite configuration / db
 
 ### DOING:
 - Threads in import
-- Application log
-- Support for other softwares (MaximDL, SGP)
 
 ### DONE:
 
 **v0.2**
+- Save settings doesn't require restart AstroDom (fixed signal/slots updates and Image list reload). 
+- Startup script for Windows
+- Imports: fixed import doesn't update statistics
+- CSV import: fixed update db error handling and logging 
+- Add version number to title bar
+- Imports logs and message window
+- Settings: Support for other softwares and default profile for MaximDL and INDI/Ekos
+- Settings: Basic input validation
 - Image List: filter on 'selected night'
 - Fits Header: read key/val, show missing keys
 - Settings: toggle column visibility in ImageList
 - Import: Log messages to GUI (https://docs.python.org/3/howto/logging-cookbook.html)
 - Settings: Save profile
-
-
 **v0.1**
 - Image List: months interval in Settings
 - Select Database

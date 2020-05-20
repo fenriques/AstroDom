@@ -33,10 +33,22 @@ class ChartWindow(QDialog):
         self.app = app
 
     def closeEvent(self, event):
+        self.app.settings.setValue("sizeChartW", self.size())
+        self.app.settings.setValue("posChartW", self.pos())
+        try:
+            self.close()
+        except Exception as e:
+            self.logger.debug(f"Closing not existing window {e}")
         event.accept()
 
     def plot(self, imageListModel):
         self.imageListModel = imageListModel
+        try:
+            self.resize(self.app.settings.value("sizeChartW"))
+            self.move(self.app.settings.value("posChartW"))
+        except Exception as e:
+            self.logger.error(f"{e}")
+
         self.show()
         self.ui.labelColorL.setStyleSheet("color:rgb(244, 244, 244);font-weight:bold")
         self.ui.labelColorR.setStyleSheet("color:rgb(255,0,0);font-weight:bold")

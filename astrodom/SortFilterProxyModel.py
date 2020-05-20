@@ -1,3 +1,4 @@
+from PyQt5 import  QtCore
 from PyQt5.QtCore import QDate, QDateTime, QRegExp, QSortFilterProxyModel, Qt, QTime
 from datetime import datetime
 
@@ -206,3 +207,8 @@ class SortFilterProxyModel(QSortFilterProxyModel):
                 bReturn = False
 
         return bReturn
+    
+    def removeSelectedRows(self, indexP, rows, parent):
+        for i in sorted(indexP):
+            indexSource = self.mapToSource(i)
+            self.removeRow(indexSource.row())

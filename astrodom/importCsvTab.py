@@ -131,7 +131,7 @@ class ImportCsvTab():
             if dataTemp[row][0] == 'Index':
                 self._headers = self.app.filterDictToList(
                     'pix_csv', 'description')
-                self._headers.append('Matching FITS File')
+                self._headers.append('Status')
                 checkCsv = True
                 
         if checkCsv == True:

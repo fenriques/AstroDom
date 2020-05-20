@@ -6,6 +6,7 @@ import ntpath
 import glob
 from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog, QMessageBox
 from PyQt5 import QtSql, QtGui, QtCore
+from PyQt5.QtCore import QByteArray
 
 
 """
@@ -183,6 +184,7 @@ class SettingsTab:
             self.app.config["defaultTimeStart"]
         )
         self.mainW.ui.spinBoxDefaultTimeEnd.setValue(self.app.config["defaultTimeEnd"])
+        self.mainW.ui.spinBoxPrecision.setValue(self.app.config["precision"])
 
     def selectDb(self):
         dbName, _ = QFileDialog.getOpenFileName(
@@ -324,6 +326,10 @@ class SettingsTab:
         if fileName == "":
             fileName = self.app.conf["profile"]
         fileName = "profile-" + fileName + ".json"
+       
+        # Clear the tableview state else it prevents hide/show
+        # columns set here to work properly.
+        self.app.settings.setValue("readStateOnStart","False")
 
         with open(os.path.join(self.app.directory, "config", fileName), "w") as outfile:
             json.dump(self.app.conf, outfile)
@@ -358,7 +364,7 @@ class SettingsTab:
                 "Enter a name to create a new database or choose an existing one.",
             )
             return
-
+        
         self.app.config["dbname"] = self.mainW.ui.lineEditDbname.text()
         self.app.config["debug"] = self.mainW.ui.comboBoxDebug.currentText()
         self.app.config["profile"] = self.mainW.ui.lineEditProfileName.text()
@@ -374,6 +380,7 @@ class SettingsTab:
         ] = self.mainW.ui.spinBoxDefaultTimeStart.value()
 
         self.app.config["defaultTimeEnd"] = self.mainW.ui.spinBoxDefaultTimeEnd.value()
+        self.app.config["precision"] = self.mainW.ui.spinBoxPrecision.value()
         with open(
             os.path.join(self.app.directory, "config", "config.json"), "w"
         ) as outfile3:

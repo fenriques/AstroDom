@@ -11,6 +11,7 @@ import json
 import logging
 import codecs
 from PyQt5 import QtSql
+from PyQt5.QtCore import QSettings
 from datetime import date
 
 from .mainWindow import *
@@ -57,6 +58,8 @@ class AstroDom:
         ) as configFileFilters:
             self.confFilters = json.load(configFileFilters)
             self.logger.debug("Read Config Filters File " + str(configFileFilters))
+
+        self.settings = QSettings("fenriques", "AstroDom")
 
         # For hashing files
         self.BLOCKSIZE = 1024768

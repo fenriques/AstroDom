@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 
 from astropy.io import fits
 from astropy.visualization import *
+from astropy import units as u
+from astropy.coordinates import Angle, Longitude, Latitude
+
 from matplotlib.colors import LogNorm
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
 from matplotlib.figure import Figure
@@ -26,10 +29,11 @@ preview of the image.
 class ImageDetailWindow(QDialog):
     logger = logging.getLogger(__name__)
 
-    def __init__(self, imageListModel):
+    def __init__(self, app, imageListModel):
         super().__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
+        self.app = app
         self.setWindowTitle("Image Detail")
         self.imageListModel = imageListModel
 
@@ -65,14 +69,55 @@ class ImageDetailWindow(QDialog):
         self.mapper.addMapping(self.ui.lineEditSnrWeight, 27)
         self.mapper.addMapping(self.ui.lineEditNoise, 28)
         self.mapper.setCurrentIndex(modelIndex.row())
+        self.ui.lineEditRaF.setText(self.convertCoord(self.ui.lineEditRa.text(), "hms"))
+        self.ui.lineEditDecF.setText(self.convertCoord(self.ui.lineEditDec.text(), "dms"))
+        self.ui.lineEditSiteLatF.setText(self.convertCoord(self.ui.lineEditSiteLat.text(), "lat"))
+        self.ui.lineEditSiteLongF.setText(self.convertCoord(self.ui.lineEditSiteLong.text(), "long"))
+        self.ui.lineEditAltF.setText(self.convertCoord(self.ui.lineEditAlt.text(), "dms"))
+        self.ui.lineEditAzF.setText(self.convertCoord(self.ui.lineEditAz.text(), "dms"))
+        
         cr = self.imageListModel.index(modelIndex.row(), 1)
         t = self.imageListModel.data(cr, QtCore.Qt.DisplayRole)
         self.mplwidget = MatplotlibWidget(self.ui.MplWidget)
         self.mplwidget.setFileName(t)
         self.mplwidget.plot()
+        try:
+            self.resize(self.app.settings.value("sizeDetailW"))
+            self.move(self.app.settings.value("posDetailW"))
+        except Exception as e:
+            self.logger.error(f"{e}")
+        
+  
         self.show()
+        
+    def closeEvent(self, event):
+        self.app.settings.setValue("sizeDetailW", self.size())
+        self.app.settings.setValue("posDetailW", self.pos())
+        try:
+            self.close()
+        except Exception as e:
+            self.logger.debug(f"Closing not existing window {e}")
+        event.accept()
 
+    def convertCoord(self,coord, type ="dms"):
+        if type == "dms":
+            a = Angle(coord, u.deg)
+            value = str(a.to_string(unit=u.degree,precision=0, sep=("°", "'" ,"''" )))
+        elif type == "hms":
+            a = Angle(coord, u.deg)
+            value = str(a.to_string(unit=u.hour, precision=0, sep=("h", "m", "s")))
+        elif type == "lat":
+            a = Latitude(coord, u.deg)
+            a.wrap_angle = 90 * u.deg
+            value = str(a.to_string(unit=u.degree,precision=0, sep=("°", "'" ,"''" )))
+          
+        elif type == "long":
+            a = Longitude(coord, u.deg)
+            a.wrap_angle = 180 * u.deg
+            value = str(a.to_string(unit=u.degree, precision=0, sep=("°", "'" ,"''" )))
 
+        return str(value)
+  
 class MatplotlibWidget(Canvas):
     logger = logging.getLogger(__name__)
 

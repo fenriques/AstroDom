@@ -3,11 +3,12 @@ import os
 import ntpath
 import numpy as np
 import logging
-
+import copy
 from PyQt5.QtWidgets import QDialog, QApplication, QTableWidgetItem, QFileDialog
 
 from .chartWindow import *
 from .imageDetailWindow import *
+from .dashboardWindow import *
 from .SortFilterProxyModel import *
 from .fitsHeaderTab import *
 from .settingsTab import *
@@ -31,14 +32,19 @@ class MainWindow(QDialog):
     imageListModel = None
     changeProfileSig = QtCore.pyqtSignal(str)
     changeDbSig = QtCore.pyqtSignal(str)
-
     def __init__(self, app):
         super().__init__()
         self.app = app
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
+        # Load windows position and size
+        try:
+            self.resize(self.app.settings.value("sizeMainW"))
+            self.move(self.app.settings.value("posMainW"))
+        except Exception as e:
+            self.logger.error(f"{e}")
         self.show()
-
+    
         self.imageListModel = SortFilterProxyModel(self.ui)
         self.imageListTab = ImageListTab(self, app)
         self.importFitsTab = ImportFitsTab(self, app)
@@ -173,7 +179,11 @@ class MainWindow(QDialog):
         self.ui.pushButtonFitsHeader.clicked.connect(self.fitsHeaderTab.readHeaders)
 
         # Button icons
+        
         self.ui.pushButtonGraph.setIcon(QtGui.QIcon("astrodom/icons/chart-up.png"))
+        self.ui.pushButtonDashboard.setIcon(QtGui.QIcon("astrodom/icons/application-monitor.png"))
+        self.ui.pushButtonLastNight.setIcon(QtGui.QIcon("astrodom/icons/weather-moon-half.png"))
+        self.ui.pushButtonDeleteRow.setIcon(QtGui.QIcon("astrodom/icons/cross.png"))
         self.ui.pushButtonDeleteFitsRow.setIcon(QtGui.QIcon("astrodom/icons/cross.png"))
         self.ui.pushButtonDeleteCsvRow.setIcon(QtGui.QIcon("astrodom/icons/cross.png"))
         self.ui.pushButtonSaveFits.setIcon(QtGui.QIcon("astrodom/icons/disk.png"))
@@ -230,8 +240,11 @@ class MainWindow(QDialog):
         self.ui.lineEditCsv.textChanged.connect(
             lambda: self.ui.pushButtonDeleteCsvRow.setEnabled(True)
         )
-
+        # Image List tab
         self.ui.pushButtonGraph.clicked.connect(self.dialogChart)
+        self.ui.pushButtonDashboard.clicked.connect(self.dashboard)
+        self.ui.pushButtonDeleteRow.clicked.connect(self.imageListTab.deleteRows)
+
         self.ui.lineEditTarget.textChanged.connect(self.filterRegExpChanged)
         self.ui.lineEditFilter.textChanged.connect(self.filterRegExpChanged)
         self.ui.lineEditFrame.textChanged.connect(self.filterRegExpChanged)
@@ -271,14 +284,22 @@ class MainWindow(QDialog):
         self.ui.tableViewImages.doubleClicked.connect(self.imageDetail)
 
     def imageDetail(self, modelIndex):
-        self.imageDetailWindow = ImageDetailWindow(self.imageListModel)
+        self.imageDetailWindow = ImageDetailWindow(self.app,self.imageListModel)
         self.imageDetailWindow.plot(modelIndex)
 
+    def dashboard(self):
+        self.dashboardWindow = DashboardWindow(self.app,self.imageListModel)
+        
     def dialogChart(self):
         self.chartWindow = ChartWindow(self.app)
         self.chartWindow.plot(self.imageListModel)
 
     def closeEvent(self, event):
+        ssViewImages = self.ui.tableViewImages.horizontalHeader().saveState()
+        jssViewImages = json.dumps(bytes(ssViewImages.toHex()).decode('ascii'))
+        self.app.settings.setValue("imageListState",jssViewImages)
+        self.app.settings.setValue("sizeMainW", self.size())
+        self.app.settings.setValue("posMainW", self.pos())
         try:
             self.imageDetailWindow.close()
         except Exception as e:
@@ -375,7 +396,7 @@ class MainWindow(QDialog):
 
         self.ui.lineEditTotImages.setText(str(rowCount))
         exposure = str(np.round(np.sum(exposureM, axis=0) / 3600, 1))
-        self.ui.lineEditTotExposure.setText(exposure + "hrs")
+        self.ui.lineEditTotExposure.setText(exposure + "h")
 
         alt = str(np.round(np.mean(altM, axis=0), 2))
         self.ui.lineEditMeanAlt.setText(alt)
@@ -401,3 +422,4 @@ class MainWindow(QDialog):
         self.ui.lineEditMeanNoise.setText(noise)
         noiseSigma = str(np.round(np.std(noiseM, axis=0), 2))
         self.ui.lineEditSigmaNoise.setText(noiseSigma)
+  

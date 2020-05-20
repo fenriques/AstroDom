@@ -6,680 +6,668 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>762</width>
-    <height>1015</height>
+    <width>755</width>
+    <height>1011</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>440</y>
-     <width>741</width>
-     <height>571</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Image Details</string>
-   </property>
-   <widget class="QLineEdit" name="lineEditFile">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>30</y>
-      <width>591</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFile">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>34</y>
-      <width>91</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>File Name</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditHash">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>66</y>
-      <width>591</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelHash">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>70</y>
-      <width>101</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>File Hash</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditTarget">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>102</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFileTarget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>106</y>
-      <width>74</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Target</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditFrame">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>138</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFrame">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>142</y>
-      <width>74</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Frame</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditFilter">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>174</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFilter">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>178</y>
-      <width>74</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Filter</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditExposure">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>210</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelExposure">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>214</y>
-      <width>74</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Exposure</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditTemp">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>246</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelTemp">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>250</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Camera Temp</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditXbinning">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>282</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelXBinning">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>286</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>X Binning</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditYbinning">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>318</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelYbinning">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>322</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Y Binning</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditSiteLong">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>354</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelSiteLong">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>358</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Site Longitude</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditSiteLat">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>390</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelSiteLat">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>394</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Site Latitude</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelRa">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>432</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RA</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditRa">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>428</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelDec">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>468</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>DEC</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditDec">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>464</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditAlt">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>500</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelAlt">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>504</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ALT</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditAz">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>536</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelAz">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>540</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>AZ</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditSnrWeight">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>498</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditGain">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>138</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFileDate">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>106</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Obs Date</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelEccentricity">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>466</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Eccentricity</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditSubframeScale">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>210</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelScaleUnit">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>322</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Scale Unit</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditOffset">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>174</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditCsvFile">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>390</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditFwhm">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>426</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelNoise">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>540</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Noise</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditCameraGain">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>246</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelCsvFile">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>394</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>CSV File</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFileOffset">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>178</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Offset</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelGain">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>142</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Gain</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelSnrWeight">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>502</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>SNR Weight</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelCameraResolution">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>286</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Camera Res</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditEccentricity">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>462</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelSubframeScale">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>214</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Scale</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditCameraResolution">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>282</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditNoise">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>536</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditDate">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>102</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelCameraGain">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>250</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Camera Gain</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFwhm">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>430</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>FWHM</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditScaleUnit">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>318</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelDataUnit">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>358</y>
-      <width>116</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Data Unit</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditDataUnit">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>354</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QWidget" name="MplWidget" native="true">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>0</y>
-     <width>691</width>
-     <height>441</height>
-    </rect>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QWidget" name="MplWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>300</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="maximumSize">
+        <size>
+         <width>600</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Image Details</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="labelFile">
+          <property name="text">
+           <string>File Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="labelHash">
+          <property name="text">
+           <string>File Hash</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="labelFileTarget">
+          <property name="text">
+           <string>Target</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="lineEditTarget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="labelFileDate">
+          <property name="text">
+           <string>Obs Date</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QLineEdit" name="lineEditDate">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="labelFrame">
+          <property name="text">
+           <string>Frame</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="lineEditFrame">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="labelGain">
+          <property name="text">
+           <string>Gain</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QLineEdit" name="lineEditGain">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="labelFilter">
+          <property name="text">
+           <string>Filter</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="lineEditFilter">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QLabel" name="labelFileOffset">
+          <property name="text">
+           <string>Offset</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3">
+         <widget class="QLineEdit" name="lineEditOffset">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="labelExposure">
+          <property name="text">
+           <string>Exposure</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="lineEditExposure">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2">
+         <widget class="QLabel" name="labelSubframeScale">
+          <property name="text">
+           <string>Scale</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="3">
+         <widget class="QLineEdit" name="lineEditSubframeScale">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="labelTemp">
+          <property name="text">
+           <string>Camera Temp</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QLineEdit" name="lineEditTemp">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2">
+         <widget class="QLabel" name="labelCameraGain">
+          <property name="text">
+           <string>Camera Gain</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="3">
+         <widget class="QLineEdit" name="lineEditCameraGain">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="labelXBinning">
+          <property name="text">
+           <string>X Binning</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QLineEdit" name="lineEditXbinning">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="2">
+         <widget class="QLabel" name="labelCameraResolution">
+          <property name="text">
+           <string>Camera Res</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="3">
+         <widget class="QLineEdit" name="lineEditCameraResolution">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0">
+         <widget class="QLabel" name="labelYbinning">
+          <property name="text">
+           <string>Y Binning</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <widget class="QLineEdit" name="lineEditYbinning">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="2">
+         <widget class="QLabel" name="labelScaleUnit">
+          <property name="text">
+           <string>Scale Unit</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="3">
+         <widget class="QLineEdit" name="lineEditScaleUnit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QLabel" name="labelSiteLong">
+          <property name="text">
+           <string>Site Longitude</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLineEdit" name="lineEditSiteLong">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditSiteLongF">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="9" column="2">
+         <widget class="QLabel" name="labelDataUnit">
+          <property name="text">
+           <string>Data Unit</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="3">
+         <widget class="QLineEdit" name="lineEditDataUnit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <widget class="QLabel" name="labelSiteLat">
+          <property name="text">
+           <string>Site Latitude</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="lineEditSiteLat">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditSiteLatF">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="10" column="2">
+         <widget class="QLabel" name="labelCsvFile">
+          <property name="text">
+           <string>CSV File</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="3">
+         <widget class="QLineEdit" name="lineEditCsvFile">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QLabel" name="labelRa">
+          <property name="text">
+           <string>RA</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLineEdit" name="lineEditRa">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>10</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditRaF">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="11" column="2">
+         <widget class="QLabel" name="labelFwhm">
+          <property name="text">
+           <string>FWHM</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="3">
+         <widget class="QLineEdit" name="lineEditFwhm">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0">
+         <widget class="QLabel" name="labelDec">
+          <property name="text">
+           <string>DEC</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QLineEdit" name="lineEditDec">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditDecF">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="12" column="2">
+         <widget class="QLabel" name="labelEccentricity">
+          <property name="text">
+           <string>Eccentricity</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="3">
+         <widget class="QLineEdit" name="lineEditEccentricity">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0">
+         <widget class="QLabel" name="labelAlt">
+          <property name="text">
+           <string>ALT</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLineEdit" name="lineEditAlt">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditAltF">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="13" column="2">
+         <widget class="QLabel" name="labelSnrWeight">
+          <property name="text">
+           <string>SNR Weight</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="3">
+         <widget class="QLineEdit" name="lineEditSnrWeight">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="0">
+         <widget class="QLabel" name="labelAz">
+          <property name="text">
+           <string>AZ</string>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLineEdit" name="lineEditAz">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditAzF">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="14" column="2">
+         <widget class="QLabel" name="labelNoise">
+          <property name="text">
+           <string>Noise</string>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="3">
+         <widget class="QLineEdit" name="lineEditNoise">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>60</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="3">
+         <widget class="QLineEdit" name="lineEditFile"/>
+        </item>
+        <item row="1" column="1" colspan="3">
+         <widget class="QLineEdit" name="lineEditHash"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

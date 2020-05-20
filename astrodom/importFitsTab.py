@@ -217,8 +217,8 @@ class ImportDir(QtCore.QObject):
                 row[fitsKeyList.index("ra")], row[fitsKeyList.index("dec")]
             )
             if c:
-                row[fitsKeyList.index("ra")] = str(round(c.ra.degree, 3))
-                row[fitsKeyList.index("dec")] = str(round(c.dec.degree, 3))
+                row[fitsKeyList.index("ra")] = str(round(c.ra.degree, self.app.config["precision"]))
+                row[fitsKeyList.index("dec")] = str(round(c.dec.degree, self.app.config["precision"]))
 
             # Strip subseconds
             dateobs = row[fitsKeyList.index("date")]
@@ -233,8 +233,8 @@ class ImportDir(QtCore.QObject):
                 row[fitsKeyList.index("sitelong")], row[fitsKeyList.index("sitelat")]
             )
             if s and c:
-                row[fitsKeyList.index("sitelong")] = str(round(s.ra.degree, 3))
-                row[fitsKeyList.index("sitelat")] = str(round(s.dec.degree, 3))
+                row[fitsKeyList.index("sitelong")] = str(round(s.ra.degree, self.app.config["precision"]))
+                row[fitsKeyList.index("sitelat")] = str(round(s.dec.degree, self.app.config["precision"]))
                 altAz = AstropyCalcObj.getAltAzCoord(
                     c.ra.degree,
                     c.dec.degree,

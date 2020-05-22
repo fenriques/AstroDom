@@ -38,14 +38,19 @@ class SettingsTab:
         self.mainW.ui.lineEditProfileName.setText(currentProfile)
 
         # FITS Headers keywords
-        self.mainW.ui.lineEditFitsFile.setText(self.cProfile["file"]["fitsHeader"])
-        self.mainW.ui.lineEditFitsTarget.setText(self.cProfile["target"]["fitsHeader"])
-        self.mainW.ui.lineEditFitsFrame.setText(self.cProfile["frame"]["fitsHeader"])
-        self.mainW.ui.lineEditFitsFilter.setText(self.cProfile["filter"]["fitsHeader"])
+        self.mainW.ui.lineEditFitsFile.setText(
+            self.cProfile["file"]["fitsHeader"])
+        self.mainW.ui.lineEditFitsTarget.setText(
+            self.cProfile["target"]["fitsHeader"])
+        self.mainW.ui.lineEditFitsFrame.setText(
+            self.cProfile["frame"]["fitsHeader"])
+        self.mainW.ui.lineEditFitsFilter.setText(
+            self.cProfile["filter"]["fitsHeader"])
         self.mainW.ui.lineEditFitsExposure.setText(
             self.cProfile["exposure"]["fitsHeader"]
         )
-        self.mainW.ui.lineEditFitsTemp.setText(self.cProfile["temp"]["fitsHeader"])
+        self.mainW.ui.lineEditFitsTemp.setText(
+            self.cProfile["temp"]["fitsHeader"])
         self.mainW.ui.lineEditFitsXbinning.setText(
             self.cProfile["xbinning"]["fitsHeader"]
         )
@@ -59,10 +64,14 @@ class SettingsTab:
             self.cProfile["sitelong"]["fitsHeader"]
         )
         self.mainW.ui.lineEditFitsRa.setText(self.cProfile["ra"]["fitsHeader"])
-        self.mainW.ui.lineEditFitsDec.setText(self.cProfile["dec"]["fitsHeader"])
-        self.mainW.ui.lineEditFitsDate.setText(self.cProfile["date"]["fitsHeader"])
-        self.mainW.ui.lineEditFitsGain.setText(self.cProfile["gain"]["fitsHeader"])
-        self.mainW.ui.lineEditFitsOffset.setText(self.cProfile["offset"]["fitsHeader"])
+        self.mainW.ui.lineEditFitsDec.setText(
+            self.cProfile["dec"]["fitsHeader"])
+        self.mainW.ui.lineEditFitsDate.setText(
+            self.cProfile["date"]["fitsHeader"])
+        self.mainW.ui.lineEditFitsGain.setText(
+            self.cProfile["gain"]["fitsHeader"])
+        self.mainW.ui.lineEditFitsOffset.setText(
+            self.cProfile["offset"]["fitsHeader"])
 
         # FITS header defaults
         self.mainW.ui.lineEditFitsFileDefault.setText(
@@ -95,7 +104,8 @@ class SettingsTab:
         self.mainW.ui.lineEditFitsSitelongDefault.setText(
             self.cProfile["sitelong"]["fitsDefault"]
         )
-        self.mainW.ui.lineEditFitsRaDefault.setText(self.cProfile["ra"]["fitsDefault"])
+        self.mainW.ui.lineEditFitsRaDefault.setText(
+            self.cProfile["ra"]["fitsDefault"])
         self.mainW.ui.lineEditFitsDecDefault.setText(
             self.cProfile["dec"]["fitsDefault"]
         )
@@ -109,18 +119,21 @@ class SettingsTab:
             self.cProfile["offset"]["fitsDefault"]
         )
         # Hide
-        self.mainW.ui.checkBoxFitsFile.setChecked(bool(self.app.conf["file"]["hide"]))
+        self.mainW.ui.checkBoxFitsFile.setChecked(
+            bool(self.app.conf["file"]["hide"]))
         self.mainW.ui.checkBoxFitsTarget.setChecked(
             bool(self.app.conf["target"]["hide"])
         )
-        self.mainW.ui.checkBoxFitsFrame.setChecked(bool(self.app.conf["frame"]["hide"]))
+        self.mainW.ui.checkBoxFitsFrame.setChecked(
+            bool(self.app.conf["frame"]["hide"]))
         self.mainW.ui.checkBoxFitsFilter.setChecked(
             bool(self.app.conf["filter"]["hide"])
         )
         self.mainW.ui.checkBoxFitsExposure.setChecked(
             bool(self.app.conf["exposure"]["hide"])
         )
-        self.mainW.ui.checkBoxFitsTemp.setChecked(bool(self.app.conf["temp"]["hide"]))
+        self.mainW.ui.checkBoxFitsTemp.setChecked(
+            bool(self.app.conf["temp"]["hide"]))
         self.mainW.ui.checkBoxFitsXbinning.setChecked(
             bool(self.app.conf["xbinning"]["hide"])
         )
@@ -133,10 +146,14 @@ class SettingsTab:
         self.mainW.ui.checkBoxFitsSitelong.setChecked(
             bool(self.app.conf["sitelong"]["hide"])
         )
-        self.mainW.ui.checkBoxFitsRa.setChecked(bool(self.app.conf["ra"]["hide"]))
-        self.mainW.ui.checkBoxFitsDec.setChecked(bool(self.app.conf["dec"]["hide"]))
-        self.mainW.ui.checkBoxFitsDate.setChecked(bool(self.app.conf["date"]["hide"]))
-        self.mainW.ui.checkBoxFitsGain.setChecked(bool(self.app.conf["gain"]["hide"]))
+        self.mainW.ui.checkBoxFitsRa.setChecked(
+            bool(self.app.conf["ra"]["hide"]))
+        self.mainW.ui.checkBoxFitsDec.setChecked(
+            bool(self.app.conf["dec"]["hide"]))
+        self.mainW.ui.checkBoxFitsDate.setChecked(
+            bool(self.app.conf["date"]["hide"]))
+        self.mainW.ui.checkBoxFitsGain.setChecked(
+            bool(self.app.conf["gain"]["hide"]))
         self.mainW.ui.checkBoxFitsOffset.setChecked(
             bool(self.app.conf["offset"]["hide"])
         )
@@ -158,19 +175,28 @@ class SettingsTab:
             f = f.replace("profile-", "")
             self.mainW.ui.comboBoxProfile.addItem(f, i)
 
-        self.mainW.ui.comboBoxProfile.setCurrentText(self.app.config["profile"])
+        self.mainW.ui.comboBoxProfile.setCurrentText(
+            self.app.config["profile"])
         self.currentProfile = self.mainW.ui.comboBoxProfile.currentText()
         self.setProfile(self.currentProfile)
 
         # Filters Keywords
-        self.mainW.ui.lineEditFilterL.setText(",".join(self.app.confFilters["L"]))
-        self.mainW.ui.lineEditFilterR.setText(",".join(self.app.confFilters["R"]))
-        self.mainW.ui.lineEditFilterG.setText(",".join(self.app.confFilters["G"]))
-        self.mainW.ui.lineEditFilterB.setText(",".join(self.app.confFilters["B"]))
-        self.mainW.ui.lineEditFilterHa.setText(",".join(self.app.confFilters["Ha"]))
-        self.mainW.ui.lineEditFilterSii.setText(",".join(self.app.confFilters["Sii"]))
-        self.mainW.ui.lineEditFilterOiii.setText(",".join(self.app.confFilters["Oiii"]))
-        self.mainW.ui.lineEditFilterLpr.setText(",".join(self.app.confFilters["LPR"]))
+        self.mainW.ui.lineEditFilterL.setText(
+            ",".join(self.app.confFilters["L"]))
+        self.mainW.ui.lineEditFilterR.setText(
+            ",".join(self.app.confFilters["R"]))
+        self.mainW.ui.lineEditFilterG.setText(
+            ",".join(self.app.confFilters["G"]))
+        self.mainW.ui.lineEditFilterB.setText(
+            ",".join(self.app.confFilters["B"]))
+        self.mainW.ui.lineEditFilterHa.setText(
+            ",".join(self.app.confFilters["Ha"]))
+        self.mainW.ui.lineEditFilterSii.setText(
+            ",".join(self.app.confFilters["Sii"]))
+        self.mainW.ui.lineEditFilterOiii.setText(
+            ",".join(self.app.confFilters["Oiii"]))
+        self.mainW.ui.lineEditFilterLpr.setText(
+            ",".join(self.app.confFilters["LPR"]))
 
         # Config main settings
         self.mainW.ui.lineEditDbname.setText(self.app.config["dbname"])
@@ -183,7 +209,8 @@ class SettingsTab:
         self.mainW.ui.spinBoxDefaultTimeStart.setValue(
             self.app.config["defaultTimeStart"]
         )
-        self.mainW.ui.spinBoxDefaultTimeEnd.setValue(self.app.config["defaultTimeEnd"])
+        self.mainW.ui.spinBoxDefaultTimeEnd.setValue(
+            self.app.config["defaultTimeEnd"])
         self.mainW.ui.spinBoxPrecision.setValue(self.app.config["precision"])
 
     def selectDb(self):
@@ -326,10 +353,10 @@ class SettingsTab:
         if fileName == "":
             fileName = self.app.conf["profile"]
         fileName = "profile-" + fileName + ".json"
-       
+
         # Clear the tableview state else it prevents hide/show
         # columns set here to work properly.
-        self.app.settings.setValue("readStateOnStart","False")
+        self.app.settings.setValue("readStateOnStart", "False")
 
         with open(os.path.join(self.app.directory, "config", fileName), "w") as outfile:
             json.dump(self.app.conf, outfile)
@@ -339,18 +366,26 @@ class SettingsTab:
 
     def saveFilter(self):
 
-        self.app.confFilters["L"] = self.mainW.ui.lineEditFilterL.text().split(",")
-        self.app.confFilters["R"] = self.mainW.ui.lineEditFilterR.text().split(",")
-        self.app.confFilters["G"] = self.mainW.ui.lineEditFilterG.text().split(",")
-        self.app.confFilters["B"] = self.mainW.ui.lineEditFilterB.text().split(",")
-        self.app.confFilters["Ha"] = self.mainW.ui.lineEditFilterHa.text().split(",")
-        self.app.confFilters["Sii"] = self.mainW.ui.lineEditFilterSii.text().split(",")
+        self.app.confFilters["L"] = self.mainW.ui.lineEditFilterL.text().split(
+            ",")
+        self.app.confFilters["R"] = self.mainW.ui.lineEditFilterR.text().split(
+            ",")
+        self.app.confFilters["G"] = self.mainW.ui.lineEditFilterG.text().split(
+            ",")
+        self.app.confFilters["B"] = self.mainW.ui.lineEditFilterB.text().split(
+            ",")
+        self.app.confFilters["Ha"] = self.mainW.ui.lineEditFilterHa.text().split(
+            ",")
+        self.app.confFilters["Sii"] = self.mainW.ui.lineEditFilterSii.text().split(
+            ",")
         self.app.confFilters["Oiii"] = self.mainW.ui.lineEditFilterOiii.text().split(
             ","
         )
-        self.app.confFilters["LPR"] = self.mainW.ui.lineEditFilterLpr.text().split(",")
+        self.app.confFilters["LPR"] = self.mainW.ui.lineEditFilterLpr.text().split(
+            ",")
         with open(
-            os.path.join(self.app.directory, "config", "configFilters.json"), "w"
+            os.path.join(self.app.directory, "config",
+                         "configFilters.json"), "w"
         ) as outfile2:
             json.dump(self.app.confFilters, outfile2)
             self.logger.debug(self.app.confFilters)
@@ -364,11 +399,12 @@ class SettingsTab:
                 "Enter a name to create a new database or choose an existing one.",
             )
             return
-        
+
         self.app.config["dbname"] = self.mainW.ui.lineEditDbname.text()
         self.app.config["debug"] = self.mainW.ui.comboBoxDebug.currentText()
         self.app.config["profile"] = self.mainW.ui.lineEditProfileName.text()
-        self.mainW.changeProfileSig.emit(self.mainW.ui.lineEditProfileName.text())
+        self.mainW.changeProfileSig.emit(
+            self.mainW.ui.lineEditProfileName.text())
         self.mainW.changeDbSig.emit(self.mainW.ui.lineEditDbname.text())
 
         self.app.config[
@@ -397,7 +433,7 @@ class SettingsTab:
 
         if not self.app.db.open():
             self.logger.critical("Failed to set up db connection")
-        self.app.setUpDb()
+        self.app.setUpDbStructure()
 
         # Force image list to reload data
         self.mainW.imageSourceModel.select()

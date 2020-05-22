@@ -6,6 +6,8 @@ from .gui.dashBoardWindowGui import *
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 from PyQt5.QtGui import *
+import pandas as pd
+import numpy as np
 """
 """
 
@@ -20,44 +22,86 @@ class DashboardWindow(QDialog):
         self.app = app
         self.setWindowTitle("Dashboard")
         self.imageListModel = imageListModel
+        # Load windows position and size
+        try:
+            self.resize(self.app.settings.value("sizeDashboardW"))
+            self.move(self.app.settings.value("posDashboardW"))
+        except Exception as e:
+            self.logger.error(f"{e}")
         self.show()
-      
+
+        plist = []
         rowCount = self.imageListModel.rowCount()
-        field = self.app.filterDictToList("order","keys")
-        eNew=[]
-        
-        for i in range(rowCount):
-            target = self.imageListModel.data(self.imageListModel.index(i, field.index("target")))
-            filter = self.imageListModel.data(self.imageListModel.index(i, field.index("filter")))
-            exposure = self.imageListModel.data(self.imageListModel.index(i, field.index("exposure")))
+        colCount = self.imageListModel.columnCount()
+        for rc in range(rowCount):
+            row = []
+            for cc in range(colCount):
+                item = self.imageListModel.data(
+                    self.imageListModel.index(rc, cc))
+                row.insert(cc, item)
+            row.insert(cc+1, "")
+            plist.append(row)
 
-            checkAppend = False
-            if len(eNew) ==0:
-                eNew.append([target , filter, 1,  exposure])
-                checkAppend = True
-                                
-            for k,v in enumerate(eNew):
-                if checkAppend == False and v[0] == target and v[1] == filter:
-                    countNew  = v[2] +1 
-                    exposureNew =v[3] +exposure
-                    eNew[k]= [ target ,filter, countNew,  exposureNew]
-                    checkAppend = True
-            if checkAppend == False:
-                eNew.append( [target , filter, 1, exposure])
+        headers = list(self.app.conf.keys())
+        df = pd.DataFrame(plist, columns=headers)
+        df = df[["target", "filter", "exposure"]]
+        df = df.sort_values(by=['target'])
+        tableCount = pd.pivot_table(df,
+                                    values='exposure',
+                                    index=['target'],
+                                    columns='filter',
+                                    aggfunc=[lambda x: x.count()],
+                                    fill_value="",
+                                    margins=True, margins_name='Total')
+        tableCount.columns = [f'{j}' for i, j in tableCount.columns]
+        tableCount.reset_index(level=0, inplace=True)
 
-        headers=["Target", "Filter", "Count", "Tot Exposure"]
+        tableTime = pd.pivot_table(df,
+                                   values='exposure',
+                                   index=['target'],
+                                   columns='filter',
+                                   aggfunc=[np.sum],
+                                   fill_value="",
+                                   margins=True, margins_name='Total')
+        tableTime.columns = [f'{j}' for i, j in tableTime.columns]
+        tableTime.reset_index(level=0, inplace=True)
+        self.modelCount = DashboardModel(self.app, tableCount)
 
-        self.model = DashboardModel(eNew,headers)
-        self.ui.tableViewDashboard.setModel(self.model)
-        self.ui.tableViewDashboard.setWordWrap(False)
-        self.ui.tableViewDashboard.verticalHeader().hide()
-        self.ui.tableViewDashboard.setSortingEnabled(False)
-        self.ui.tableViewDashboard.sortByColumn(0, QtCore.Qt.AscendingOrder)
-        self.ui.tableViewDashboard.setAlternatingRowColors(False)
-        self.ui.tableViewDashboard.setTextElideMode(QtCore.Qt.ElideLeft)
-        timeDelegate = TimeDelegate(self.ui.tableViewDashboard)        
-        self.ui.tableViewDashboard.setItemDelegateForColumn(3, timeDelegate)
- 
+        self.ui.tableViewDashboardCount.setModel(self.modelCount)
+        self.ui.tableViewDashboardCount.setWordWrap(False)
+        self.ui.tableViewDashboardCount.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+
+        self.ui.tableViewDashboardCount.verticalHeader().hide()
+        self.ui.tableViewDashboardCount.setSortingEnabled(False)
+        self.ui.tableViewDashboardCount.sortByColumn(0, qtc.Qt.AscendingOrder)
+        self.ui.tableViewDashboardCount.setAlternatingRowColors(True)
+        self.ui.tableViewDashboardCount.setTextElideMode(qtc.Qt.ElideLeft)
+        roundDelegate = RoundDelegate(self.ui.tableViewDashboardCount)
+        for i in range(tableCount.shape[1]):
+            if i > 0:
+                self.ui.tableViewDashboardCount.setItemDelegateForColumn(
+                    i, roundDelegate)
+
+        self.modelTime = DashboardModel(self.app, tableTime)
+        self.ui.tableViewDashboardTime.setModel(self.modelTime)
+        self.ui.tableViewDashboardTime.setWordWrap(False)
+        self.ui.tableViewDashboardTime.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        self.ui.tableViewDashboardTime.verticalHeader().hide()
+        self.ui.tableViewDashboardTime.setSortingEnabled(False)
+        self.ui.tableViewDashboardTime.sortByColumn(0, qtc.Qt.AscendingOrder)
+        self.ui.tableViewDashboardTime.setAlternatingRowColors(True)
+        self.ui.tableViewDashboardTime.setTextElideMode(qtc.Qt.ElideLeft)
+        timeDelegate = TimeDelegate(self.ui.tableViewDashboardTime)
+        for i in range(tableTime.shape[1]):
+            if i > 0:
+                self.ui.tableViewDashboardTime.setItemDelegateForColumn(
+                    i, timeDelegate)
+
+    def closeEvent(self, event):
+        self.app.settings.setValue("sizeDashboardW", self.size())
+        self.app.settings.setValue("posDashboardW", self.pos())
+        self.close()
+        event.accept()
 
 
 """
@@ -66,66 +110,92 @@ Generic class that extends QAbstractTableModel.
 
 
 class DashboardModel(qtc.QAbstractTableModel):
-    logger = logging.getLogger(__name__)
 
-    def __init__(self, data, headers):
-        super().__init__()
+    def __init__(self, app, data):
+        super(DashboardModel, self).__init__()
         self._data = data
-        self._headers = headers
-        print(data)
-    def rowCount(self, parent):
-        return len(self._data)
-
-    def columnCount(self, parent):
-        return len(self._headers)
+        self.app = app
 
     def data(self, index, role):
-        data = self._data[index.row()][index.column()]
+        value = self._data.iloc[index.row(), index.column()]
+        if role == qtc.Qt.DisplayRole:
+            return str(value)
+        if role == qtc.Qt.FontRole and index.column() == 0 and value != "":
+            font = QFont()
+            font.setBold(True)
+            return font
 
-        if role in (qtc.Qt.DisplayRole, qtc.Qt.EditRole):
-            return data
-        if role == qtc.Qt.BackgroundRole and (
-            data == "Error: FITS file already exists in database"
-            or data == "File not found"
-            or data == ""
-        ):
-            return QBrush(qtc.Qt.darkRed)
-        if role == qtc.Qt.BackgroundRole and (
-            data == "OK: FITS file saved"
-            or data == "OK: FITS file updated"
-            or data == "File found"
-        ):
-            return QBrush(qtc.Qt.darkGreen)
+    def rowCount(self, index):
+        return self._data.shape[0]
 
-    # Additional features methods:
+    def columnCount(self, index):
+        return self._data.shape[1]
+
     def headerData(self, section, orientation, role):
+        # section is the index of the column/row.
+        if role == qtc.Qt.DisplayRole:
+            if orientation == qtc.Qt.Horizontal:
+                return str(self._data.columns[section])
 
-        if orientation == qtc.Qt.Horizontal and role == qtc.Qt.DisplayRole:
-            return self._headers[section]
-        else:
-            return super().headerData(section, orientation, role)
+            if orientation == qtc.Qt.Vertical:
+                return str(self._data.index[section])
 
-    def sort(self, column, order):
-        self.layoutAboutToBeChanged.emit()  # needs to be emitted before a sort
-        self._data.sort(key=lambda x: x[column])
-        if order == qtc.Qt.DescendingOrder:
-            self._data.reverse()
-        self.layoutChanged.emit()  # needs to be emitted after a sort
+        if role == qtc.Qt.FontRole:
+            font = QFont()
+            font.setBold(True)
+            return font
 
-    # Methods for Read/Write
+        try:
+            value = str(self._data.columns[section])
+            if role == qtc.Qt.ForegroundRole:
+                if value in self.app.confFilters["L"]:
+                    return QBrush(QColor(44, 44, 44, 255))
+                elif value in self.app.confFilters["R"]:
+                    return QBrush(QColor(44, 44, 44, 255))
+                elif value in self.app.confFilters["B"]:
+                    return QBrush(QColor(44, 44, 44, 255))
+                elif value in self.app.confFilters["G"]:
+                    return QBrush(QColor(44, 44, 44, 255))
+                elif value in self.app.confFilters["Ha"]:
+                    return QBrush(QColor(44, 44, 44, 255))
+                elif value in self.app.confFilters["Oiii"]:
+                    return QBrush(QColor(44, 44, 44, 255))
+                elif value in self.app.confFilters["Sii"]:
+                    return QBrush(QColor(44, 44, 44, 255))
 
-    def flags(self, index):
-        return super().flags(index) | qtc.Qt.ItemIsEditable
+            if role == qtc.Qt.BackgroundRole:
+                if value in self.app.confFilters["L"]:
+                    return QBrush(QColor(244, 244, 244, 60))
+                elif value in self.app.confFilters["R"]:
+                    return QBrush(QColor(255, 0, 0, 60))
+                elif value in self.app.confFilters["B"]:
+                    return QBrush(QColor(55, 55, 255, 60))
+                elif value in self.app.confFilters["G"]:
+                    return QBrush(QColor(0, 140, 55, 60))
+                elif value in self.app.confFilters["Ha"]:
+                    return QBrush(QColor(190, 255, 0, 60))
+                elif value in self.app.confFilters["Oiii"]:
+                    return QBrush(QColor(150, 200, 255, 60))
+                elif value in self.app.confFilters["Sii"]:
+                    return QBrush(QColor(255, 120, 190, 60))
 
-    def setData(self, index, value, role):
-        if index.isValid() and role == qtc.Qt.EditRole:
-            self._data[index.row()][index.column()] = value
-            self.dataChanged.emit(index, index, [role])
-            return True
-        else:
-            return False
+        except Exception as e:
+            pass
+
 
 class TimeDelegate(QtWidgets.QStyledItemDelegate):
     def displayText(self, value, locale):
-        value = time.strftime('%H:%M:%S',  time.gmtime(value))
+        try:
+            value = time.strftime("%H:%M:%S", time.gmtime(float(value)))
+        except Exception as e:
+            value = ""
         return super(TimeDelegate, self).displayText(value, locale)
+
+
+class RoundDelegate(QtWidgets.QStyledItemDelegate):
+    def displayText(self, value, locale):
+        try:
+            value = round(float(value), 0)
+        except Exception as e:
+            value = ""
+        return super(RoundDelegate, self).displayText(value, locale)

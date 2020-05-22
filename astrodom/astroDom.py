@@ -19,8 +19,8 @@ from .mainWindow import *
 """
 AstroDom application class. It inizializes logs,
 sets up database connection, reads config files,
-eventually creates a new db, defines some useful 
-methods and calls the mainWindow GUI. In children 
+eventually creates a new db, defines some useful
+methods and calls the mainWindow GUI. In children
 classes it is referenced as 'app'.
 """
 
@@ -57,7 +57,8 @@ class AstroDom:
             os.path.join(self.directory, "config", "configFilters.json"), "r"
         ) as configFileFilters:
             self.confFilters = json.load(configFileFilters)
-            self.logger.debug("Read Config Filters File " + str(configFileFilters))
+            self.logger.debug("Read Config Filters File " +
+                              str(configFileFilters))
 
         self.settings = QSettings("fenriques", "AstroDom")
 
@@ -76,7 +77,8 @@ class AstroDom:
         # Create db connection
         if not self.createConnection():
             QMessageBox.about(None, "Message", "Cannot connect to database.")
-        self.setUpDb()
+            exit(0)
+        self.setUpDbStructure()
         self.mainWindow = MainWindow(self)
 
     # Mainly used to extract a list from configurations
@@ -89,17 +91,31 @@ class AstroDom:
                         if returnDifferentParameter == "keys":
                             returnList.append(key)
                         else:
-                            returnList.append(dictInfo[returnDifferentParameter])
+                            returnList.append(
+                                dictInfo[returnDifferentParameter])
                     else:
                         returnList.append(dictInfo[subKey])
         return returnList
 
     def createConnection(self):
-        self.logger.info("Set up db connection " + self.DBDRIVER)
+        # If there's no database, create one.
+        if len(self.config["dbname"]) == 0:
+            dbName, ok = DbDialog.getDataBaseName()
+            if not ok or len(dbName) == 0:
+                return False
+            self.config["dbname"] = dbName
+            with open(
+                os.path.join(self.directory, "config", "config.json"), "w"
+            ) as outfile3:
+                json.dump(self.config, outfile3)
+                self.logger.debug(self.config)
 
+        # Establish connection
+        self.logger.info("Set up db connection " + self.DBDRIVER)
         self.db = QtSql.QSqlDatabase.addDatabase(self.DBDRIVER)
         self.db.setDatabaseName(
-            os.path.join(self.directory, "config", self.config["dbname"] + ".db")
+            os.path.join(self.directory, "config",
+                         self.config["dbname"] + ".db")
         )
         if not self.db.open():
             self.logger.critical("Failed to set up db connection")
@@ -107,7 +123,7 @@ class AstroDom:
         return True
 
     # the database structure is stored in a json config file
-    def setUpDb(self):
+    def setUpDbStructure(self):
         separator = ","
         sqlString = separator.join(self.filterDictToList("fieldType"))
         tableCreate = (
@@ -123,7 +139,8 @@ class AstroDom:
             self.logger.error(ret.lastError().text())
 
         self.logger.debug("Try to create index")
-        ret = self.db.exec("CREATE UNIQUE INDEX idx_images_hash ON images (hash);")
+        ret = self.db.exec(
+            "CREATE UNIQUE INDEX idx_images_hash ON images (hash);")
         if ret.lastError().text():
             self.logger.warning(str(ret.lastError().text()))
 
@@ -142,3 +159,37 @@ class AstroDom:
                 return line.split(delim)[1]
         else:
             raise RuntimeError("Unable to find version string.")
+
+
+class DbDialog(QDialog):
+    def __init__(self, parent=None):
+        super(DbDialog, self).__init__(parent)
+
+        layout = QVBoxLayout(self)
+        self.setWindowTitle("Message")
+        self.labelMsg = QLabel()
+        self.labelMsg.setText(
+            "Please choose a name for the storage.\nFor example 'MyAstroImages', 'Images6-2020', 'IC434' ")
+        layout.addWidget(self.labelMsg)
+        self.lineEditDbName = QLineEdit()
+        layout.addWidget(self.lineEditDbName)
+
+        # OK and Cancel buttons
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    # get current date and time from the dialog
+    def dbName(self):
+        return self.lineEditDbName.text()
+
+    # static method to create the dialog and return (date, time, accepted)
+    @staticmethod
+    def getDataBaseName(parent=None):
+        dialog = DbDialog(parent)
+        result = dialog.exec_()
+        dbName = dialog.dbName()
+        return (dbName, result == QDialog.Accepted)

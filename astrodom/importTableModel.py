@@ -3,7 +3,6 @@ import logging
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 from PyQt5.QtGui import *
-
 import csv
 
 """
@@ -76,7 +75,8 @@ class ImportTableModel(qtc.QAbstractTableModel):
     # Methods for inserting or deleting
 
     def insertRows(self, position, rows, parent):
-        self.beginInsertRows(parent or qtc.QModelIndex(), position, position + rows - 1)
+        self.beginInsertRows(parent or qtc.QModelIndex(),
+                             position, position + rows - 1)
 
         for i in range(rows):
             default_row = [""] * len(self._headers)
@@ -84,7 +84,8 @@ class ImportTableModel(qtc.QAbstractTableModel):
         self.endInsertRows()
 
     def removeRows(self, position, rows, parent):
-        self.beginRemoveRows(parent or qtc.QModelIndex(), position, position + rows - 1)
+        self.beginRemoveRows(parent or qtc.QModelIndex(),
+                             position, position + rows - 1)
         for i in range(rows):
             del self._data[position]
         self.endRemoveRows()

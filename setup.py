@@ -53,10 +53,9 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Environment :: X11 Applications :: Qt",
         "Environment :: Other Environment",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3 :: Only",
         "Operating System :: Microsoft :: Windows :: Windows 10",
         "Operating System :: POSIX :: Linux",

@@ -32,6 +32,7 @@ class MainWindow(QDialog):
     imageListModel = None
     changeProfileSig = QtCore.pyqtSignal(str)
     changeDbSig = QtCore.pyqtSignal(str)
+
     def __init__(self, app):
         super().__init__()
         self.app = app
@@ -44,7 +45,7 @@ class MainWindow(QDialog):
         except Exception as e:
             self.logger.error(f"{e}")
         self.show()
-    
+
         self.imageListModel = SortFilterProxyModel(self.ui)
         self.imageListTab = ImageListTab(self, app)
         self.importFitsTab = ImportFitsTab(self, app)
@@ -179,10 +180,14 @@ class MainWindow(QDialog):
         self.ui.pushButtonFitsHeader.clicked.connect(self.fitsHeaderTab.readHeaders)
 
         # Button icons
-        
+
         self.ui.pushButtonGraph.setIcon(QtGui.QIcon("astrodom/icons/chart-up.png"))
-        self.ui.pushButtonDashboard.setIcon(QtGui.QIcon("astrodom/icons/application-monitor.png"))
-        self.ui.pushButtonLastNight.setIcon(QtGui.QIcon("astrodom/icons/weather-moon-half.png"))
+        self.ui.pushButtonDashboard.setIcon(
+            QtGui.QIcon("astrodom/icons/application-monitor.png")
+        )
+        self.ui.pushButtonLastNight.setIcon(
+            QtGui.QIcon("astrodom/icons/weather-moon-half.png")
+        )
         self.ui.pushButtonDeleteRow.setIcon(QtGui.QIcon("astrodom/icons/cross.png"))
         self.ui.pushButtonDeleteFitsRow.setIcon(QtGui.QIcon("astrodom/icons/cross.png"))
         self.ui.pushButtonDeleteCsvRow.setIcon(QtGui.QIcon("astrodom/icons/cross.png"))
@@ -284,20 +289,20 @@ class MainWindow(QDialog):
         self.ui.tableViewImages.doubleClicked.connect(self.imageDetail)
 
     def imageDetail(self, modelIndex):
-        self.imageDetailWindow = ImageDetailWindow(self.app,self.imageListModel)
+        self.imageDetailWindow = ImageDetailWindow(self.app, self.imageListModel)
         self.imageDetailWindow.plot(modelIndex)
 
     def dashboard(self):
-        self.dashboardWindow = DashboardWindow(self.app,self.imageListModel)
-        
+        self.dashboardWindow = DashboardWindow(self.app, self.imageListModel)
+
     def dialogChart(self):
         self.chartWindow = ChartWindow(self.app)
         self.chartWindow.plot(self.imageListModel)
 
     def closeEvent(self, event):
         ssViewImages = self.ui.tableViewImages.horizontalHeader().saveState()
-        jssViewImages = json.dumps(bytes(ssViewImages.toHex()).decode('ascii'))
-        self.app.settings.setValue("imageListState",jssViewImages)
+        jssViewImages = json.dumps(bytes(ssViewImages.toHex()).decode("ascii"))
+        self.app.settings.setValue("imageListState", jssViewImages)
         self.app.settings.setValue("sizeMainW", self.size())
         self.app.settings.setValue("posMainW", self.pos())
         try:
@@ -306,6 +311,10 @@ class MainWindow(QDialog):
             self.logger.debug(f"Closing not existing window {e}")
         try:
             self.chartWindow.close()
+        except Exception as e:
+            self.logger.debug(f"Closing not existing window {e}")
+        try:
+            self.dashboardWindow.close()
         except Exception as e:
             self.logger.debug(f"Closing not existing window {e}")
         self.close()
@@ -422,4 +431,3 @@ class MainWindow(QDialog):
         self.ui.lineEditMeanNoise.setText(noise)
         noiseSigma = str(np.round(np.std(noiseM, axis=0), 2))
         self.ui.lineEditSigmaNoise.setText(noiseSigma)
-  

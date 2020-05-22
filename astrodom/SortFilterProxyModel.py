@@ -1,4 +1,4 @@
-from PyQt5 import  QtCore
+from PyQt5 import QtCore
 from PyQt5.QtCore import QDate, QDateTime, QRegExp, QSortFilterProxyModel, Qt, QTime
 from datetime import datetime
 
@@ -71,11 +71,13 @@ class SortFilterProxyModel(QSortFilterProxyModel):
 
         indexAlt = self.sourceModel().index(sourceRow, 14, sourceParent)
         dataAlt = self.sourceModel().data(indexAlt)
-        operatorAlt = self.ui.comboBoxAlt.itemText(self.ui.comboBoxAlt.currentIndex())
+        operatorAlt = self.ui.comboBoxAlt.itemText(
+            self.ui.comboBoxAlt.currentIndex())
 
         indexAz = self.sourceModel().index(sourceRow, 15, sourceParent)
         dataAz = self.sourceModel().data(indexAz)
-        operatorAz = self.ui.comboBoxAz.itemText(self.ui.comboBoxAz.currentIndex())
+        operatorAz = self.ui.comboBoxAz.itemText(
+            self.ui.comboBoxAz.currentIndex())
 
         indexDate = self.sourceModel().index(sourceRow, 16, sourceParent)
         dataDate = self.sourceModel().data(indexDate)
@@ -207,7 +209,7 @@ class SortFilterProxyModel(QSortFilterProxyModel):
                 bReturn = False
 
         return bReturn
-    
+
     def removeSelectedRows(self, indexP, rows, parent):
         for i in sorted(indexP):
             indexSource = self.mapToSource(i)

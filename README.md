@@ -24,7 +24,7 @@ Check the documentation here: [Documentation](/docs/index.md)
 # Screenshot
 Main window with search criteria and results:
 
-![image 1](/docs/test.gif?raw=true)
+![image 1](/docs/imageList.png?raw=true)
 
 Charts plotted for a subset of images (colors map different filters):
 ![image 2](/docs/ADcharts.png?raw=true)

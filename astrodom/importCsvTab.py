@@ -56,7 +56,8 @@ class ImportCsvTab():
                 dataTemp = list(csvreader)
             self.mainW.ui.lineEditCsv.setText(filename)
             self.logger.info(f"Reading {filename}")
-
+        else:
+            return
         csvList = self.app.filterDictToList('pix_csv')
 
         # First rows of the CSV file don't contain images.

@@ -360,7 +360,7 @@ class MainWindow(QDialog):
             det = QtCore.QDateTime(selDT.addDays(1), QtCore.QTime(deh, 0, 0))
         else:
             dst = QtCore.QDateTime(selDT.addDays(-1), QtCore.QTime(dsh, 0, 0))
-            det = QtCore.QDateTime(selDT, QtCore.QTime(selH, 0, 0))
+            det = QtCore.QDateTime(selDT, QtCore.QTime(deh, 0, 0))
 
         self.ui.dateEditStartDate.setDateTime(dst)
         self.ui.dateEditStartDate.dateTimeChanged.connect(self.filterRegExpChanged)

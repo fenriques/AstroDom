@@ -1,1 +1,9 @@
-{"dbname": "test", "debug": "INFO", "defaultTimeStart": 21, "defaultTimeEnd": 7, "profile": "Ekos INDI", "monthsFilter": "48", "precision": 2}
+{
+    "dbname": "",
+    "debug": "INFO",
+    "defaultTimeStart": 21,
+    "defaultTimeEnd": 7,
+    "profile": "Ekos INDI",
+    "monthsFilter": "48",
+    "precision": 2
+}

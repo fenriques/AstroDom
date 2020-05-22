@@ -120,6 +120,10 @@ class DashboardModel(qtc.QAbstractTableModel):
         value = self._data.iloc[index.row(), index.column()]
         if role == qtc.Qt.DisplayRole:
             return str(value)
+        
+        if index.column()>0 and role == qtc.Qt.TextAlignmentRole:
+            return qtc.Qt.AlignRight+ qtc.Qt.AlignVCenter
+        
         if role == qtc.Qt.FontRole and index.column() == 0 and value != "":
             font = QFont()
             font.setBold(True)
@@ -186,7 +190,10 @@ class DashboardModel(qtc.QAbstractTableModel):
 class TimeDelegate(QtWidgets.QStyledItemDelegate):
     def displayText(self, value, locale):
         try:
-            value = time.strftime("%H:%M:%S", time.gmtime(float(value)))
+            #value = time.strftime("%H:%M:%S", time.gmtime(float(value)))
+            seconds = float(value)
+            value = '%d:%02d:%02d' % (seconds / 3600, seconds / 60 % 60, seconds % 60)
+
         except Exception as e:
             value = ""
         return super(TimeDelegate, self).displayText(value, locale)

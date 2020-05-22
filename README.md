@@ -13,6 +13,8 @@ With the Charts tool you can discover important information about your data, e.g
 AstroDom was tested with FITS files written by MaximDL (v4 and v6), Ekos/INDI, SGP but any other software is supported through custom profiles.
 Check the documentation here: [Documentation](/docs/index.md)
 
+![Overview](/docs/overview.png?raw=true)
+
 # Features
 - Scans recursively filesystem directories searching for FITS files.
 - Add image parameters from Pixinsight's SubFrameSelector process: FWHM, Eccentricity, SNRWeight, Noise.

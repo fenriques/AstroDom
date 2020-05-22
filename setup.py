@@ -43,6 +43,7 @@ setup(
         "PyQt5==5.13.2",
         "pyqtgraph==0.10.0",
         "numpy==1.18.2",
+        "pandas==1.0.3"
     ],
     include_package_data=True,
     url="https://github.com/fenriques/AstroDom",

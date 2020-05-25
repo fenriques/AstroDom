@@ -1,7 +1,6 @@
-include *.md *.txt LICENSE requirements.txt *.db
+include *.md *.txt LICENSE requirements.txt astrodom/config/*.json 
 graft astrodom/icons
-graft astrodom/config
-exclude astrodom *.db
+exclude astrodom/config *.db
 recursive-exclude * __pycache__
 recursive-exclude * *.pyc
 recursive-exclude * *.pyo

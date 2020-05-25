@@ -3,7 +3,7 @@ import os
 import ntpath
 import numpy as np
 import logging
-import copy
+import subprocess
 from PyQt5.QtWidgets import QDialog, QApplication, QTableWidgetItem, QFileDialog
 
 from .chartWindow import *
@@ -287,10 +287,21 @@ class MainWindow(QDialog):
         self.ui.pushButtonLastNight.clicked.connect(self.lastNight)
 
         self.ui.tableViewImages.doubleClicked.connect(self.imageDetail)
+        self.ui.tableViewImages.clicked.connect(self.openDir)
 
+    def openDir(self, item):
+        if item.column()==1:
+            fileName = self.imageListModel.data(item)
+            try:
+                os.startfile(fileName)
+            except Exception as e:
+                opener ="open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, fileName])
+                
     def imageDetail(self, modelIndex):
-        self.imageDetailWindow = ImageDetailWindow(self.app, self.imageListModel)
-        self.imageDetailWindow.plot(modelIndex)
+        if modelIndex.column()!=1:
+            self.imageDetailWindow = ImageDetailWindow(self.app, self.imageListModel)
+            self.imageDetailWindow.plot(modelIndex)
 
     def dashboard(self):
         self.dashboardWindow = DashboardWindow(self.app, self.imageListModel)

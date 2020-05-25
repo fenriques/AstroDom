@@ -1133,6 +1133,9 @@
           <string>PixInsight SubFrameSelector CSV Import</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="6">
+           <widget class="QLineEdit" name="lineEditPathConversionFrom"/>
+          </item>
           <item row="0" column="1">
            <widget class="QPushButton" name="pushButtonChooseCsv">
             <property name="text">
@@ -1164,8 +1167,38 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="4">
+          <item row="0" column="9">
            <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="5">
+           <widget class="QLabel" name="labelPathConversion">
+            <property name="text">
+             <string>Apply Path Conversion From: </string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="8">
+           <widget class="QLineEdit" name="lineEditPathConversionTo"/>
+          </item>
+          <item row="0" column="7">
+           <widget class="QLabel" name="labePathConversion2">
+            <property name="text">
+             <string>To:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <spacer name="horizontalSpacer_4">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>

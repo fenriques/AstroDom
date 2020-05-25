@@ -6,7 +6,7 @@ import hashlib
 import ntpath
 import logging
 
-from pathlib import Path
+from pathlib import Path,PureWindowsPath,PurePosixPath, PurePath
 from PyQt5 import QtWidgets
 from PyQt5 import QtSql, QtGui, QtCore
 
@@ -109,6 +109,15 @@ class ImportCsvTab():
                                 print("FITS file not found")
                             '''
                             hashItem = self.hashFile(item)
+                            pathFrom =self.mainW.ui.lineEditPathConversionFrom.text()
+                            pathTo = self.mainW.ui.lineEditPathConversionTo.text()
+                            if len(pathFrom)>0:
+                                pathFrom=pathFrom.replace('\\','/')
+                                pathTo=pathTo.replace('\\','/')
+                                item = item.replace(pathFrom, pathTo)
+                                item =str(PurePath(item))
+                                           
+                            hashItem = self.hashFile(item)
                             sqlStatement = "SELECT hash FROM images where hash = '"+hashItem+"'"
 
                             r = self.app.db.exec(sqlStatement)
@@ -149,6 +158,8 @@ class ImportCsvTab():
 
     def hashFile(self, fileName):
         try:
+            fileName = PurePath(fileName)
+        
             with open(fileName, 'rb') as afile:
                 hasher = hashlib.md5()
                 buf = afile.read(self.app.BLOCKSIZE)

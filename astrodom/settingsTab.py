@@ -417,6 +417,7 @@ class SettingsTab:
 
         self.app.config["defaultTimeEnd"] = self.mainW.ui.spinBoxDefaultTimeEnd.value()
         self.app.config["precision"] = self.mainW.ui.spinBoxPrecision.value()
+        
         with open(
             os.path.join(self.app.directory, "config", "config.json"), "w"
         ) as outfile3:

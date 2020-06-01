@@ -157,7 +157,7 @@ class ChartWindow(QDialog):
         pg.setConfigOption("foreground", "w")
         pg.setConfigOption("antialias", True)
         pg.setConfigOptions(imageAxisOrder="row-major")
-
+        print(g3)
         # Graph1: Alt-Az
         self.ui.graphWidget1.setLabel("left", "Az (deg)", color="white", size=30)
         self.ui.graphWidget1.setLabel("bottom", "Alt (deg)", color="white", size=30)

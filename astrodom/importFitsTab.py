@@ -76,10 +76,19 @@ class ImportFitsTab:
         self.mainW.ui.tableViewImportFits.setModel(self.model)
 
     def deleteRows(self):
-        selected = self.mainW.ui.tableViewImportFits.selectedIndexes()
-        if selected:
-            self.model.removeRows(selected[0].row(), 1, None)
 
+        indexes = self.mainW.ui.tableViewImportFits.selectedIndexes()
+        countRows = self.mainW.ui.tableViewImportFits.selectionModel().selectedRows()
+        if indexes:
+            ret = QMessageBox.question(None,
+                                       "Delete rows",
+                                       "Are you sure to delete selected rows?",
+                                       QMessageBox.Yes | QMessageBox.No
+                                       )
+
+            if ret == QMessageBox.Yes:
+                self.model.removeRows(indexes[0].row(), countRows, None)
+                
     # Saves each row in the tableview into the database
     def saveFits(self):
 

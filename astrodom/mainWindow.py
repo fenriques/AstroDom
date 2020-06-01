@@ -188,6 +188,7 @@ class MainWindow(QDialog):
         self.ui.pushButtonLastNight.setIcon(
             QtGui.QIcon("astrodom/icons/weather-moon-half.png")
         )
+        self.ui.pushButtonExportCsv.setIcon(QtGui.QIcon("astrodom/icons/disk.png"))
         self.ui.pushButtonDeleteRow.setIcon(QtGui.QIcon("astrodom/icons/cross.png"))
         self.ui.pushButtonDeleteFitsRow.setIcon(QtGui.QIcon("astrodom/icons/cross.png"))
         self.ui.pushButtonDeleteCsvRow.setIcon(QtGui.QIcon("astrodom/icons/cross.png"))
@@ -249,6 +250,7 @@ class MainWindow(QDialog):
         self.ui.pushButtonGraph.clicked.connect(self.dialogChart)
         self.ui.pushButtonDashboard.clicked.connect(self.dashboard)
         self.ui.pushButtonDeleteRow.clicked.connect(self.imageListTab.deleteRows)
+        self.ui.pushButtonExportCsv.clicked.connect(self.imageListTab.exportDataCsv)
 
         self.ui.lineEditTarget.textChanged.connect(self.filterRegExpChanged)
         self.ui.lineEditFilter.textChanged.connect(self.filterRegExpChanged)
@@ -287,7 +289,7 @@ class MainWindow(QDialog):
         self.ui.pushButtonLastNight.clicked.connect(self.lastNight)
 
         self.ui.tableViewImages.doubleClicked.connect(self.imageDetail)
-        self.ui.tableViewImages.clicked.connect(self.openDir)
+        self.ui.tableViewImages.doubleClicked.connect(self.openDir)
 
     def openDir(self, item):
         if item.column()==1:

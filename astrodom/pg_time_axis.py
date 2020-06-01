@@ -133,7 +133,7 @@ class DateAxisItem(AxisItem):
             return AxisItem.tickValues(self, minVal, maxVal, size)
 
         L = len(majticks)
-        if L > maxMajSteps:
+        if L > maxMajSteps and maxMajSteps>0:
             majticks = majticks[::int(numpy.ceil(float(L) / maxMajSteps))]
 
         return [(d.total_seconds(), majticks)]
@@ -194,7 +194,8 @@ class DateAxisItem(AxisItem):
         """Remove this axis from its attached PlotItem
         (not yet implemented)
         """
-        raise NotImplementedError()  # TODO
+        self.hide()
+        #raise NotImplementedError()  # TODO
 
 
 if __name__ == '__main__':

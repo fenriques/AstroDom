@@ -190,9 +190,8 @@ class DashboardModel(qtc.QAbstractTableModel):
 class TimeDelegate(QtWidgets.QStyledItemDelegate):
     def displayText(self, value, locale):
         try:
-            #value = time.strftime("%H:%M:%S", time.gmtime(float(value)))
             seconds = float(value)
-            value = '%d:%02d:%02d' % (seconds / 3600, seconds / 60 % 60, seconds % 60)
+            value = '%02d:%02d:%02d' % (seconds / 3600, seconds / 60 % 60, seconds % 60)
 
         except Exception as e:
             value = ""

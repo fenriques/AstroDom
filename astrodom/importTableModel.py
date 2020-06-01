@@ -19,6 +19,7 @@ class ImportTableModel(qtc.QAbstractTableModel):
         super().__init__()
         self._data = data
         self._headers = headers
+        
 
     def rowCount(self, parent):
         return len(self._data)
@@ -85,9 +86,11 @@ class ImportTableModel(qtc.QAbstractTableModel):
 
     def removeRows(self, position, rows, parent):
         self.beginRemoveRows(parent or qtc.QModelIndex(),
-                             position, position + rows - 1)
-        for i in range(rows):
+                             position, position + len(rows) - 1)
+        for i in rows:
             del self._data[position]
+            self.logger.warning(f"Delete {position}")
+
         self.endRemoveRows()
         self.layoutChanged.emit()
 

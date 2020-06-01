@@ -6,8 +6,8 @@ from .astroDom import AstroDom
 
 def main():
 
-    app = QApplication(sys.argv)
-    app.setStyle('Fusion')
+    application = QApplication(sys.argv)
+    application.setStyle('Fusion')
     palette = QtGui.QPalette()
     palette.setColor(QtGui.QPalette.Window, QtGui.QColor(53, 53, 53))
     palette.setColor(QtGui.QPalette.WindowText, QtCore.Qt.white)
@@ -24,10 +24,10 @@ def main():
     palette.setColor(QtGui.QPalette.HighlightedText, QtCore.Qt.black)
     palette.setColor(QtGui.QPalette.Disabled,
                      QtGui.QPalette.ButtonText, QtCore.Qt.black)
-    app.setPalette(palette)
+    application.setPalette(palette)
 
     w = AstroDom()
-    sys.exit(app.exec_())
+    sys.exit(application.exec_())
 
 
 if __name__ == "__main__":

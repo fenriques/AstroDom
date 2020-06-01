@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog2</class>
+ <widget class="QDialog" name="Dialog2">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>985</width>
+    <height>649</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>971</width>
+     <height>631</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>50</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>60</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Filter Colors</string>
+      </property>
+      <widget class="QLabel" name="labelColorL">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>91</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Luminance</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelColorR">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>30</y>
+         <width>51</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Red</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelColorHa">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>30</y>
+         <width>61</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Halpha</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelColorOiii">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>30</y>
+         <width>41</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Oiii</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelColorSii">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>30</y>
+         <width>41</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Sii</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelColorN">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>30</y>
+         <width>81</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Other/NA</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelColorG">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>30</y>
+         <width>51</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Green</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelColorB">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>30</y>
+         <width>51</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Blue</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>X Axis</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBoxX">
+        <item>
+         <property name="text">
+          <string>frame</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>filter</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>exposure</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>temp</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>sitelat</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>sitelong</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ra</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>dec</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>alt</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>az</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>date</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>gain</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>offset</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>fwhm</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>eccentricity</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>snrWeight</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>noise</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Y Axis</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBoxY">
+        <item>
+         <property name="text">
+          <string>frame</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>filter</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>exposure</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>temp</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>sitelat</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>sitelong</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ra</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>dec</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>alt</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>az</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>date</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>gain</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>offset</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>fwhm</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>eccentricity</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>snrWeight</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>noise</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>37</width>
+          <height>17</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonPlotChart">
+        <property name="text">
+         <string>Plot</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="PlotWidget" name="graphWidget1" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <zorder>graphWidget1</zorder>
+  <zorder>groupBox</zorder>
+  <zorder>comboBoxX</zorder>
+  <zorder>comboBoxY</zorder>
+  <zorder>pushButtonPlotChart</zorder>
+  <zorder>horizontalSpacer</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

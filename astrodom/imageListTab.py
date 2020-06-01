@@ -9,6 +9,7 @@ import sys
 import os
 import ntpath
 import logging
+import csv
 
 from astropy import units as u
 from astropy.coordinates import Angle, Longitude, Latitude
@@ -78,7 +79,7 @@ class ImageListTab:
             self.app.settings.setValue("readStateOnStart", "True")
 
         self.mainW.ui.tableViewImages.setWordWrap(False)
-        self.mainW.ui.tableViewImages.verticalHeader().hide()
+        #self.mainW.ui.tableViewImages.verticalHeader().hide()
         self.mainW.ui.tableViewImages.setSortingEnabled(True)
         self.mainW.ui.tableViewImages.setAlternatingRowColors(True)
         self.mainW.ui.tableViewImages.setModel(self.mainW.imageListModel)
@@ -142,6 +143,25 @@ class ImageListTab:
                 while self.mainW.imageSourceModel.canFetchMore():
                     self.mainW.imageSourceModel.fetchMore()
                 self.mainW.filterRegExpChanged()
+    def exportDataCsv(self):
+ 
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save File",
+                                                            (QtCore.QDir.homePath() +"/export" + ".csv"), "CSV Files (*.csv)")
+        if fileName:
+            f = open(fileName, 'w')
+            with f:
+                writer = csv.writer(f, delimiter=",")
+                headers=[]
+                for headerColumn in range(self.mainW.imageListModel.columnCount()):
+                    headers.append( self.mainW.imageListModel.headerData(headerColumn, QtCore.Qt.Horizontal))
+                writer.writerow(headers)
+                
+                for rowNumber in range(self.mainW.imageListModel.rowCount()):
+                    fields = [self.mainW.imageListModel.data(self.mainW.imageListModel.index(rowNumber, columnNumber),
+                                              QtCore.Qt.DisplayRole)
+                              for columnNumber in range(self.mainW.imageListModel.columnCount())]
+                    writer.writerow(fields)
+
 
 
 class FileDelegate(QtWidgets.QStyledItemDelegate):
@@ -150,6 +170,7 @@ class FileDelegate(QtWidgets.QStyledItemDelegate):
         self.value = ntpath.basename(value)
         return super(FileDelegate, self).displayText(self.value, locale)
 
+# Here  all delegate classes for column formatting
 
 class FilterDelegate(QtWidgets.QStyledItemDelegate):
     def displayText(self, value, locale):
@@ -179,7 +200,7 @@ class FilterDelegate(QtWidgets.QStyledItemDelegate):
 
     def getFilters(self, filters):
         self.filters = filters
-
+    
 
 class FrameDelegate(QtWidgets.QStyledItemDelegate):
     def displayText(self, value, locale):

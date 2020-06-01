@@ -152,9 +152,17 @@ class ImportCsvTab():
             self.logger.error("Invalid CSV format")
 
     def deleteRows(self):
-        selected = self.mainW.ui.tableViewImportCsv.selectedIndexes()
-        if selected:
-            self.model.removeRows(selected[0].row(), 1, None)
+        indexes = self.mainW.ui.tableViewImportCsv.selectedIndexes()
+        countRows = self.mainW.ui.tableViewImportCsv.selectionModel().selectedRows()
+        if indexes:
+            ret = QMessageBox.question(None,
+                                       "Delete rows",
+                                       "Are you sure to delete selected rows?",
+                                       QMessageBox.Yes | QMessageBox.No
+                                       )
+
+            if ret == QMessageBox.Yes:
+                self.model.removeRows(indexes[0].row(), countRows, None)
 
     def hashFile(self, fileName):
         try:

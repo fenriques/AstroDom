@@ -10,6 +10,7 @@ import os
 import json
 import logging
 import codecs
+import shutil
 from PyQt5 import QtSql
 from PyQt5.QtCore import QSettings
 from datetime import date
@@ -28,7 +29,12 @@ classes it is referenced as 'app'.
 class AstroDom:
     astrodomDir = os.getcwd()
     directory = os.path.dirname(__file__)
-    with open(os.path.join(directory, "config", "config.json"), "r") as config:
+    
+    #if config files don't exist copy the defaults
+    configFile = os.path.join(directory, "config", "config.json")
+    if not os.path.isfile(configFile):
+        shutil.copyfile(os.path.join(directory, "config", "config-default.json"), configFile)
+    with open(configFile, "r") as config:
         config = json.load(config)
 
     logDir = os.path.join(directory, "logs")

@@ -42,7 +42,7 @@ setup(
         "matplotlib==3.1.3",
         "PyQt5==5.13.2",
         "pyqtgraph==0.10.0",
-        "numpy==1.18.2",
+        "numpy==1.22.0",
         "pandas==1.0.3"
     ],
     include_package_data=True,

@@ -1,3 +1,5 @@
+## Jan 2025: Contributors and maintainers for this project are needed! Please contact me or open an issue if you are interested
+
 # AstroDom
 Astro(nomy) Dom(ine) is a catalogue tool for deep sky images. It scans the directories where images (FITS format only) are  
 stored and reads information from FITS headers. 

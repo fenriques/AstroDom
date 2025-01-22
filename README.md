@@ -1,4 +1,7 @@
-## Jan 2025: Contributors and maintainers for this project are needed! Please contact me or open an issue if you are interested
+## Jan 2025 update: 
+  **1. Contributors and maintainers for this project are needed! Please contact me or open an issue if you are interested.**
+  
+  **2. pip install only works for older pythons (up to 3.8). For versions up to 3.12 read the last paragraph in the installation section**
 
 # AstroDom
 Astro(nomy) Dom(ine) is a catalogue tool for deep sky images. It scans the directories where images (FITS format only) are  

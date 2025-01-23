@@ -80,13 +80,13 @@ class ImportFitsTab:
         indexes = self.mainW.ui.tableViewImportFits.selectedIndexes()
         countRows = self.mainW.ui.tableViewImportFits.selectionModel().selectedRows()
         if indexes:
-            ret = QMessageBox.question(None,
+            ret = QtWidgets.QMessageBox.question(None,
                                        "Delete rows",
                                        "Are you sure to delete selected rows?",
-                                       QMessageBox.Yes | QMessageBox.No
+                                       QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
                                        )
 
-            if ret == QMessageBox.Yes:
+            if ret == QtWidgets.QMessageBox.Yes:
                 self.model.removeRows(indexes[0].row(), countRows, None)
                 
     # Saves each row in the tableview into the database

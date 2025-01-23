@@ -85,7 +85,7 @@ class ImageListTab:
         self.mainW.ui.tableViewImages.setModel(self.mainW.imageListModel)
         self.mainW.ui.tableViewImages.setTextElideMode(QtCore.Qt.ElideLeft)
         self.mainW.ui.tableViewImages.setEditTriggers(
-            QtGui.QAbstractItemView.NoEditTriggers
+            QtWidgets.QAbstractItemView.NoEditTriggers
         )
 
         fd = FileDelegate(self.mainW.ui.tableViewImages)

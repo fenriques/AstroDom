@@ -12,6 +12,8 @@ import logging
 import codecs
 import shutil
 from PyQt5 import QtSql
+from PyQt5 import QtWidgets as qtw
+
 from PyQt5.QtCore import QSettings
 from datetime import date
 
@@ -171,18 +173,18 @@ class DbDialog(QDialog):
     def __init__(self, parent=None):
         super(DbDialog, self).__init__(parent)
 
-        layout = QVBoxLayout(self)
+        layout = QtWidgets.QVBoxLayout(self)
         self.setWindowTitle("Message")
-        self.labelMsg = QLabel()
+        self.labelMsg = QtWidgets.QLabel()
         self.labelMsg.setText(
             "Please choose a name for the storage.\nFor example 'MyAstroImages', 'Images6-2020', 'IC434' ")
         layout.addWidget(self.labelMsg)
-        self.lineEditDbName = QLineEdit()
+        self.lineEditDbName = QtWidgets.QLineEdit()
         layout.addWidget(self.lineEditDbName)
 
         # OK and Cancel buttons
-        buttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+        buttons = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
             Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)

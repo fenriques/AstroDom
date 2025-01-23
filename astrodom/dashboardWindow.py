@@ -12,7 +12,7 @@ import numpy as np
 """
 
 
-class DashboardWindow(QDialog):
+class DashboardWindow(QtWidgets.QDialog):
     logger = logging.getLogger(__name__)
 
     def __init__(self, app, imageListModel):
@@ -69,7 +69,7 @@ class DashboardWindow(QDialog):
 
         self.ui.tableViewDashboardCount.setModel(self.modelCount)
         self.ui.tableViewDashboardCount.setWordWrap(False)
-        self.ui.tableViewDashboardCount.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        self.ui.tableViewDashboardCount.horizontalHeader().setSectionResizeMode(qtw.QHeaderView.Stretch)
 
         self.ui.tableViewDashboardCount.verticalHeader().hide()
         self.ui.tableViewDashboardCount.setSortingEnabled(False)
@@ -85,7 +85,7 @@ class DashboardWindow(QDialog):
         self.modelTime = DashboardModel(self.app, tableTime)
         self.ui.tableViewDashboardTime.setModel(self.modelTime)
         self.ui.tableViewDashboardTime.setWordWrap(False)
-        self.ui.tableViewDashboardTime.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        self.ui.tableViewDashboardTime.horizontalHeader().setSectionResizeMode(qtw.QHeaderView.Stretch)
         self.ui.tableViewDashboardTime.verticalHeader().hide()
         self.ui.tableViewDashboardTime.setSortingEnabled(False)
         self.ui.tableViewDashboardTime.sortByColumn(0, qtc.Qt.AscendingOrder)

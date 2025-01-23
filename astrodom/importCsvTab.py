@@ -155,13 +155,13 @@ class ImportCsvTab():
         indexes = self.mainW.ui.tableViewImportCsv.selectedIndexes()
         countRows = self.mainW.ui.tableViewImportCsv.selectionModel().selectedRows()
         if indexes:
-            ret = QMessageBox.question(None,
+            ret = QtWidgets.QMessageBox.question(None,
                                        "Delete rows",
                                        "Are you sure to delete selected rows?",
-                                       QMessageBox.Yes | QMessageBox.No
+                                       QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
                                        )
 
-            if ret == QMessageBox.Yes:
+            if ret == QtWidgets.QMessageBox.Yes:
                 self.model.removeRows(indexes[0].row(), countRows, None)
 
     def hashFile(self, fileName):

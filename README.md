@@ -1,3 +1,8 @@
+## Jan 2025 update: 
+  **1. Contributors and maintainers for this project are needed! Please contact me or open an issue if you are interested.**
+  
+  **2. pip install only works for older pythons (up to 3.8). For versions up to 3.12 read the last paragraph in the installation section**
+
 # AstroDom
 Astro(nomy) Dom(ine) is a catalogue tool for deep sky images. It scans the directories where images (FITS format only) are  
 stored and reads information from FITS headers. 
@@ -12,6 +17,12 @@ With the Charts tool you can discover important information about your data, e.g
 
 AstroDom was tested with FITS files written by MaximDL (v4 and v6), Ekos/INDI, SGP but any other software is supported through custom profiles.
 Check the documentation here: [Documentation](/docs/index.md)
+
+# Video
+[Features](https://www.youtube.com/watch?v=leJt-5oTfVs&t=66s)
+
+[Installation](https://www.youtube.com/watch?v=u_OSYxAcNoc)
+
 
 ![Overview](/docs/overview.png?raw=true)
 

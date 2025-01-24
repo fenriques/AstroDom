@@ -3,9 +3,6 @@ name: release
 on:
   workflow_dispatch:
 
-env:
-  PACKAGE_NAME: "AstroDom"
-  OWNER: "fenriques"
 
 jobs:
   pypi-publish:

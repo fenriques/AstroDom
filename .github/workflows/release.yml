@@ -1,12 +1,7 @@
 name: release
 
-on:
-  push:
-    tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+a[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+b[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
+
+on: workflow_dispatch
 
 env:
   PACKAGE_NAME: "AstroDom"

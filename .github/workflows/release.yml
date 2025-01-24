@@ -1,9 +1,18 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+env:
+  PACKAGE_NAME: "astrodom"
+  OWNER: "fenriques"
+
 jobs:
   pypi-publish:
     name: upload release to PyPI
     runs-on: ubuntu-latest
     # Specifying a GitHub environment is optional, but strongly encouraged
-    environment: release
+    environment: pypi
     permissions:
       # IMPORTANT: this permission is mandatory for Trusted Publishing
       id-token: write

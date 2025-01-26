@@ -1,15 +1,9 @@
 #!/bin/bash
 cd $(dirname "$0")
 source ./venv/bin/activate
-if [ -d "./venv/lib/python3.6" ]
+if [ -d "./venv/lib/python3.12" ]
 then
-  cd ./venv/lib/python3.6/site-packages/
-elif [ -d "./venv/lib/python3.7" ]
-then
-  cd ./venv/lib/python3.7/site-packages/
-elif [ -d "./venv/lib/python3.8" ]
-then
-  cd ./venv/lib/python3.8/site-packages/
+  cd ./venv/lib/python3.12/site-packages/
 else
   echo "python not found"
   exit 0

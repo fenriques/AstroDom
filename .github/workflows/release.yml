@@ -44,10 +44,7 @@ jobs:
       id-token: write
 
     # Dedicated environments with protections for publishing are strongly recommended.
-    environment:
-      name: release
-      # OPTIONAL: uncomment and update to include your PyPI project URL in the deployment status:
-      # url: https://pypi.org/p/YOURPROJECT
+    environment: release
 
     steps:
       - name: Retrieve release distributions
@@ -57,4 +54,5 @@ jobs:
           path: dist/
 
       - name: Publish release distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@6f7e8d9c0b1a2c3d4e5f6a7b8c9d0e1f2a3b4c5d
+        uses: pypa/gh-action-pypi-publish@release/v1
+        

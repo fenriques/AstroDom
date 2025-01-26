@@ -36,7 +36,7 @@ setup(
     name="astrodom",
     version=get_version("astrodom/__init__.py"),
     packages=find_packages(),
-    python_requires="3.12",
+    python_requires=">=3.12",
     install_requires=[
         "astropy",
         "matplotlib",

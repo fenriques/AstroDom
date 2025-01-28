@@ -88,51 +88,51 @@ class ImportCsvTab():
                 i+=1
                 # Items (columns) for each row
                 filteredRow = []
-                for col in range(len(val)):
-                    if str(col) in csvList:
-                        item = dataTemp[row][col]
-                        # Check if the file (hash) exists in the database
-                        if col == 8:
-                            filenameMatch = ntpath.splitext(
-                                ntpath.basename(item))[0]
-                            '''
-                            TO BE COMPLETED:
-                            filenameMatch = ntpath.splitext(
-                                ntpath.basename(item))[0]
-                            sqlStatementF = "SELECT file FROM images where file like '%"+filenameMatch+"'%"
+                for scol in csvList:
+                    col = int(scol)
+                    item = dataTemp[row][col]
+                    # Check if the file (hash) exists in the database
+                    if col == 8:
+                        filenameMatch = ntpath.splitext(
+                            ntpath.basename(item))[0]
+                        '''
+                        TO BE COMPLETED:
+                        filenameMatch = ntpath.splitext(
+                            ntpath.basename(item))[0]
+                        sqlStatementF = "SELECT file FROM images where file like '%"+filenameMatch+"'%"
 
-                            rF = self.app.db.exec(sqlStatementF)
-                            rF.next()
-                            if rF.value(0):
-                                print("trovato")
-                            else:
-                                print("FITS file not found")
-                            '''
-                            hashItem = self.hashFile(item)
-                            pathFrom =self.mainW.ui.lineEditPathConversionFrom.text()
-                            pathTo = self.mainW.ui.lineEditPathConversionTo.text()
-                            if len(pathFrom)>0:
-                                pathFrom=pathFrom.replace('\\','/')
-                                pathTo=pathTo.replace('\\','/')
-                                item = item.replace(pathFrom, pathTo)
-                                item =str(PurePath(item))
-                                           
-                            hashItem = self.hashFile(item)
-                            sqlStatement = "SELECT hash FROM images where hash = '"+hashItem+"'"
+                        rF = self.app.db.exec(sqlStatementF)
+                        rF.next()
+                        if rF.value(0):
+                            print("trovato")
+                        else:
+                            print("FITS file not found")
+                        '''
+                        hashItem = self.hashFile(item)
+                        pathFrom = self.mainW.ui.lineEditPathConversionFrom.text()
+                        pathTo = self.mainW.ui.lineEditPathConversionTo.text()
+                        if len(pathFrom)>0:
+                            pathFrom=pathFrom.replace('\\','/')
+                            pathTo=pathTo.replace('\\','/')
+                            item = item.replace(pathFrom, pathTo)
+                            item =str(PurePath(item))
+                                        
+                        hashItem = self.hashFile(item)
+                        sqlStatement = "SELECT hash FROM images where hash = '"+hashItem+"'"
 
-                            r = self.app.db.exec(sqlStatement)
-                            r.next()
-                            if r.value(0):
-                                strStatus = "File found"
-                                self.logger.info(
-                                    f"File {filenameMatch} found in the database")
-                            else:
-                                strStatus = "File not found"
-                                self.logger.error(
-                                    f"File {filenameMatch} not found in the database")
+                        r = self.app.db.exec(sqlStatement)
+                        r.next()
+                        if r.value(0):
+                            strStatus = "File found"
+                            self.logger.info(
+                                f"File {filenameMatch} found in the database")
+                        else:
+                            strStatus = "File not found"
+                            self.logger.error(
+                                f"File {filenameMatch} not found in the database")
 
-                        filteredRow.insert(col, str(item))
-                
+                    filteredRow.insert(col, str(item))
+
                 # Append info about matching fits file found/not found
                 filteredRow.insert(len(filteredRow), strStatus)
                 self._data.append(filteredRow)
@@ -186,7 +186,7 @@ class ImportCsvTab():
         fieldUpdate = self.app.filterDictToList('pix_csv', 'keys')
         rows = self.model.rowCount(self.mainW.ui.tableViewImportCsv.rootIndex())
         self.logger.info(f"Saving {rows} CSV rows")
-        
+
         # Each row from table view is an SQL update statement
         for row in range(rows):
             query = "UPDATE images SET "

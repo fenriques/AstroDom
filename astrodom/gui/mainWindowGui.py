@@ -491,6 +491,9 @@ class Ui_Dialog(object):
         self.lineEditOverrideTarget.setObjectName("lineEditOverrideTarget")
         self.gridLayout_3.addWidget(self.lineEditOverrideTarget, 1, 0, 1, 1)
         self.labelOverrideTarget = QtWidgets.QLabel(self.groupBoxFitsImport)
+        self.labelOverrideTarget.setStyleSheet(    "QToolTip { color: #000; background-color: #ccc; border: 0px; }")
+        self.labelOverrideTarget.setToolTip('''Sometimes the imaging software does not provide the target name in the FITS header. 
+        In this case, you can override the target name here so it will listed and filtered correctly in the main windows.''')
         self.labelOverrideTarget.setObjectName("labelOverrideTarget")
         self.gridLayout_3.addWidget(self.labelOverrideTarget, 1, 1, 1, 3)
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)

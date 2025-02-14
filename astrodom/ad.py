@@ -20,9 +20,20 @@ from pathlib import Path
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.cwd = Path.cwd()
-        self.gui = self.cwd / 'gui'
-        self.icons = self.cwd / 'icons'
+        if getattr(sys, 'frozen', False):
+            # If the application is frozen (e.g., packaged with PyInstaller)
+            base_path = Path(sys._MEIPASS)
+        else:
+            # If running in a virtual environment or directly from source
+            base_path = Path(__file__).resolve().parent
+
+        # Define paths for UI and icons
+        ui_path = base_path / 'gui'
+        icons_path = base_path / 'icons'
+
+        # Load the UI file
+        uic.loadUi((ui_path / 'mainWindow.ui'), self)
+
 
         # Load the main window UI
         uic.loadUi((self.gui / 'mainWindow.ui'), self)

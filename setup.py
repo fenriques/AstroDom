@@ -49,7 +49,6 @@ setup(
         "PyQt6",
         "photutils",
     ],
-    include_package_data=True,
     url="https://github.com/fenriques/AstroDom",
     license="MIT",
     author="Ferrante Enriques",

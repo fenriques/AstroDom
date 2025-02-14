@@ -1,4 +1,3 @@
-import pyqtgraph as pg
 from PyQt6.QtWidgets import QDialog, QVBoxLayout
 from PyQt6.QtCore import Qt
 import pandas as pd

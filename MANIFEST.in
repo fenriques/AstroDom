@@ -1,4 +1,6 @@
 include README.md
 include setup.py
-recursive-include gui *
-recursive-include icons *
+graft gui
+graft icons
+global-exclude __pycache__
+global-exclude *.py[cod]

@@ -1,0 +1,11 @@
+{
+    "DBNAME": "astrodom_database.db",
+    "LOGGING_LEVEL": "DEBUG",
+    "FILE_LOG": "NO",
+    "DATE_FORMAT": "%Y-%m-%d",
+    "ALT_LIMIT_DEFAULT": 10.0,
+    "FWHM_LIMIT_DEFAULT": 3.0,
+    "ECCENTRICITY_LIMIT_DEFAULT": 0.15,
+    "SNR_LIMIT_DEFAULT": 20.0,
+    "COMPACT_DASHBOARD": "Extended"
+}

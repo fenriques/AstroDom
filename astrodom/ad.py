@@ -14,13 +14,18 @@ from charts import Charts
 from starAnalysis import StarAnalysis
 from syncProgress import SyncProgress
 from PyQt6.QtWidgets import QMessageBox
+from pathlib import Path
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        
+        self.cwd = Path.cwd()
+        self.gui = self.cwd / 'gui'
+        self.icons = self.cwd / 'icons'
+
         # Load the main window UI
-        uic.loadUi('gui/mainWindow.ui', self)
+        uic.loadUi((self.gui / 'mainWindow.ui'), self)
 
         # Initialize the log widget at the bottom of the window
         self.logEdit = self.findChild(QTextEdit, 'logEdit')

@@ -40,10 +40,10 @@ setup(
     install_requires=[
         "astropy",
         "matplotlib",
-        "PyQt5",
-        "pyqtgraph",
         "numpy",
-        "pandas"
+        "pandas",
+        "PyQt6",
+        "photutils",
     ],
     include_package_data=True,
     url="https://github.com/fenriques/AstroDom",

@@ -1,0 +1,4 @@
+include README.md
+include setup.py
+recursive-include gui *
+recursive-include icons *

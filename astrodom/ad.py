@@ -35,9 +35,6 @@ class MainWindow(QMainWindow):
         uic.loadUi((ui_path / 'mainWindow.ui'), self)
 
 
-        # Load the main window UI
-        uic.loadUi((self.gui / 'mainWindow.ui'), self)
-
         # Initialize the log widget at the bottom of the window
         self.logEdit = self.findChild(QTextEdit, 'logEdit')
         self.logEdit.setReadOnly(True)

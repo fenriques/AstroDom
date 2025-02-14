@@ -38,7 +38,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        '': ['gui/*', 'icons/*'],
+        'astrodom': ['gui/*', 'icons/*'],
     },
     python_requires=">=3.12",
     install_requires=[

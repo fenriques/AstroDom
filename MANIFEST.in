@@ -1,6 +1,6 @@
 include README.md
 include setup.py
-graft gui
-graft icons
+graft astrodom/gui
+graft astrodom/icons
 global-exclude __pycache__
 global-exclude *.py[cod]

@@ -1,8 +1,10 @@
 import os, sys, logging
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget,QPushButton,QComboBox,QTextEdit,QLineEdit
+
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget,QPushButton,QComboBox,QTextEdit,QLineEdit,QStyle
 from PyQt6.QtSql import QSqlQuery,QSqlDatabase
-from PyQt6.QtGui import QIcon
 from PyQt6 import uic
+from PyQt6.QtGui import QIcon
+import importlib_resources
 
 from fitsBrowser import FitsBrowser
 from dashboard import Dashboard
@@ -14,26 +16,15 @@ from charts import Charts
 from starAnalysis import StarAnalysis
 from syncProgress import SyncProgress
 from PyQt6.QtWidgets import QMessageBox
-from pathlib import Path
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        if getattr(sys, 'frozen', False):
-            # If the application is frozen (e.g., packaged with PyInstaller)
-            base_path = Path(sys._MEIPASS)
-        else:
-            # If running in a virtual environment or directly from source
-            base_path = Path(__file__).resolve().parent
-
-        # Define paths for UI and icons
-        ui_path = base_path / 'gui'
-        icons_path = base_path / 'icons'
-
         # Load the UI file
-        uic.loadUi((ui_path / 'mainWindow.ui'), self)
+        self.rsc_path = importlib_resources.files("rsc")
+        #self.rsc_path = os.path.join(os.path.dirname(__file__), 'rsc')
 
+        uic.loadUi((self.rsc_path.joinpath( 'gui', 'mainWindow.ui')), self)
 
         # Initialize the log widget at the bottom of the window
         self.logEdit = self.findChild(QTextEdit, 'logEdit')
@@ -61,28 +52,32 @@ class MainWindow(QMainWindow):
 
         # Create buttons and icons
         self.newProjectButton = self.findChild(QPushButton, 'newProjectButton')
-        self.newProjectButton.setIcon(QIcon('icons/folder-open.png'))
-        self.editProjectButton.setIcon(QIcon('icons/gear.png'))
+        self.newProjectButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_FileDialogNewFolder))
+        
+        self.editProjectButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_FileDialogContentsView))
 
         self.syncButton = self.findChild(QPushButton, 'syncButton')
-        self.syncButton.setIcon(QIcon('icons/sync.png'))
+        self.syncButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
 
         self.chartsButton = self.findChild(QPushButton, 'chartsButton')
-        self.chartsButton.setIcon(QIcon('icons/chart-up.png'))
+        self.chartsButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'chart-up.png'))))
         self.charts_widget = None
 
         self.settingsButton = self.findChild(QPushButton, 'settingsButton')
-        self.settingsButton.setIcon(QIcon('icons/gear.png'))
+        self.settingsButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'gear.png'))))
 
         self.starAnalysisButton = self.findChild(QPushButton, 'starAnalysisButton')
-        self.starAnalysisButton.setIcon(QIcon('icons/gear.png'))
+        self.starAnalysisButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirOpenIcon))
 
         self.fwhmEdit = self.findChild(QLineEdit, 'fwhmEdit')
         self.snrEdit = self.findChild(QLineEdit, 'snrEdit')
         self.altEdit = self.findChild(QLineEdit, 'altEdit')
         self.eccentricityEdit = self.findChild(QLineEdit, 'eccentricityEdit')
         self.setThresholdsButton = self.findChild(QPushButton, 'setThresholdsButton')
+        self.setThresholdsButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogSaveButton))
+
         self.fileOpButton = self.findChild(QPushButton, 'fileOpButton')
+        self.fileOpButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
 
         # Disable buttons if no project is selected
         self.syncButton.setEnabled(False)
@@ -151,7 +146,7 @@ class MainWindow(QMainWindow):
             # The FitsBrowser thread is created and started 
             # Two signals are connected to the thread: one for logging and one for updating the dashboard
             # when the thread is completed.
-            self.thread = FitsBrowser(project_id=selected_project_id, base_dir=base_dir)
+            self.thread = FitsBrowser(project_id=selected_project_id, base_dir=base_dir, parent=self)
             self.thread.taskCompleted.connect(self.dashboard.load_data)
             self.thread.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
 
@@ -333,7 +328,8 @@ class MainWindow(QMainWindow):
     # settings.json file
     def createDB(self):
         self.db = QSqlDatabase.addDatabase("QSQLITE")
-        db_path = os.path.join(os.path.dirname(__file__), DBNAME)
+        
+        db_path = str(self.rsc_path.joinpath( DBNAME))
         db_exists = os.path.exists(db_path)
         logging.info(f"Database path: {db_path}")
         

@@ -85,7 +85,8 @@ class Dashboard(QTreeView):
 
     def load_data(self):
         # Connect to the database
-        conn = sqlite3.connect(DBNAME)
+        db_path = str(self.parent.rsc_path.joinpath( DBNAME))
+        conn = sqlite3.connect(db_path)
 
         if hasattr(self.parent, 'projectStatus') and self.parent.projectStatus != 'Active':
             self.parent.syncButton.setEnabled(False)

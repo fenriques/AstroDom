@@ -277,7 +277,8 @@ class FitsBrowser(QThread):
             self.threadLogger.emit(f"These are files not found in the database anymore: {self.dbFiles}", "debug")    
             
             # Remove the files that are not in the folder anymore
-            conn = sqlite3.connect(DBNAME)
+            db_path = str(self.parent.rsc_path.joinpath( DBNAME))
+            conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
             for file in self.dbFiles:
                 cursor.execute("DELETE FROM images WHERE file = ?", (file,))
@@ -293,7 +294,8 @@ class FitsBrowser(QThread):
     # this function is used to get the filenames of the images in the database so that are skipped when parsing
     # files in the folders and the remainders are removed from the db if they are not in the folder
     def get_filesFromDb(self,project_id):
-        conn = sqlite3.connect(DBNAME)
+        db_path = str(self.parent.rsc_path.joinpath( DBNAME))
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         cursor.execute("SELECT file FROM images WHERE PROJECT_ID = ?", (project_id,))
 
@@ -305,7 +307,8 @@ class FitsBrowser(QThread):
     def save_to_db(self,fits_data):
 
         self.file_counter += 1
-        conn = sqlite3.connect(DBNAME)
+        db_path = str(self.parent.rsc_path.joinpath( DBNAME))
+        conn = sqlite3.connect(db_path)
         self.threadLogger.emit("Connected to database","debug")
             
         cursor = conn.cursor()

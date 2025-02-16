@@ -1,6 +1,8 @@
 include README.md
 include setup.py
-graft astrodom/gui
-graft astrodom/icons
+recursive-include package *
+graft astrodom/rsc
+graft astrodom/rsc/gui
+graft astrodom/rsc/icons
 global-exclude __pycache__
 global-exclude *.py[cod]

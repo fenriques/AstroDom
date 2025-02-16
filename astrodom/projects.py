@@ -14,10 +14,11 @@ class Projects(QDialog):
     project_updated = pyqtSignal()
     def __init__(self, parent=None, project_id=None):
         super().__init__(parent)
-        uic.loadUi('gui/projects.ui', self)
+        self.parent = parent
+        self.project_id = project_id
+        uic.loadUi((self.parent.rsc_path.joinpath( 'gui', 'projects.ui')), self)
         self.setWindowTitle("Projects")
         self.setGeometry(100, 100, 600, 300)
-        self.project_id = project_id
 
         self.infoBox = self.findChild(QLabel, 'infoBox')
         self.infoBox.setText("This dialog allows you to create or edit a project. Please provide the necessary details and click Save to store the project information.")
@@ -57,7 +58,9 @@ class Projects(QDialog):
         self.project_id = project_id
 
         # Connect to the database
-        conn = sqlite3.connect(DBNAME)
+
+        db_path = str(self.parent.rsc_path.joinpath( DBNAME))
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
         # Fetch project data
@@ -93,7 +96,8 @@ class Projects(QDialog):
         project_status = self.project_statusComboBox.currentText()  
 
         # Connect to the database
-        conn = sqlite3.connect(DBNAME)
+        db_path = str(self.parent.rsc_path.joinpath( DBNAME))
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
         if self.project_id is None:
@@ -134,7 +138,8 @@ class Projects(QDialog):
             if reply == QMessageBox.StandardButton.No:
                 return
             # Connect to the database
-            conn = sqlite3.connect(DBNAME)
+            db_path = str(self.parent.rsc_path.joinpath( DBNAME))
+            conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
 
             # Delete project data from projects table

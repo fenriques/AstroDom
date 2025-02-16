@@ -1,8 +1,12 @@
-import json
+import json,os
+import importlib_resources
+
 
 def load_settings():
     try:
-        with open('settings.json', 'r') as file:
+        settingsPath = importlib_resources.files("rsc") /  'settings.json'
+
+        with open( settingsPath, 'r') as file:
             settings = json.load(file)
             for key, value in settings.items():
                 globals()[key] = value

@@ -38,7 +38,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        'astrodom': ['gui/*', 'icons/*'],
+        'astrodom.rsc': ['gui/*', 'icons/*'],
     },
     python_requires=">=3.12",
     install_requires=[
@@ -48,6 +48,8 @@ setup(
         "pandas",
         "PyQt6",
         "photutils",
+        "pyqtgraph",
+        "importlib_resources",
     ],
     url="https://github.com/fenriques/AstroDom",
     license="MIT",

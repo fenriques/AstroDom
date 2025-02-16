@@ -181,7 +181,8 @@ class FitsBrowser(QWidget):
                     except Exception as e:
                         print(f"Error: {e} for file {file_name}")
         # Connect to the database (or create it if it doesn't exist)
-        conn = sqlite3.connect(DBNAME)
+        db_path = os.path.join(os.path.dirname(__file__), 'rsc', DBNAME)
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
         # Start iterating from the root index

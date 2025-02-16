@@ -4,12 +4,15 @@ from PyQt6.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushB
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.parent() == parent
+
+
         self.setWindowTitle("Settings")
         self.setGeometry(100, 100, 400, 300)
 
         # Load settings from JSON file
         self.settings = self.load_settings()
-
+        
         # Create layout
         layout = QVBoxLayout(self)
         form_layout = QFormLayout()
@@ -64,8 +67,10 @@ class SettingsDialog(QDialog):
         layout.addWidget(save_button)
 
     def load_settings(self):
+        db_path = str(self.parent().rsc_path.joinpath( 'settings.json'))
+        print(db_path)
         try:
-            with open('settings.json', 'r') as file:
+            with open(str(self.parent().rsc_path.joinpath('settings.json')), 'r') as file:
                 return json.load(file)
         except FileNotFoundError:
             logging.error("settings.json file not found.")
@@ -94,7 +99,7 @@ class SettingsDialog(QDialog):
         if not self.settings["SNR_LIMIT_DEFAULT"]:
             self.settings["SNR_LIMIT_DEFAULT"] = 0.0
 
-        with open('settings.json', 'w') as file:
+        with open(str(self.parent().rsc_path.joinpath('settings.json')), 'w') as file:
             json.dump(self.settings, file, indent=4)
 
             logging.debug(f"Settings to be saved: {self.settings}")

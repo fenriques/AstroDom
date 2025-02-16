@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QDialog, QVBoxLayout
 from PyQt6.QtCore import Qt
 import pandas as pd
 from PyQt6.QtGui import QColor
+import pyqtgraph as pg
 from settings import *
 
 class Charts(QDialog):

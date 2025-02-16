@@ -2,10 +2,10 @@ import sqlite3, sys, logging
 import pandas as pd
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QTreeView
 from PyQt6.QtCore import Qt
-from customTreeModel import CustomTreeModel, CustomFilterProxyModel
-from viewDelegates import *
-from settings import *
-from loadSettings import *  # Import the constants
+from astrodom.customTreeModel import CustomTreeModel, CustomFilterProxyModel
+from astrodom.viewDelegates import *
+from astrodom.settings import *
+from astrodom.loadSettings import *  # Import the constants
 
 
 class Dashboard(QTreeView):

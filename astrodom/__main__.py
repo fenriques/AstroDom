@@ -1,6 +1,6 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from  ad import MainWindow
+from  astrodom.ad import MainWindow
 
 
 def main():

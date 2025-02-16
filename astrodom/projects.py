@@ -1,12 +1,12 @@
 import logging
 import sqlite3
+import os, datetime
 from PyQt6.QtWidgets import QDialog, QComboBox, QLabel, QPushButton, QLineEdit, QDialogButtonBox
 from PyQt6.QtWidgets import QFileDialog, QStyle,QMessageBox
 from PyQt6.QtCore import pyqtSignal
 from PyQt6 import uic
-from settings import *
-from loadSettings import *  # Import the constants
-import os, datetime
+from astrodom.settings import *
+from astrodom.loadSettings import *  # Import the constants
 
 
 

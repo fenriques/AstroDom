@@ -16,8 +16,8 @@ from astropy.time import Time
 import astropy.units as u
 from datetime import datetime
 from PyQt6.QtCore import pyqtSignal,QThread
-from settings import *
-from loadSettings import *  
+from astrodom.settings import *
+from astrodom.loadSettings import *  
 from PyQt6.QtSql import QSqlQuery
 
 

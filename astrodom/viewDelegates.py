@@ -15,8 +15,8 @@ from PyQt6 import QtCore, QtGui
 from PyQt6 import QtWidgets
 
 from PyQt6.QtGui import QColor
-from settings import *
-from loadSettings import *  
+from astrodom.settings import *
+from astrodom.loadSettings import *  
 
 
 #from dateutil.relativedelta import relativedelta

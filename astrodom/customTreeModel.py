@@ -1,11 +1,13 @@
-from PyQt6.QtCore import QAbstractItemModel, QModelIndex, Qt, QVariant, QSize
 import pandas as pd
 import numpy as np
-from PyQt6.QtGui import QBrush, QColor, QFont
 import logging
-from utils import format_seconds, format_file_size  # Import utility functions
+
+from PyQt6.QtCore import QAbstractItemModel, QModelIndex, Qt, QVariant, QSize
+from PyQt6.QtGui import QBrush, QColor, QFont
 from PyQt6.QtCore import QSortFilterProxyModel, Qt
-from loadSettings import *
+
+from astrodom.utils import format_seconds, format_file_size  # Import utility functions
+from astrodom.loadSettings import *
 
 class CustomFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, parent=None):

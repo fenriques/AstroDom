@@ -6,22 +6,22 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 import importlib_resources
 
-from fitsBrowser import FitsBrowser
-from dashboard import Dashboard
-from projects import Projects  
-from logHandler import QTextEditLogger,ColorFormatter  
-from settings import SettingsDialog  
-from loadSettings import *  # Import the constants
-from charts import Charts 
-from starAnalysis import StarAnalysis
-from syncProgress import SyncProgress
+from astrodom.fitsBrowser import FitsBrowser
+from astrodom.dashboard import Dashboard
+from astrodom.projects import Projects  
+from astrodom.logHandler import QTextEditLogger,ColorFormatter  
+from astrodom.settings import SettingsDialog  
+from astrodom.loadSettings import *  # Import the constants
+from astrodom.charts import Charts 
+from astrodom.starAnalysis import StarAnalysis
+from astrodom.syncProgress import SyncProgress
 from PyQt6.QtWidgets import QMessageBox
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         # Load the UI file
-        self.rsc_path = importlib_resources.files("rsc")
+        self.rsc_path = importlib_resources.files("astrodom").joinpath('rsc')
         #self.rsc_path = os.path.join(os.path.dirname(__file__), 'rsc')
 
         uic.loadUi((self.rsc_path.joinpath( 'gui', 'mainWindow.ui')), self)

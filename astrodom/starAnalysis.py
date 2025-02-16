@@ -1,6 +1,8 @@
 
 import numpy as np,logging
 import matplotlib.pyplot as plt
+import astropy.units as u
+
 from matplotlib.colors import LogNorm
 from photutils.detection import DAOStarFinder
 from photutils.psf import fit_2dgaussian, fit_fwhm
@@ -8,9 +10,6 @@ from photutils.aperture import CircularAperture
 from astropy.io import fits
 from astropy.stats import sigma_clipped_stats,gaussian_sigma_to_fwhm
 from astropy.modeling import models, fitting
-import astropy.units as u
-from settings import *
-from loadSettings import *  
 from PyQt6.QtWidgets import QApplication, QDialog, QLabel,QVBoxLayout, QGridLayout,QHBoxLayout, QLineEdit, QComboBox, QTableView, QWidget
 from PyQt6.QtCore import QAbstractTableModel, Qt
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT, FigureCanvasQTAgg as FigureCanvas
@@ -20,6 +19,8 @@ from pandas import DataFrame
 from PyQt6.QtWidgets import QSpacerItem, QSizePolicy
 from PyQt6.QtWidgets import QGroupBox
 
+from astrodom.settings import *
+from astrodom.loadSettings import *  
 
 class QTableModel(QAbstractTableModel):
     def __init__(self, data):

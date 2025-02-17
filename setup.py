@@ -63,7 +63,7 @@ setup(
         "Environment :: X11 Applications :: Qt",
         "Environment :: Other Environment",
         "Programming Language :: Python :: 3 :: Only",
-        "Operating System :: Microsoft :: Windows :: Windows 10 :: Windows 11",
+        "Operating System :: Microsoft :: Windows :: Windows 10",
         "Operating System :: POSIX :: Linux",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",

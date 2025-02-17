@@ -11,7 +11,9 @@ from astrodom.loadSettings import *  # Import the constants
 
 
 class Projects(QDialog):
-    project_updated = pyqtSignal()
+    
+    project_updated = pyqtSignal(int)
+    
     def __init__(self, parent=None, project_id=None):
         super().__init__(parent)
         self.parent = parent
@@ -19,7 +21,6 @@ class Projects(QDialog):
         uic.loadUi((self.parent.rsc_path.joinpath( 'gui', 'projects.ui')), self)
         self.setWindowTitle("Projects")
         self.setGeometry(100, 100, 600, 300)
-
         self.infoBox = self.findChild(QLabel, 'infoBox')
         self.infoBox.setText("This dialog allows you to create or edit a project. Please provide the necessary details and click Save to store the project information.")
         
@@ -108,7 +109,7 @@ class Projects(QDialog):
             ''', (project_name, project_folder, project_date, project_status))
             
             logging.info(f"Project {project_name} created")
-
+            self.project_id = cursor.lastrowid
         else:
             # Update project data
             cursor.execute('''
@@ -122,9 +123,10 @@ class Projects(QDialog):
         # Commit and close the connection
         conn.commit()
         conn.close()
+        self.project_updated.emit(self.project_id)
 
         self.accept()
-        self.project_updated.emit()
+
 
     def delete_project(self):
             
@@ -167,5 +169,5 @@ class Projects(QDialog):
             conn.commit()
             conn.close()
 
+            self.project_updated.emit(0)
             self.accept()
-            self.project_updated.emit()

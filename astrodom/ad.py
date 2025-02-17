@@ -1,6 +1,8 @@
 import os, sys, logging
 
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget,QPushButton,QComboBox,QTextEdit,QLineEdit,QStyle
+from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtCore import Qt
 from PyQt6.QtSql import QSqlQuery,QSqlDatabase
 from PyQt6 import uic
 from PyQt6.QtGui import QIcon
@@ -15,11 +17,14 @@ from astrodom.loadSettings import *  # Import the constants
 from astrodom.charts import Charts 
 from astrodom.starAnalysis import StarAnalysis
 from astrodom.syncProgress import SyncProgress
-from PyQt6.QtWidgets import QMessageBox
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        
+        # Star Analysis file path
+        self.starAnalysisFilePath = None
+        
         # Load the UI file
         self.rsc_path = importlib_resources.files("astrodom").joinpath('rsc')
         #self.rsc_path = os.path.join(os.path.dirname(__file__), 'rsc')
@@ -46,6 +51,7 @@ class MainWindow(QMainWindow):
         dashboard_layout = QVBoxLayout(dashboard_widget)
         dashboard_layout.setContentsMargins(0, 5, 0, 5)
         dashboard_layout.addWidget(self.dashboard)
+        self.dashboard.clicked.connect(self.on_table_row_clicked)
 
         # Initialize projectsComboBox
         self.projectsComboBox = self.findChild(QComboBox, 'projectsComboBox')
@@ -142,11 +148,29 @@ class MainWindow(QMainWindow):
             
             if query.exec() and query.next():
                 base_dir = query.value(0)
-            
+  
+            #Check if images are already in the database for this project
+            bResync = True                          
+            query.prepare("SELECT COUNT(*) FROM images WHERE PROJECT_ID = :id")
+            query.bindValue(":id", selected_project_id)
+            if query.exec() and query.next():    
+                if query.value(0) > 0:
+                    reply = QMessageBox.question(self, 'Sync Folder', 
+                    '''This project already contains images in the database. \n
+                    YES - Read again all the files from the base folder and delete records in the database for this project\n 
+                    NO - Only new files will be inserted in the database and files not in the filesystem will be removed from the database \n 
+                    If you want to update values like  FWHM, SNR, etc.), you have to resync (YES).''', 
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+                    
+                    if reply == QMessageBox.StandardButton.No:
+                        logging.info("Resync not selected")
+                        bResync = False
+                    
+
             # The FitsBrowser thread is created and started 
             # Two signals are connected to the thread: one for logging and one for updating the dashboard
             # when the thread is completed.
-            self.thread = FitsBrowser(project_id=selected_project_id, base_dir=base_dir, parent=self)
+            self.thread = FitsBrowser(project_id=selected_project_id, base_dir=base_dir, bResync=bResync,parent=self)
             self.thread.taskCompleted.connect(self.dashboard.load_data)
             self.thread.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
 
@@ -250,9 +274,9 @@ class MainWindow(QMainWindow):
                     self.syncButton.setEnabled(False)
                 else:
                     self.syncButton.setEnabled(True)
-            logging.info(f"Selected project: {query.value(0)} ({query.value(2)},{query.value(1)})")
-            logging.info(f"Project base folder: {query.value(3)} ")
-            self.dashboard.setProjectID(selected_project_id)
+                logging.info(f"Selected project: {query.value(0)} ({query.value(2)},{query.value(1)})")
+                logging.info(f"Project base folder: {query.value(3)} ")
+                self.dashboard.setProjectID(selected_project_id)
 
     # Handle the threshold values set by the user
     # and calls the applyThreshold method of the dashboard widget
@@ -273,13 +297,28 @@ class MainWindow(QMainWindow):
     # Open the star analysis dialog
     def open_staranalysis_dialog(self):
         logging.info("Opening star analysis dialog")
-        reply = QMessageBox.question(self, 'Star Analysis', 
-                                     'The Star Analysis tool is not yet ready. To test it enter manually a file path at the beginning of \'starAnalysis.py\' script.', 
-                                     QMessageBox.StandardButton.Ok)
-        current_project_id = self.projectsComboBox.currentData()
 
-        settings_dialog = StarAnalysis(self)
-        settings_dialog.exec()
+        if self.starAnalysisFilePath is not None and self.starAnalysisFilePath != "":
+            if os.path.exists(self.starAnalysisFilePath):
+                logging.info(f"Selected image: {self.starAnalysisFilePath}")
+                self.starAnalysis = StarAnalysis(self,self.starAnalysisFilePath)
+                self.starAnalysis.show()
+            else:
+             logging.warning(f"Selected image file does not exist: {self.starAnalysisFilePath}")
+        else:
+            logging.warning("No valid image file selected")
+
+    # Handle the click event on he table row and gets the file path that
+    # Star Analysis will use to analyze the image
+    def on_table_row_clicked(self, index):
+
+        source_index = self.dashboard.proxy_model.mapToSource(index)
+        source_model = self.dashboard.proxy_model.sourceModel()
+        source_index = source_index.siblingAtColumn(21)
+    
+        self.starAnalysisFilePath = source_model.data(source_index, Qt.ItemDataRole.DisplayRole)
+        
+        return
     
     # Open the file operationsdialog
     def open_fileOperation_dialog(self):
@@ -311,8 +350,10 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     # Load the projects into the projectsComboBox
-    def load_projects_combobox(self):
+    def load_projects_combobox(self, project_id=None):
         self.projectsComboBox.clear()
+        selected_project_id = project_id
+
         query = QSqlQuery("SELECT NAME,ID, DATE, STATUS FROM projects ORDER BY CASE STATUS WHEN 'Active' THEN 1 WHEN 'Completed' THEN 2 WHEN 'Archived' THEN 3 END, DATE DESC")
         
         self.projectsComboBox.addItem('---------- Select project ----------', 0)
@@ -321,6 +362,11 @@ class MainWindow(QMainWindow):
             project_name = f"{query.value(0)} ({query.value(2)}, {query.value(3)})"
             project_id = query.value(1)
             self.projectsComboBox.addItem(project_name,project_id)
+        
+        if selected_project_id and selected_project_id > 0:
+            index = self.projectsComboBox.findData(selected_project_id)
+            if index != -1:
+                self.projectsComboBox.setCurrentIndex(index)
 
     # AstroDom uses a SQLite database to store project and image data
     # This function creates the database if it doesn't exist

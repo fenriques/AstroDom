@@ -50,7 +50,7 @@ filterMapping = {"L": ["Luminance", "luminance", "Lum", "lum", "L", "l"],
            "B": ["Blue", "B", "b", "blue"], 
            "G": ["Green", "G", "g", "green"], 
            "Ha": ["Ha", "ha", "Halpha", "halpha", "H_alpha", "h_alpha", "H_Alpha", "h_Alpha"], 
-           "Sii": ["SII", "Sii", "sii"], 
+           "Sii": ["SII", "Sii", "sii", "s2"], 
            "Oiii": ["OIII", "Oiii", "oiii", "O3"], 
            "LPR": ["Lpr", "LPR", "lpr"]}
 
@@ -60,22 +60,24 @@ class FitsBrowser(QThread):
     nFileSync = pyqtSignal(int)
     nFileTot = pyqtSignal(int)
     
-    def __init__(self,  project_id, base_dir,parent=None):
+    def __init__(self,  project_id, base_dir,bResync,parent=None):
 
         super().__init__(parent)
 
         self.project_id = project_id
         self.base_directory = base_dir
+        self.bResync = bResync
         self.parent = parent
+
         self.runs = True
         #this is used to store the filenames of the images in the database so that are skipped when parsing
-        self.dbFiles = []
-        self.dbFiles = []
+        self.filesAlreadyInDb = []
+        self.filesAlreadyInDb = []
         self.file_counter = 0
         self.files_path = [] 
 
     def run(self):
-        self.dbFiles = self.get_filesFromDb(self.project_id)
+        self.filesAlreadyInDb = self.get_filesFromDb(self.project_id)
         self.syncFolder()
         self.stop()
        
@@ -93,9 +95,14 @@ class FitsBrowser(QThread):
         
         self.nFileTot.emit(len(self.files_path))
         return len(self.files_path)
+
     
     def syncFolder(self)  :
         
+        # If a resync is requested, all the files for the project are deleted from the database
+        if self.bResync == True:
+            self.delete_files_from_db(self.project_id)
+
         nParsed = 0
         self.get_files()
 
@@ -104,8 +111,8 @@ class FitsBrowser(QThread):
             file = os.path.basename(file_path)
 
             # Skip parsing if the file is already in the database
-            if file_path in self.dbFiles:
-                self.dbFiles.remove(file_path)
+            if self.bResync == False and file_path in self.filesAlreadyInDb:
+                self.filesAlreadyInDb.remove(file_path)
                 self.threadLogger.emit(f"File was already parsed, so skipping: {file}", "info")
                 continue
             
@@ -273,14 +280,15 @@ class FitsBrowser(QThread):
         self.threadLogger.emit(f"New files inserted in the database: {self.file_counter}", "info")
 
         # Syncing means also that files that are not in the folder anymore (deleted by user?) are removed from the db
-        if len(self.dbFiles) > 0:
-            self.threadLogger.emit(f"These are files not found in the database anymore: {self.dbFiles}", "debug")    
+        # If a resync is forced, the files are already removed from the db
+        if len(self.filesAlreadyInDb)  > 0 and self.bResync == False:
+            self.threadLogger.emit(f"These are files not found in the database anymore: {self.filesAlreadyInDb}", "debug")    
             
             # Remove the files that are not in the folder anymore
-            db_path = str(self.parent.rsc_path.joinpath( DBNAME))
+            db_path = str(self.parent.rsc_path.joinpath(DBNAME))
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
-            for file in self.dbFiles:
+            for file in self.filesAlreadyInDb:
                 cursor.execute("DELETE FROM images WHERE file = ?", (file,))
                 self.threadLogger.emit(f"File removed from database: {file}","warning")
             conn.commit()
@@ -345,17 +353,46 @@ class FitsBrowser(QThread):
         except sqlite3.Error as e:
             self.threadLogger.emit(f"Error: {e} for file {fits_data['FILE']}", "error")
 
+        conn.close()
+
  
         self.threadLogger.emit(f"Saved to db: {fits_data['FILE']}","debug")
+    
+    # To be used when a resync is forced ( bResync == True)
+    def delete_files_from_db(self, project_id):
+        db_path = str(self.parent.rsc_path.joinpath(DBNAME))
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM images WHERE PROJECT_ID = ?", (project_id,))
+        conn.commit()
+        conn.close()
+        self.threadLogger.emit(f"All files for project {project_id} deleted from database", "info")
 
     def measure_stars(self,fits_file):
 
-        cropFactor = 2 # Crop the image by cropFactor of its width and height (faster processing)
-        randomSources = 60 # Choose randomSources (faster processing)
-        threshold = 20 #threshold for star detection, 20 seems to work well
-        pixelScale = 0.73 # pixel scale in arcsec/pixel
-        bit = 16 # bit depth of the sensor, used to cut saturated stars
-        radius = 7 # radius of the aperture for the star measurement
+        if self.parent and hasattr(self.parent, 'starAnalysis'):
+            starAnalysis = self.parent.starAnalysis
+        else:
+            starAnalysis = None
+
+        randomSources = starAnalysis.nStars if starAnalysis and starAnalysis.nStars else 30
+        self.threadLogger.emit(f"randomSources: {randomSources}","info")
+
+        cropFactor = starAnalysis.cropFactor if starAnalysis and starAnalysis.cropFactor else 2
+        self.threadLogger.emit(f"cropFactor: {cropFactor}","info")
+
+        threshold = starAnalysis.threshold if starAnalysis and starAnalysis.threshold else 20
+        self.threadLogger.emit(f"threshold: {threshold}","info")
+
+        bit = starAnalysis.bit if starAnalysis and starAnalysis.bit else 16
+        self.threadLogger.emit(f"bit: {bit}","info")
+
+        bin = starAnalysis.bin if starAnalysis and starAnalysis.bin else 1
+        self.threadLogger.emit(f"bin: {bin}","info")
+
+        radius = starAnalysis.radius if starAnalysis and starAnalysis.radius else 7
+        self.threadLogger.emit(f"radius: {radius}","info")
+
         mode = "both" # "micah" or "astropy" or "both"
         plot_image = False # plot the image with the detected stars
         fwhm_micah = []

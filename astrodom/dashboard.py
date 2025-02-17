@@ -1,6 +1,6 @@
 import sqlite3, sys, logging
 import pandas as pd
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QTreeView
+from PyQt6.QtWidgets import QApplication, QTreeView
 from PyQt6.QtCore import Qt
 from astrodom.customTreeModel import CustomTreeModel, CustomFilterProxyModel
 from astrodom.viewDelegates import *

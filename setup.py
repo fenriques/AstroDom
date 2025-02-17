@@ -4,7 +4,7 @@
 #  Astroimaging catalogue software
 #
 # Ferrante Enriques
-# (c) 2020
+# (c) 2021-2025
 #
 # License MIT
 #
@@ -63,7 +63,7 @@ setup(
         "Environment :: X11 Applications :: Qt",
         "Environment :: Other Environment",
         "Programming Language :: Python :: 3 :: Only",
-        "Operating System :: Microsoft :: Windows :: Windows 10",
+        "Operating System :: Microsoft :: Windows :: Windows 10 :: Windows 11",
         "Operating System :: POSIX :: Linux",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",

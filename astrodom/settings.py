@@ -27,9 +27,6 @@ class SettingsDialog(QDialog):
         self.eccentricity_limit_edit = QLineEdit(str(self.settings.get("ECCENTRICITY_LIMIT_DEFAULT", 0)))
         self.snr_limit_edit = QLineEdit(str(self.settings.get("SNR_LIMIT_DEFAULT", 0)))
 
-        self.compact_dashboard_edit = QComboBox()
-        self.compact_dashboard_edit.addItems(["Compact", "Extended"])
-        self.compact_dashboard_edit.setCurrentText(str(self.settings.get("COMPACT_DASHBOARD", "Extended")))
 
         # Create a combo box for logging levels
         self.logging_level_edit = QComboBox()
@@ -51,7 +48,7 @@ class SettingsDialog(QDialog):
         form_layout.addRow("Enable Log File :", self.file_log)
         form_layout.addRow(separator)
         form_layout.addRow("Date Format:", self.date_format_edit)
-        form_layout.addRow("Dashboard View:", self.compact_dashboard_edit)
+
         form_layout.addRow(separator)
         form_layout.addRow("ALT Threshold Default:", self.alt_limit_edit)
         form_layout.addRow("FWHM Threshold Default:", self.fwhm_limit_edit)
@@ -85,7 +82,7 @@ class SettingsDialog(QDialog):
         self.settings["FWHM_LIMIT_DEFAULT"] = float(self.fwhm_limit_edit.text())
         self.settings["ECCENTRICITY_LIMIT_DEFAULT"] = float(self.eccentricity_limit_edit.text())
         self.settings["SNR_LIMIT_DEFAULT"] = float(self.snr_limit_edit.text())
-        self.settings["COMPACT_DASHBOARD"] = self.compact_dashboard_edit.currentText()
+
 
         if not self.dbname_edit.text():
             logging.error("Database name cannot be empty.")

@@ -11,14 +11,16 @@ from photutils.aperture import CircularAperture
 from astropy.io import fits
 from astropy.stats import sigma_clipped_stats,gaussian_sigma_to_fwhm
 from astropy.modeling import models, fitting
-from astropy.coordinates import Angle,SkyCoord, EarthLocation, AltAz
+from astropy.coordinates import Angle, AltAz, EarthLocation, SkyCoord
 from astropy.time import Time
 import astropy.units as u
+import ephem
 from datetime import datetime
 from PyQt6.QtCore import pyqtSignal,QThread
 from astrodom.settings import *
 from astrodom.loadSettings import *  
 from PyQt6.QtSql import QSqlQuery
+import warnings
 
 
 ad_keywords = {
@@ -41,10 +43,13 @@ ad_keywords = {
     "MEDIAN": {'fits_key':'', 'display_name': 'Median'},
     "STD": {'fits_key':'', 'display_name': 'SNR'},
     "SIZE": {'fits_key': "", 'display_name': 'Size'},
-    "FILE": {'fits_key': '', 'display_name': 'File Name'}
-    
-}
-
+    "FILE": {'fits_key': '', 'display_name': 'File Name'},
+    "SITELAT": {'fits_key': ["SITELAT","LAT-OBS"], 'display_name': 'Site Lat'},
+    "SITELONG": {'fits_key': ["SITELONG","LONG-OBS"], 'display_name': 'Site Long'},
+    "MOON_PHASE": {'fits_key': '', 'display_name': 'Moon Phase'},
+    "MOON_SEPARATION": {'fits_key': '', 'display_name': 'Moon Separation'}
+    }
+warnings.filterwarnings("ignore")
 filterMapping = {"L": ["Luminance", "luminance", "Lum", "lum", "L", "l"], 
            "R": ["Red", "R", "r", "red"], 
            "B": ["Blue", "B", "b", "blue"], 
@@ -71,7 +76,6 @@ class FitsBrowser(QThread):
 
         self.runs = True
         #this is used to store the filenames of the images in the database so that are skipped when parsing
-        self.filesAlreadyInDb = []
         self.filesAlreadyInDb = []
         self.file_counter = 0
         self.files_path = [] 
@@ -125,8 +129,14 @@ class FitsBrowser(QThread):
             fits_data_dict = {}
             
             # Open the single FITS file and extract the header
-            with fits.open(file_path) as hdul:
+            try:
+                hdul = fits.open(file_path)
                 header = hdul[0].header
+            except Exception as e:
+                self.threadLogger.emit(f"Error opening FITS file: {e}", "error")
+                continue
+            finally:
+                hdul.close()
 
                 # The loop is over the AstroDom internal keywords
                 for ad_keyword, ad_value in ad_keywords.items():
@@ -146,11 +156,14 @@ class FitsBrowser(QThread):
                             except ValueError:
                                 try:
                                     date = datetime.strptime(value.split('.')[0], '%Y-%m-%dT%H:%M:%S').strftime('%Y-%m-%dT%H:%M:%S')
+
                                 except ValueError:
                                     try:
                                         date = datetime.strptime(value, '%Y-%m-%d').strftime('%Y-%m-%dT00:00:00')
                                     except ValueError:
-                                        date = value
+                                        date = '1970-01-01T00:00:00'
+                            
+                            ephem_date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
 
                             fits_data.append(("DATE-OBS", date))
                         
@@ -173,14 +186,24 @@ class FitsBrowser(QThread):
                                     fits_data.append(("FILTER", filter_key))    
 
                         # OBJECT-RA, OBJECT-DEC,OBJECT-ALT, OBJECT-AZ, are decimal converted values
-                        if ad_keyword == "OBJECT-RA"  and value:
+                        if ad_keyword in ["OBJECT-RA","OBJTRA"]  and value:
                             fits_data.append((ad_keyword, round(Angle(value, unit='hourangle').degree, 4)))
-                        if ad_keyword == "OBJECT-DEC" and value:
+                            ephem_target_ra = Angle(value, unit='hourangle').degree
+                        if ad_keyword in ["OBJECT-DEC", "OBJCTDEC"] and value:
                             fits_data.append((ad_keyword, round(Angle(value, unit='deg').degree, 4)))
+                            ephem_target_dec = Angle(value, unit='deg').degree
                         if ad_keyword == "OBJECT-ALT" and value:
                             fits_data.append((ad_keyword, round(Angle(value, unit='deg').degree, 4)))
                         if ad_keyword == "OBJECT-AZ" and value:
                             fits_data.append((ad_keyword, round(Angle(value, unit='deg').degree, 4)))
+
+                        # Site Lat and Long
+                        if ad_keyword in ["SITELAT","LAT-OBS"] : 
+                            fits_data.append((ad_keyword, round(Angle(value, unit='deg').degree, 4)))
+                            ephem_site_lat = Angle(value, unit='deg').degree
+                        if ad_keyword in ["SITELONG","LONG-OBS"] : 
+                            fits_data.append((ad_keyword, round(Angle(value, unit='deg').degree, 4)))
+                            ephem_site_long = Angle(value, unit='deg').degree
 
                     # this else is for the case where the ad_keyword is not found in the header of the FITS file
                     # (eg, NINA doesn't have ALT/ AZ)
@@ -191,15 +214,7 @@ class FitsBrowser(QThread):
                         if ad_keyword == "OBJECT-ALT" or ad_keyword == "OBJECT-AZ" :
                             self.threadLogger.emit(f"{ad_keyword} calculation", "info")
 
-                            # Create SkyCoord object for the target
-                            try:
-                                target = SkyCoord(header["OBJECT-RA"], header["OBJECT-DEC"], unit=(u.hourangle, u.deg))
-
-                            except Exception as e:
-                                self.threadLogger.emit(f"Error creating SkyCoord object: {e}", "info")
-                                self.threadLogger.emit(f"Using alternative headers", "info")
-                                target = SkyCoord(header["OBJCTRA"], header["OBJCTDEC"], unit=(u.hourangle, u.deg))
-                                
+                            # The following 3 oblecjt (EarthLocation, Skycoord and Time) are utitities used to calculate the ALT and AZ of the target if they are not in the FITS header
                             # Create EarthLocation object for the observer's location
                             try:
                                 lat1 =header["SITELAT"].split('.')[0]
@@ -215,7 +230,16 @@ class FitsBrowser(QThread):
                                 except Exception as e:  
                                     self.threadLogger.emit(f"Error creating EarthLocation object: {e}", "warning")
                                     location = EarthLocation(lat=0*u.deg, lon=0*u.deg)  
+            
+                            # Create SkyCoord object for the target
+                            try:
+                                target = SkyCoord(header["OBJECT-RA"], header["OBJECT-DEC"], unit=(u.hourangle, u.deg))
 
+                            except Exception as e:
+                                self.threadLogger.emit(f"Error creating SkyCoord object: {e}", "info")
+                                self.threadLogger.emit(f"Using alternative headers", "info")
+                                target = SkyCoord(header["OBJCTRA"], header["OBJCTDEC"], unit=(u.hourangle, u.deg))
+                                
 
                             # Create Time object for the observation time
                             try:
@@ -228,7 +252,7 @@ class FitsBrowser(QThread):
                                 except Exception as e:
                                     self.threadLogger.emit(f"Error creating Time object: {e}", "warning")
                                     observation_time = Time.now()   
-
+                        
 
                             # Create AltAz frame for the transformation
                             try:
@@ -246,6 +270,7 @@ class FitsBrowser(QThread):
                             azimuth = altaz.az.degree
                             if ad_keyword == "OBJECT-ALT" : fits_data.append(("OBJECT-ALT", round(Angle(altitude, unit='deg').degree, 4)))
                             if ad_keyword == "OBJECT-AZ" : fits_data.append(("OBJECT-AZ", round(Angle(azimuth, unit='deg').degree, 4)))
+
 
                     # Other Ad_keyowrds are not meant to be in the FITS header so they are derived from calculation
                     fits_data.append(("FILE", file_path))
@@ -268,7 +293,27 @@ class FitsBrowser(QThread):
                         fits_data.append(("MEAN", starMeasurement[3]))
                         fits_data.append(("MEDIAN", starMeasurement[4]))
                         fits_data.append(("STD", starMeasurement[5]))
-                
+
+
+                    if ad_keyword == "MOON_PHASE" :
+                        try:
+                            moon_phase = self.calculate_moon_phase(ephem_date, ephem_site_lat, ephem_site_long) 
+                            
+                        except Exception as e:
+                            self.threadLogger.emit(f"Error calculating moon phase: {e}", "error")
+                            moon_phase = 0.0
+                        self.threadLogger.emit(f"moon phase: {moon_phase}", "error")
+                        fits_data.append(("MOON_PHASE", (moon_phase)))  
+
+                    if ad_keyword == "MOON_SEPARATION" :
+                        try:
+                            moon_separation = self.calculate_moon_separation(ephem_date, ephem_target_ra, ephem_target_dec, ephem_site_lat, ephem_site_long)
+                        except Exception as e:
+                            self.threadLogger.emit(f"Error calculating moon separation: {e}", "error")
+                            moon_separation = 0.0
+                        fits_data.append(("MOON_SEPARATION", moon_separation))
+                        self.threadLogger.emit(f" MOON_SEPARATION: {moon_separation}", "error")
+
                 fits_data_dict = dict(fits_data)
 
                 # Save the data to the database
@@ -324,8 +369,8 @@ class FitsBrowser(QThread):
             cursor.execute('''
             INSERT INTO images (
             OBJECT, DATE_OBS, FILTER, EXPOSURE, CCD_TEMP, IMAGETYP, XBINNING, OBJECT_RA, OBJECT_DEC, OBJECT_ALT, 
-            OBJECT_AZ, GAIN, OFFSET, FWHM, ECCENTRICITY, FILE, SIZE, MEAN, MEDIAN, STD, PROJECT_ID
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            OBJECT_AZ, GAIN, OFFSET, FWHM, ECCENTRICITY, FILE, SIZE, MEAN, MEDIAN, STD, SITELAT, SITELONG, MOON_PHASE, MOON_SEPARATION, PROJECT_ID
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
             fits_data.get('OBJECT', ''),
             fits_data.get('DATE-OBS', '1970-01-01T00:00:00'),
@@ -347,9 +392,15 @@ class FitsBrowser(QThread):
             fits_data.get('MEAN', 0.0),
             fits_data.get('MEDIAN', 0.0),
             fits_data.get('STD', 0.0),
+            fits_data.get('SITELAT', 0.0),
+            fits_data.get('SITELONG', 0.0),
+            fits_data.get('MOON_PHASE',0.0),
+            fits_data.get('MOON_SEPARATION', 0.0),
             fits_data.get('PROJECT_ID', self.project_id)
             ))
             conn.commit()
+            self.threadLogger.emit(f"PHASE ok : { fits_data.get('MOON_PHASE', 0)}", "error")
+
         except sqlite3.Error as e:
             self.threadLogger.emit(f"Error: {e} for file {fits_data['FILE']}", "error")
 
@@ -368,6 +419,44 @@ class FitsBrowser(QThread):
         conn.close()
         self.threadLogger.emit(f"All files for project {project_id} deleted from database", "info")
 
+    def calculate_moon_separation(self, date, target_ra, target_dec, site_lat, site_long):
+
+        observer = ephem.Observer()
+        observer.lon = str(site_long)
+        observer.lat = str(site_lat)
+        observer.date = ephem.Date(date)
+
+        moon = ephem.Moon(observer)
+        
+        target = ephem.FixedBody()
+        target._ra = target_ra
+        target._dec = target_dec
+        target.compute(observer)
+        
+        separation = ephem.separation(moon, target)
+        separation_degrees = np.degrees(separation)
+        
+        return round(separation_degrees, 2)
+
+    def calculate_moon_phase(self, date, site_lat, site_long):
+        
+        try:
+
+            # Create an observer 
+            observer = ephem.Observer()
+            observer.lon = str(site_long)
+            observer.lat = str(site_lat)
+            observer.date = ephem.Date(date)  # Set the observation date
+            moon = ephem.Moon(observer)
+            
+            phase_illumination = round(moon.moon_phase * 100, 2)
+
+        except Exception as e:
+            self.threadLogger.emit(f"Error calculating moon phase: {e}", "error")
+            phase_illumination = 0.0
+
+        return phase_illumination
+    
     def measure_stars(self,fits_file):
 
         if self.parent and hasattr(self.parent, 'starAnalysis'):

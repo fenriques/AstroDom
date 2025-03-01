@@ -1,6 +1,6 @@
 import sqlite3, sys, logging
 import pandas as pd
-from PyQt6.QtWidgets import QApplication, QTreeView
+from PyQt6.QtWidgets import QApplication, QTreeView,QHeaderView
 from PyQt6.QtCore import Qt
 from astrodom.customTreeModel import CustomTreeModel, CustomFilterProxyModel
 from astrodom.viewDelegates import *
@@ -13,73 +13,78 @@ class Dashboard(QTreeView):
         super().__init__(parent)
         self.project_id = None
         self.parent = parent
+        self.itemList = ["Target", "#", "Exposure", "Size", "Date", "Time","Filter","FWHM", "Eccentricity","SNR","ALT", "AZ", "Temp", "Frame",
+                         "Bin","RA", "DEC", "Gain", "Offset", "Mean", "Median", "Site Lat", "Site Long", "Moon Phase", "Moon Separation","File"]
 
         self.setGeometry(100, 100, 800, 600)
+        
+        self.load_data()
+        self.selectionModel().selectionChanged.connect(self.on_selection_changed)
 
         self.setAlternatingRowColors(True)
-        self.setColumnWidth(0, 350)
         self.header().setDefaultAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setColumnWidth(5, 250)
+        self.header().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         self.dateDelegate = DateDelegate(self)
-        self.setItemDelegateForColumn(4, self.dateDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("Date"), self.dateDelegate)
 
         self.timeDelegate = TimeDelegate(self)
-        self.setItemDelegateForColumn(5, self.timeDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("Time"), self.timeDelegate)
 
         self.filterDelegate = FilterDelegate(self)
-        self.setItemDelegateForColumn(6, self.filterDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("Filter"), self.filterDelegate)
 
         self.fwhmDelegate = FWHMDelegate(self)
-        self.setItemDelegateForColumn(7, self.fwhmDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("FWHM"), self.fwhmDelegate)
         self.fwhmDelegate.setLimit(FWHM_LIMIT_DEFAULT)
 
         self.eccentricityDelegate = EccentricityDelegate(self)
-        self.setItemDelegateForColumn(8, self.eccentricityDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("Eccentricity"), self.eccentricityDelegate)
         self.eccentricityDelegate.setLimit(ECCENTRICITY_LIMIT_DEFAULT)
 
         self.snrDelegate = SNRDelegate(self)
-        self.setItemDelegateForColumn(9, self.snrDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("SNR"), self.snrDelegate)
         self.snrDelegate.setLimit(SNR_LIMIT_DEFAULT)
 
         self.altDelegate = AltDelegate(self)
-        self.setItemDelegateForColumn(10, self.altDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("ALT"), self.altDelegate)
         self.altDelegate.setLimit(ALT_LIMIT_DEFAULT)
 
         self.azDelegate = DmsDelegate(self)
-        self.setItemDelegateForColumn(11, self.azDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("AZ"), self.azDelegate)
 
         self.frameDelegate = FrameDelegate(self)
-        self.setItemDelegateForColumn(13, self.frameDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("Frame"), self.frameDelegate)
 
         self.raDelegate = HmsDelegate(self)
-        self.setItemDelegateForColumn(15, self.raDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("RA"), self.raDelegate)
 
         self.decDelegate = DmsDelegate(self)
-        self.setItemDelegateForColumn(16, self.decDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("DEC"), self.decDelegate)
         
         self.roundDelegate = RoundDelegate(self)
-        self.setItemDelegateForColumn(19, self.roundDelegate)
-        self.setItemDelegateForColumn(20, self.roundDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("Mean"), self.roundDelegate)
+        self.setItemDelegateForColumn(self.itemList.index("Median"), self.roundDelegate)
 
 
-        self.load_data()
-        self.selectionModel().selectionChanged.connect(self.on_selection_changed)
-    
     def on_selection_changed(self, selected, deselected):
         indexes = self.selectionModel().selectedIndexes()
         if indexes:
             index = indexes[0]
             model_index = self.proxy_model.mapToSource(index)
-            value = self.proxy_model.sourceModel().data(model_index.siblingAtColumn(21), Qt.ItemDataRole.DisplayRole)
-            print(f"Value at column 10: {value}")
+            value = self.proxy_model.sourceModel().data(model_index.siblingAtColumn(self.itemList.index("File")), Qt.ItemDataRole.DisplayRole)
 
     def applyThreshold(self,fwhm, snr, alt, eccentricity):
+        # setLimit is a method in the Delegate classes that formats the threshold values
         self.fwhmDelegate.setLimit(float(fwhm))
         self.eccentricityDelegate.setLimit(float(eccentricity))
         self.altDelegate.setLimit(float(alt))
         self.snrDelegate.setLimit(float(snr))
         expanded_items = self.save_expanded_state()
+        
+        # setThresholds sets the threshold values in the model
+        self.model.setThresholds(fwhm, snr, alt, eccentricity)
+
         self.proxy_model.layoutChanged.emit()
         self.restore_expanded_state(expanded_items)
 
@@ -104,9 +109,9 @@ class Dashboard(QTreeView):
             print(f"An error occurred: {e}")
             conn.close()
             return
-        
+
         # Set the model
-        self.model = CustomTreeModel(self.df)
+        self.model = CustomTreeModel(self.df, parent=self)
         self.proxy_model = CustomFilterProxyModel(self)
         self.proxy_model.setSourceModel(self.model)
 

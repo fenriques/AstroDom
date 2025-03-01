@@ -10,7 +10,8 @@ from photutils.aperture import CircularAperture
 from astropy.io import fits
 from astropy.stats import sigma_clipped_stats,gaussian_sigma_to_fwhm
 from astropy.modeling import models, fitting
-from PyQt6.QtWidgets import QApplication, QDialog, QLabel,QVBoxLayout, QGridLayout,QHBoxLayout, QLineEdit, QComboBox, QTableView, QWidget
+from PyQt6.QtWidgets import QApplication, QDialog, QLabel, QVBoxLayout, QGridLayout, QHBoxLayout, QLineEdit, QComboBox, QTableView, QWidget, QPushButton
+from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QAbstractTableModel, Qt
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT, FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -51,7 +52,7 @@ class StarAnalysis(QDialog):
     def __init__(self, parent = None, fits_path = None):
         super().__init__(parent)
 
-
+        self.rsc_path = importlib_resources.files("astrodom").joinpath('rsc')
 
         self.fits_path = fits_path # Path to the FITS file to analyze
         self.nStars = 30 # Choose randomSources (faster processing)
@@ -110,8 +111,9 @@ class StarAnalysis(QDialog):
         self.radiusComboBox.setCurrentText(str(self.radius))
         
         self.applyButton = QPushButton("Analyze Image", self)
-        self.applyButton.clicked.connect(self.on_apply_clicked) # Create a grid layout for the control panel
-        
+        self.applyButton.clicked.connect(self.on_apply_clicked) 
+        self.applyButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'star.png'))))
+
         self.saturationLimitComboBox = QComboBox(self)
         saturation_limit_label = QLabel("Saturation Limit %", self)
         self.saturationLimitComboBox.addItems(['100', '98', '95', '90', '85', '80'])
@@ -131,9 +133,9 @@ class StarAnalysis(QDialog):
         control_grid_layout.addWidget(self.binComboBox, 1, 3)
         control_grid_layout.addWidget(cradiusLabel, 1, 4)
         control_grid_layout.addWidget(self.radiusComboBox, 1, 5)
-        control_grid_layout.addWidget(saturation_limit_label, 0, 6)
-        control_grid_layout.addWidget(self.saturationLimitComboBox, 0, 7)
-        control_grid_layout.addWidget(self.applyButton, 2, 0, 1, 2)
+        control_grid_layout.addWidget(saturation_limit_label, 2, 0)
+        control_grid_layout.addWidget(self.saturationLimitComboBox, 2, 1)
+        control_grid_layout.addWidget(self.applyButton, 1, 6)
         control_grid_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 0,8, 2, 1)
         control_panel.setLayout(control_grid_layout)
         # Group box for control panel
@@ -147,9 +149,8 @@ class StarAnalysis(QDialog):
 
         # Add a widget to show the current file name and average values
         file_info_layout = QHBoxLayout()
-        
-        self.averageFwhmLabel = QLabel("Average FWHM: N/A", self)
-        self.averageRoundnessLabel = QLabel("Average Roundness: N/A", self)
+        self.averageFwhmLabel = QLabel("<b>Average FWHM: N/A</b>", self)
+        self.averageRoundnessLabel = QLabel("<b>Average Roundness: N/A</b>", self)
         
         file_info_layout.addWidget(self.averageFwhmLabel)
         file_info_layout.addWidget(self.averageRoundnessLabel)
@@ -190,6 +191,7 @@ class StarAnalysis(QDialog):
     # When the "Analyze Image" button is clicked, read the star detection parameters
     # and call the measure_stars method
     def on_apply_clicked(self):
+        
         self.cropFactor = int(self.cropFactorComboBox.currentText())
         self.nStars = int(self.nStarsEdit.text())
         self.threshold = int(self.thresholdEdit.text())
@@ -390,7 +392,7 @@ class StarAnalysis(QDialog):
         logging.info(f"Average Roundness: {roundness2_avg:.2f}")
 
         if average_fwhm and roundness2_avg:
-            self.averageFwhmLabel.setText(f"Average FWHM: {average_fwhm:.2f}")
-            self.averageRoundnessLabel.setText(f"Average Roundness: {roundness2_avg:.2f}")
+            self.averageFwhmLabel.setText(f"<b>Average FWHM: {average_fwhm:.2f}</b>")
+            self.averageRoundnessLabel.setText(f"<b>Average Roundness: {roundness2_avg:.2f}</b>")
 
         return np.array([ round(average_fwhm, 2), round(roundness2_avg, 2)])

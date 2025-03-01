@@ -8,26 +8,27 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 import importlib_resources
 
-from astrodom.fitsBrowser import FitsBrowser
-from astrodom.dashboard import Dashboard
-from astrodom.projects import Projects  
-from astrodom.logHandler import QTextEditLogger,ColorFormatter  
-from astrodom.settings import SettingsDialog  
-from astrodom.loadSettings import *  # Import the constants
 from astrodom.charts import Charts 
+from astrodom.dashboard import Dashboard
+from astrodom.fitsBrowser import FitsBrowser
+from astrodom.fitsHeader import FitsHeaderDialog
+from astrodom.loadSettings import *  # Import the constants
+from astrodom.logHandler import QTextEditLogger,ColorFormatter  
+from astrodom.projects import Projects  
+from astrodom.settings import SettingsDialog  
 from astrodom.starAnalysis import StarAnalysis
 from astrodom.syncProgress import SyncProgress
+from astrodom.fileOperation import FileOperationDialog
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         
         # Star Analysis file path
-        self.starAnalysisFilePath = None
+        self.fileAtSelectedRow = None
         
         # Load the UI file
         self.rsc_path = importlib_resources.files("astrodom").joinpath('rsc')
-        #self.rsc_path = os.path.join(os.path.dirname(__file__), 'rsc')
 
         uic.loadUi((self.rsc_path.joinpath( 'gui', 'mainWindow.ui')), self)
 
@@ -55,65 +56,72 @@ class MainWindow(QMainWindow):
 
         # Initialize projectsComboBox
         self.projectsComboBox = self.findChild(QComboBox, 'projectsComboBox')
+        self.load_projects_combobox()
+        self.projectsComboBox.currentIndexChanged.connect(self.update_dashboard_contents)
+        self.projectsComboBox.currentIndexChanged.connect(self.update_button_states)
 
-        # Create buttons and icons
+        # New Peoject 
         self.newProjectButton = self.findChild(QPushButton, 'newProjectButton')
         self.newProjectButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_FileDialogNewFolder))
-        
-        self.editProjectButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_FileDialogContentsView))
+        self.newProjectButton.clicked.connect(self.open_new_project_dialog)
 
+        # Edit Project
+        self.editProjectButton = self.findChild(QPushButton, 'editProjectButton')
+        self.editProjectButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_FileDialogContentsView))
+        self.editProjectButton.clicked.connect(self.open_edit_project_dialog)
+        self.editProjectButton.setEnabled(False)
+
+        # Sync Button
         self.syncButton = self.findChild(QPushButton, 'syncButton')
         self.syncButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
+        self.syncButton.clicked.connect(self.syncButtonPressed)
+        self.syncButton.setEnabled(False)
 
+        # Charts Button
         self.chartsButton = self.findChild(QPushButton, 'chartsButton')
         self.chartsButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'chart-up.png'))))
         self.charts_widget = None
-
-        self.settingsButton = self.findChild(QPushButton, 'settingsButton')
-        self.settingsButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'gear.png'))))
-
-        self.starAnalysisButton = self.findChild(QPushButton, 'starAnalysisButton')
-        self.starAnalysisButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirOpenIcon))
-
-        self.fwhmEdit = self.findChild(QLineEdit, 'fwhmEdit')
-        self.snrEdit = self.findChild(QLineEdit, 'snrEdit')
-        self.altEdit = self.findChild(QLineEdit, 'altEdit')
-        self.eccentricityEdit = self.findChild(QLineEdit, 'eccentricityEdit')
-        self.setThresholdsButton = self.findChild(QPushButton, 'setThresholdsButton')
-        self.setThresholdsButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogSaveButton))
-
-        self.fileOpButton = self.findChild(QPushButton, 'fileOpButton')
-        self.fileOpButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
-
-        # Disable buttons if no project is selected
-        self.syncButton.setEnabled(False)
-        self.editProjectButton.setEnabled(False)
+        self.chartsButton.clicked.connect(self.open_charts_dialog)
         self.chartsButton.setEnabled(False)
 
-        # Enable buttons when a project is selected
-        self.projectsComboBox.currentIndexChanged.connect(self.update_button_states)
-
-        # Set default values for threshold inputs
-        self.fwhmEdit.setText(str(FWHM_LIMIT_DEFAULT))
-        self.snrEdit.setText(str(SNR_LIMIT_DEFAULT))
-        self.altEdit.setText(str(ALT_LIMIT_DEFAULT))
-        self.eccentricityEdit.setText(str(ECCENTRICITY_LIMIT_DEFAULT))
-
-        # Connect the buttons to their respective functions
-        self.newProjectButton.clicked.connect(self.open_new_project_dialog)
-        self.editProjectButton.clicked.connect(self.open_edit_project_dialog)
-        self.syncButton.clicked.connect(self.syncButtonPressed)
-        self.chartsButton.clicked.connect(self.open_charts_dialog)
-        self.setThresholdsButton.clicked.connect(self.setThresholds)
+        # Settings Button
+        self.settingsButton = self.findChild(QPushButton, 'settingsButton')
+        self.settingsButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'gear.png'))))
         self.settingsButton.clicked.connect(self.open_settings_dialog)
+
+        # Star Analysis Button
+        self.starAnalysisButton = self.findChild(QPushButton, 'starAnalysisButton')
+        self.starAnalysisButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirOpenIcon))
         self.starAnalysisButton.clicked.connect(self.open_staranalysis_dialog)
+        self.starAnalysisButton.setEnabled(False)
+        self.starAnalysisButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'star.png'))))
+
+        # Fits Header Button
+        self.fitsHeaderButton = self.findChild(QPushButton, 'fitsHeaderButton')
+        self.fitsHeaderButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
+        self.fitsHeaderButton.clicked.connect(self.open_fitsheader_dialog)
+        self.fitsHeaderButton.setEnabled(False)
+        self.fitsHeaderButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'keyword.png'))))
+
+        # File Operations Button
+        self.fileOpButton = self.findChild(QPushButton, 'fileOpButton')
+        self.fileOpButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
         self.fileOpButton.clicked.connect(self.open_fileOperation_dialog)
 
-        # Populate the projectsComboBox with items from the projects table
-        self.projectsComboBox = self.findChild(QComboBox, 'projectsComboBox')
-        self.load_projects_combobox()
-        self.projectsComboBox.currentIndexChanged.connect(self.update_dashboard_contents)
+        # Thresholds
+        self.fwhmEdit = self.findChild(QLineEdit, 'fwhmEdit')
+        self.fwhmEdit.setText(str(FWHM_LIMIT_DEFAULT))
+        self.snrEdit = self.findChild(QLineEdit, 'snrEdit')
+        self.snrEdit.setText(str(SNR_LIMIT_DEFAULT))
+        self.altEdit = self.findChild(QLineEdit, 'altEdit')
+        self.altEdit.setText(str(ALT_LIMIT_DEFAULT))
+        self.eccentricityEdit = self.findChild(QLineEdit, 'eccentricityEdit')
+        self.eccentricityEdit.setText(str(ECCENTRICITY_LIMIT_DEFAULT))
+        self.filterSelectComboBox = self.findChild(QComboBox, 'filterSelectComboBox')
 
+        self.setThresholdsButton = self.findChild(QPushButton, 'setThresholdsButton')
+        self.setThresholdsButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
+        self.setThresholdsButton.clicked.connect(self.setThresholds)
 
     def syncButtonPressed(self):
         logging.debug(f"Entering syncButtonPressed for project {self.projectsComboBox.currentData()}")
@@ -253,6 +261,7 @@ class MainWindow(QMainWindow):
         self.chartsButton.setEnabled(is_project_selected)
         self.starAnalysisButton.setEnabled(is_project_selected)
         self.fileOpButton.setEnabled(is_project_selected)
+        self.fitsHeaderButton.setEnabled(is_project_selected)
     
     # Update the dashboard contents when a project is selected
     # This function is connected to the projectsComboBox currentIndexChanged signal
@@ -293,18 +302,32 @@ class MainWindow(QMainWindow):
         logging.info("Opening settings dialog")
         settings_dialog = SettingsDialog(self)
         settings_dialog.exec()
-    
+
+    # Open the settings dialog
+    def open_fitsheader_dialog(self):
+        logging.info("Opening fits header dialog")
+
+        if self.fileAtSelectedRow is not None and self.fileAtSelectedRow != "":
+            if os.path.exists(self.fileAtSelectedRow):
+                logging.info(f"Selected image: {self.fileAtSelectedRow}")
+                fitsheader_dialog = FitsHeaderDialog(self,self.fileAtSelectedRow)
+                fitsheader_dialog.show()
+            else:
+                logging.warning(f"Selected image file does not exist: {self.fileAtSelectedRow}")
+        else:
+            logging.warning("No valid image file selected")
+
     # Open the star analysis dialog
     def open_staranalysis_dialog(self):
         logging.info("Opening star analysis dialog")
 
-        if self.starAnalysisFilePath is not None and self.starAnalysisFilePath != "":
-            if os.path.exists(self.starAnalysisFilePath):
-                logging.info(f"Selected image: {self.starAnalysisFilePath}")
-                self.starAnalysis = StarAnalysis(self,self.starAnalysisFilePath)
+        if self.fileAtSelectedRow is not None and self.fileAtSelectedRow != "":
+            if os.path.exists(self.fileAtSelectedRow):
+                logging.info(f"Selected image: {self.fileAtSelectedRow}")
+                self.starAnalysis = StarAnalysis(self,self.fileAtSelectedRow)
                 self.starAnalysis.show()
             else:
-             logging.warning(f"Selected image file does not exist: {self.starAnalysisFilePath}")
+             logging.warning(f"Selected image file does not exist: {self.fileAtSelectedRow}")
         else:
             logging.warning("No valid image file selected")
 
@@ -314,20 +337,24 @@ class MainWindow(QMainWindow):
 
         source_index = self.dashboard.proxy_model.mapToSource(index)
         source_model = self.dashboard.proxy_model.sourceModel()
-        source_index = source_index.siblingAtColumn(21)
+        source_index = source_index.siblingAtColumn(25)
     
-        self.starAnalysisFilePath = source_model.data(source_index, Qt.ItemDataRole.DisplayRole)
+        self.fileAtSelectedRow = source_model.data(source_index, Qt.ItemDataRole.DisplayRole)
         
         return
     
     # Open the file operationsdialog
     def open_fileOperation_dialog(self):
         logging.info("Opening open_fileOperation_dialog")
-        reply = QMessageBox.question(self, 'File operations', 
-                                     'The File operations tool is not yet ready.', 
-                                     QMessageBox.StandardButton.Ok)
+        checked_files = self.dashboard.proxy_model.sourceModel().get_checked_files()
+        if len(checked_files) == 0:
+            QMessageBox.warning(self, 'No Files Selected', 'File operations are not possible if no images are selected.', QMessageBox.StandardButton.Ok)
+            return
+        fileOperationDialog = FileOperationDialog(checked_files,self)
+        fileOperationDialog.filesDeleted.connect(self.refresh_dashboard_model)  
+
+        fileOperationDialog.exec()
         
-        return
     
     # Open the charts dialog
     def open_charts_dialog(self):
@@ -409,6 +436,10 @@ class MainWindow(QMainWindow):
                         MEAN REAL,
                         MEDIAN REAL,
                         STD REAL,
+                        SITELAT VARCHAR(255),
+                        SITELONG VARCHAR(255),
+                        MOON_PHASE REAL,
+                        MOON_SEPARATION REAL,
                         FOREIGN KEY(PROJECT_ID) REFERENCES projects(ID)
                         )
                         """

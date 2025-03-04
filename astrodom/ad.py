@@ -178,10 +178,14 @@ class MainWindow(QMainWindow):
                 if query.value(0) > 0:
                     reply = QMessageBox.question(self, 'Sync Folder', 
                     '''This project already contains images in the database. \n
-                    YES - Read again all the files from the base folder and delete records in the database for this project\n 
-                    NO - Only new files will be inserted in the database and files not in the filesystem will be removed from the database \n 
-                    If you want to update values like  FWHM, SNR, etc.), you have to resync (YES).''', 
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+YES, FULL RESYNC: Read again all the files from the base folder for this project\n 
+NO, ONLY DIFF: Only new files will be inserted in the database and files not in the filesystem anymore will be removed from the database \n 
+Examples: If you want to update values like  FWHM, SNR, etc.), you have to resync (YES). If you just add files from a new imaging session, you can select NO. \n''', 
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel)
+
+                    if reply == QMessageBox.StandardButton.Cancel:
+                        logging.info("Sync operation cancelled")
+                        return
                     
                     if reply == QMessageBox.StandardButton.No:
                         logging.info("Resync not selected")
@@ -371,7 +375,6 @@ class MainWindow(QMainWindow):
         self.fileAtSelectedRow = source_model.data(source_index, Qt.ItemDataRole.DisplayRole)
         self.itemsAtSelectedRow = [source_model.data(source_index.siblingAtColumn(col), Qt.ItemDataRole.DisplayRole) for col in range(source_model.columnCount())]
         self.previewAndDataWidget.setItemsAtSelectedRow(self.itemsAtSelectedRow)
-        self.previewAndDataWidget.loadPreviewAndData()
   
         return
 

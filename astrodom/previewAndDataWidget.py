@@ -10,9 +10,9 @@ from matplotlib.figure import Figure
 from matplotlib import colors, cm, pyplot as plt
 import logging
 
-class PreviewAndDataModel(QAbstractTableModel):
+class KeywordsModel(QAbstractTableModel):
     def __init__(self, header, parent=None):
-        super(PreviewAndDataModel, self).__init__(parent)
+        super(KeywordsModel, self).__init__(parent)
         self.header = header
         self.keys = list(header.keys())
         self.values = list(header.values())
@@ -51,19 +51,23 @@ class PreviewAndDataWidget(QWidget):
         layout.setSpacing(0)
         self.setLayout(layout)
 
+        #Add the image preview canvas
         self.canvas = FigureCanvas(Figure(figsize=(self.width() / 100, 3)))
         layout.addWidget(self.canvas)
-        self.toolbar = NavigationToolbar2QT(self.canvas, self)
-        layout.addWidget(self.toolbar)
-
-        self.tableView = QTableView(self)
-        layout.addWidget(self.tableView)
-        
         self.ax = self.canvas.figure.subplots()
         self.canvas.figure.patch.set_facecolor('gray')
         self.ax.set_facecolor('black')
         self.resetZoom = True
         self.connectZoomEvent()
+        
+        # Image preview controls
+        self.toolbar = NavigationToolbar2QT(self.canvas, self)
+        layout.addWidget(self.toolbar)
+
+        # Add the keyowords table to the layout 
+        self.tableView = QTableView(self)
+        layout.addWidget(self.tableView)
+
 
 
     def setItemsAtSelectedRow(self, itemsAtSelectedRow):
@@ -72,15 +76,19 @@ class PreviewAndDataWidget(QWidget):
 
         file_name = os.path.basename(self.fits_path)
 
-        self.loadPreviewAndData()
         self.plotImage()
+        self.printKeywords()
 
-    def loadPreviewAndData(self):
-        with fits.open(self.fits_path) as hdul:
-            header = hdul[0].header
-            model = PreviewAndDataModel(header)
-            self.tableView.setModel(model)
-            self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+    def printKeywords(self):
+        try:
+            with fits.open(self.fits_path) as hdul:
+                header = hdul[0].header
+                keywordsModel = KeywordsModel(header)
+                self.tableView.setModel(keywordsModel)
+                self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        except Exception as e:  
+            logging.error(f"Cannot open fits file: {e}")
+            return
 
     # Plot the preview image
     def plotImage(self):
@@ -103,7 +111,7 @@ class PreviewAndDataWidget(QWidget):
                 if self.resetZoom == False and hasattr(self, 'zoom_rect'):
                     xlim, ylim = self.zoom_rect
                     logging.debug(f"Zoom rect: {xlim}, {ylim}")
-                    
+
                     # the zoomed image needs its own scale factor
                     self.zoomScaleFactor = max(int((xlim[1] - xlim[0])*imageScaleFactor / (320*2)), 1)
                     logging.debug(f"Zoom scale factor: {self.zoomScaleFactor}")
@@ -111,6 +119,10 @@ class PreviewAndDataWidget(QWidget):
                     # The original image is read again so the rectangle has to be scaled back to its original size 
                     x_start, x_end = int(xlim[0]*imageScaleFactor), int(xlim[1]*imageScaleFactor)
                     y_start, y_end = int(ylim[0]*imageScaleFactor), int(ylim[1]*imageScaleFactor)
+                    x_start = max(x_start, 0)
+                    x_end = max(x_end, 0)
+                    y_start = max(y_start, 0)
+                    y_end = max(y_end, 0)
                     logging.debug(f"Zoom rect scaled: {x_start}, {x_end}, {y_start}, {y_end}")
                     try:
                         self.image = image_data[y_start:y_end:self.zoomScaleFactor, x_start:x_end:self.zoomScaleFactor]
@@ -122,11 +134,14 @@ class PreviewAndDataWidget(QWidget):
                
                 norm = ImageNormalize(self.image, interval=ZScaleInterval(contrast=0.05), stretch=AsinhStretch())      
 
-                if self.image.size > 1:
+                try:
                     self.ax.imshow(self.image, cmap=cm.gray, norm=norm,origin='lower')
-                    self.canvas.draw()
-                else:
+                except Exception as e:
+  
+                    logging.error(f"Error in plotting image: {e}")
                     self.ax.text(0.5, 0.5, 'No data', color='white', ha='center', va='center')
+
+                self.canvas.draw()
 
             else:
                 logging.error("No data in the FITS file")
@@ -137,6 +152,7 @@ class PreviewAndDataWidget(QWidget):
         if event.name == 'button_release_event' :
             self.resetZoom =False
             self.zoom_rect = self.ax.get_xlim(), self.ax.get_ylim()
+            logging.debug(f"Zoom rect onZoom: {self.zoom_rect}")
 
     def connectZoomEvent(self):
         self.canvas.mpl_connect('button_release_event', self.onZoom)

@@ -15,7 +15,6 @@ class Dashboard(QTreeView):
         self.parent = parent
         self.itemList = ["Target", "#", "Exposure", "Size", "Date", "Time","Filter","FWHM", "Eccentricity","SNR","ALT", "AZ", "Temp", "Frame",
                          "Bin","RA", "DEC", "Gain", "Offset", "Mean", "Median", "Site Lat", "Site Long", "Moon Phase", "Moon Separation","File"]
-
         self.setGeometry(100, 100, 800, 600)
         
         self.load_data()
@@ -65,6 +64,11 @@ class Dashboard(QTreeView):
         self.roundDelegate = RoundDelegate(self)
         self.setItemDelegateForColumn(self.itemList.index("Mean"), self.roundDelegate)
         self.setItemDelegateForColumn(self.itemList.index("Median"), self.roundDelegate)
+        
+        allAdditionalColumns = ["Temp", "Frame","Bin","RA", "DEC", "Gain", "Offset", "Mean", "Median", "Site Lat", "Site Long", "Moon Phase", "Moon Separation", "File"]
+        hidden_columns = [col for col in allAdditionalColumns if col not in ADDITIONAL_COLUMNS]
+        
+        self.hide_columns(hidden_columns)
 
 
     def on_selection_changed(self, selected, deselected):
@@ -127,6 +131,11 @@ class Dashboard(QTreeView):
 
     def update_contents(self,selected_project_id):
         self.proxy_model.setFilterString(str(selected_project_id))
+
+    def hide_columns(self, columns_to_hide):
+        for column_name in columns_to_hide:
+            column_index = self.itemList.index(column_name)
+            self.setColumnHidden(column_index, True)
 
     def save_expanded_state(self):
         expanded_items = []

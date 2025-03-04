@@ -64,6 +64,7 @@ class TreeItem:
 class CustomTreeModel(QAbstractItemModel):
     def __init__(self, data, parent=None):
         super().__init__(parent)
+
         self.checked_items = set() # Initialize the set to keep track of checked items
 
         self.itemList = ["Target", "#", "Exposure", "Size", "Date", "Time","Filter","FWHM", "Eccentricity","SNR","ALT", "AZ", "Temp", "Frame",
@@ -85,6 +86,7 @@ class CustomTreeModel(QAbstractItemModel):
             return QVariant()
 
         item = index.internalPointer()
+        
         match role:
             case Qt.ItemDataRole.DisplayRole:
                 # Format the date and time

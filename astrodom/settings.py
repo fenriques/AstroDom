@@ -1,5 +1,6 @@
 import sys,json,logging
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QFrame, QComboBox, QApplication
+from PyQt6.QtWidgets import QListWidget
 
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
@@ -55,6 +56,23 @@ class SettingsDialog(QDialog):
         form_layout.addRow("Eccentricity Threshold Default:", self.eccentricity_limit_edit)
         form_layout.addRow("SNR Threshold Default:", self.snr_limit_edit)
 
+        form_layout.addRow(separator)
+        
+        # Create a QListWidget for additional settings
+        self.additional_columns_list = QListWidget()
+        self.additional_columns_list.setSelectionMode(QListWidget.SelectionMode.MultiSelection)
+        additional_settings = ["Temp", "Frame","Bin","RA", "DEC", "Gain", "Offset", "Mean", "Median", "Site Lat", "Site Long", "Moon Phase", "Moon Separation", "File"]
+        self.additional_columns_list.addItems(additional_settings)
+
+        # Select saved items in the list
+        saved_columns = self.settings.get("ADDITIONAL_COLUMNS", [])
+        for i in range(self.additional_columns_list.count()):
+            item = self.additional_columns_list.item(i)
+            if item.text() in saved_columns:
+                item.setSelected(True)
+        
+        form_layout.addRow("Additional Columns:", self.additional_columns_list)
+
         # Create save button
         save_button = QPushButton("Save")
         save_button.clicked.connect(self.save_settings)
@@ -83,6 +101,7 @@ class SettingsDialog(QDialog):
         self.settings["ECCENTRICITY_LIMIT_DEFAULT"] = float(self.eccentricity_limit_edit.text())
         self.settings["SNR_LIMIT_DEFAULT"] = float(self.snr_limit_edit.text())
 
+        self.settings["ADDITIONAL_COLUMNS"] = [item.text() for item in self.additional_columns_list.selectedItems()]
 
         if not self.dbname_edit.text():
             logging.error("Database name cannot be empty.")
@@ -105,9 +124,4 @@ class SettingsDialog(QDialog):
         logging.warning( "Please restart AstroDom to reload settings.")
         self.accept()
 
-# Example usage
-if __name__ == "__main__":
 
-    app = QApplication(sys.argv)
-    dialog = SettingsDialog()
-    dialog.exec()

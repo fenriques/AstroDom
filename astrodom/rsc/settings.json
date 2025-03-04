@@ -6,5 +6,11 @@
     "ALT_LIMIT_DEFAULT": 30.0,
     "FWHM_LIMIT_DEFAULT": 2.8,
     "ECCENTRICITY_LIMIT_DEFAULT": 0.3,
-    "SNR_LIMIT_DEFAULT": 22.0
+    "SNR_LIMIT_DEFAULT": 22.0,
+    "ADDITIONAL_COLUMNS": [
+        "Temp",
+        "Bin",
+        "DEC",
+        "RA"
+    ]
 }

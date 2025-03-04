@@ -1,6 +1,6 @@
 import os, sys, logging
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget,QPushButton,QComboBox,QTextEdit,QLineEdit,QStyle
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget,QPushButton,QCheckBox,QComboBox,QTextEdit,QLineEdit,QStyle
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtCore import Qt
 from PyQt6.QtSql import QSqlQuery,QSqlDatabase
@@ -11,7 +11,7 @@ import importlib_resources
 from astrodom.charts import Charts 
 from astrodom.dashboard import Dashboard
 from astrodom.fitsBrowser import FitsBrowser
-from astrodom.fitsHeader import FitsHeaderDialog
+from astrodom.fitsHeader import FitsHeaderWidget
 from astrodom.loadSettings import *  # Import the constants
 from astrodom.logHandler import QTextEditLogger,ColorFormatter  
 from astrodom.projects import Projects  
@@ -19,6 +19,8 @@ from astrodom.settings import SettingsDialog
 from astrodom.starAnalysis import StarAnalysis
 from astrodom.syncProgress import SyncProgress
 from astrodom.fileOperation import FileOperationDialog
+from astrodom.previewAndDataWidget import PreviewAndDataWidget
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -54,11 +56,20 @@ class MainWindow(QMainWindow):
         dashboard_layout.addWidget(self.dashboard)
         self.dashboard.clicked.connect(self.on_table_row_clicked)
 
+        # Initialize PreviewAndDataWidget
+        previewAndDataWidget = self.findChild(QWidget, 'PreviewAndDataWidget')
+        if previewAndDataWidget:
+            self.previewAndDataWidget = PreviewAndDataWidget(self)
+            fits_header_layout = QVBoxLayout(previewAndDataWidget)
+            fits_header_layout.setContentsMargins(0, 5, 0, 5)
+            fits_header_layout.addWidget(self.previewAndDataWidget)
+        else:
+            logging.error("PreviewAndDataWidget not found")
+
         # Initialize projectsComboBox
         self.projectsComboBox = self.findChild(QComboBox, 'projectsComboBox')
         self.load_projects_combobox()
         self.projectsComboBox.currentIndexChanged.connect(self.update_dashboard_contents)
-        self.projectsComboBox.currentIndexChanged.connect(self.update_button_states)
 
         # New Peoject 
         self.newProjectButton = self.findChild(QPushButton, 'newProjectButton')
@@ -69,20 +80,17 @@ class MainWindow(QMainWindow):
         self.editProjectButton = self.findChild(QPushButton, 'editProjectButton')
         self.editProjectButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_FileDialogContentsView))
         self.editProjectButton.clicked.connect(self.open_edit_project_dialog)
-        self.editProjectButton.setEnabled(False)
 
         # Sync Button
         self.syncButton = self.findChild(QPushButton, 'syncButton')
         self.syncButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
         self.syncButton.clicked.connect(self.syncButtonPressed)
-        self.syncButton.setEnabled(False)
 
         # Charts Button
         self.chartsButton = self.findChild(QPushButton, 'chartsButton')
         self.chartsButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'chart-up.png'))))
         self.charts_widget = None
         self.chartsButton.clicked.connect(self.open_charts_dialog)
-        self.chartsButton.setEnabled(False)
 
         # Settings Button
         self.settingsButton = self.findChild(QPushButton, 'settingsButton')
@@ -93,14 +101,12 @@ class MainWindow(QMainWindow):
         self.starAnalysisButton = self.findChild(QPushButton, 'starAnalysisButton')
         self.starAnalysisButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirOpenIcon))
         self.starAnalysisButton.clicked.connect(self.open_staranalysis_dialog)
-        self.starAnalysisButton.setEnabled(False)
         self.starAnalysisButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'star.png'))))
 
         # Fits Header Button
         self.fitsHeaderButton = self.findChild(QPushButton, 'fitsHeaderButton')
         self.fitsHeaderButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
         self.fitsHeaderButton.clicked.connect(self.open_fitsheader_dialog)
-        self.fitsHeaderButton.setEnabled(False)
         self.fitsHeaderButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'keyword.png'))))
 
         # File Operations Button
@@ -123,6 +129,13 @@ class MainWindow(QMainWindow):
         self.setThresholdsButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
         self.setThresholdsButton.clicked.connect(self.setThresholds)
 
+        # Add the toggle button for FitsHeaderWidget
+        self.togglePreviewAndDataWidgetButton = self.findChild(QCheckBox, 'togglePreviewAndDataWidgetButton')
+        self.togglePreviewAndDataWidgetButton.stateChanged.connect(self.toggle_previewAndDataWidget_visibility)
+
+    # Called when the sync button is pressed, this function starts the FitsBrowser thread
+    # The thread is started with the project ID and the base folder
+    # The thread is connected to the dashboard widget to update the data
     def syncButtonPressed(self):
         logging.debug(f"Entering syncButtonPressed for project {self.projectsComboBox.currentData()}")
 
@@ -204,8 +217,8 @@ class MainWindow(QMainWindow):
 
         return
     
+    # When the sync thread is completed, the buttons are re-enabled
     def on_task_completed(self):
-        # When the thread is completed, the buttons are re-enabled
         self.chartsButton.setEnabled(True)
         self.projectsComboBox.setEnabled(True)
         self.editProjectButton.setEnabled(True)
@@ -229,6 +242,7 @@ class MainWindow(QMainWindow):
         
         if FILE_LOG == "YES":
             # Add file logging
+
             file_handler = logging.FileHandler('astrodom.log')
             file_handler.setLevel(logging.DEBUG)
             file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
@@ -252,17 +266,31 @@ class MainWindow(QMainWindow):
         else: 
             logging.info(message)
 
-    # Some actions are only available when a project is selected
-    def update_button_states(self):
-        current_data = self.projectsComboBox.currentData()
-        is_project_selected = current_data is not None and current_data != 0
-        self.syncButton.setEnabled(is_project_selected)
-        self.editProjectButton.setEnabled(is_project_selected)
-        self.chartsButton.setEnabled(is_project_selected)
-        self.starAnalysisButton.setEnabled(is_project_selected)
-        self.fileOpButton.setEnabled(is_project_selected)
-        self.fitsHeaderButton.setEnabled(is_project_selected)
-    
+
+    # Load the projects into the projectsComboBox
+    def load_projects_combobox(self, project_id=None):
+        self.projectsComboBox.clear()
+        selected_project_id = project_id
+
+        query = QSqlQuery("SELECT NAME,ID, DATE, STATUS FROM projects ORDER BY CASE STATUS WHEN 'Active' THEN 1 WHEN 'Completed' THEN 2 WHEN 'Archived' THEN 3 END, DATE DESC")
+        
+        # Important: decided to force the user to select a project
+        # so the first item in the combobox is selected by default
+        #self.projectsComboBox.addItem('---------- Select project ----------', 0)
+
+        while query.next():
+            project_name = f"{query.value(0)} ({query.value(2)}, {query.value(3)})"
+            project_id = query.value(1)
+            self.projectsComboBox.addItem(project_name,project_id)
+        
+        if selected_project_id and selected_project_id > 0:
+            index = self.projectsComboBox.findData(selected_project_id)
+            if index != -1:
+                self.projectsComboBox.setCurrentIndex(index)
+        
+        self.update_dashboard_contents()
+
+
     # Update the dashboard contents when a project is selected
     # This function is connected to the projectsComboBox currentIndexChanged signal
     def update_dashboard_contents(self):
@@ -285,6 +313,7 @@ class MainWindow(QMainWindow):
                     self.syncButton.setEnabled(True)
                 logging.info(f"Selected project: {query.value(0)} ({query.value(2)},{query.value(1)})")
                 logging.info(f"Project base folder: {query.value(3)} ")
+
                 self.dashboard.setProjectID(selected_project_id)
 
     # Handle the threshold values set by the user
@@ -340,9 +369,12 @@ class MainWindow(QMainWindow):
         source_index = source_index.siblingAtColumn(25)
     
         self.fileAtSelectedRow = source_model.data(source_index, Qt.ItemDataRole.DisplayRole)
-        
+        self.itemsAtSelectedRow = [source_model.data(source_index.siblingAtColumn(col), Qt.ItemDataRole.DisplayRole) for col in range(source_model.columnCount())]
+        self.previewAndDataWidget.setItemsAtSelectedRow(self.itemsAtSelectedRow)
+        self.previewAndDataWidget.loadPreviewAndData()
+  
         return
-    
+
     # Open the file operationsdialog
     def open_fileOperation_dialog(self):
         logging.info("Opening open_fileOperation_dialog")
@@ -376,24 +408,12 @@ class MainWindow(QMainWindow):
         dialog.project_updated.connect(self.load_projects_combobox)
         dialog.exec()
 
-    # Load the projects into the projectsComboBox
-    def load_projects_combobox(self, project_id=None):
-        self.projectsComboBox.clear()
-        selected_project_id = project_id
-
-        query = QSqlQuery("SELECT NAME,ID, DATE, STATUS FROM projects ORDER BY CASE STATUS WHEN 'Active' THEN 1 WHEN 'Completed' THEN 2 WHEN 'Archived' THEN 3 END, DATE DESC")
-        
-        self.projectsComboBox.addItem('---------- Select project ----------', 0)
-
-        while query.next():
-            project_name = f"{query.value(0)} ({query.value(2)}, {query.value(3)})"
-            project_id = query.value(1)
-            self.projectsComboBox.addItem(project_name,project_id)
-        
-        if selected_project_id and selected_project_id > 0:
-            index = self.projectsComboBox.findData(selected_project_id)
-            if index != -1:
-                self.projectsComboBox.setCurrentIndex(index)
+    
+    def toggle_previewAndDataWidget_visibility(self):
+        if self.togglePreviewAndDataWidgetButton.isChecked():
+            self.previewAndDataWidget.show()
+        else:
+            self.previewAndDataWidget.hide() 
 
     # AstroDom uses a SQLite database to store project and image data
     # This function creates the database if it doesn't exist

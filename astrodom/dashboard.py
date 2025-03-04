@@ -116,8 +116,11 @@ class Dashboard(QTreeView):
         self.proxy_model.setSourceModel(self.model)
 
         self.setModel(self.proxy_model)
-  
-    
+        
+        # By default, expand the first item so the single filters are visible
+        self.expand(self.proxy_model.index(0, 0))
+
+    # The project_id is set automatically at startup and updated when a project is selected
     def setProjectID(self,project_id):
         self.project_id = project_id
         self.load_data()

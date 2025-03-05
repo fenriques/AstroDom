@@ -39,7 +39,7 @@ class Projects(QDialog):
         self.browseButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirOpenIcon))
 
         self.project_statusComboBox = self.findChild(QComboBox, 'project_statusComboBox')
-        self.project_statusComboBox.addItems(['Active', 'Completed', 'Archived'])
+        self.project_statusComboBox.addItems(['Active', 'Archived'])
 
         self.delete_button = self.findChild(QPushButton, 'delete_button')
         self.buttonBox = self.findChild(QDialogButtonBox, 'buttonBox')

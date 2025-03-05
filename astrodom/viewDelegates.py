@@ -75,7 +75,7 @@ class FrameDelegate(QtWidgets.QStyledItemDelegate):
 
     def initStyleOption(self, option, index):
         super(FrameDelegate, self).initStyleOption(option, index)
-        if self.value in ["Light", "Light Frame"]:
+        if self.value in ["Light", "LIGHT", "Light Frame"]:
             option.backgroundBrush = QtGui.QBrush(
                 QColor(120, 120, 244, 55))
         elif self.value in ["Dark", "Dark Frame"]:

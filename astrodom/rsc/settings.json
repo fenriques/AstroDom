@@ -8,9 +8,6 @@
     "ECCENTRICITY_LIMIT_DEFAULT": 0.3,
     "SNR_LIMIT_DEFAULT": 22.0,
     "ADDITIONAL_COLUMNS": [
-        "Temp",
-        "Bin",
-        "DEC",
-        "RA"
+        "Temp"
     ]
 }

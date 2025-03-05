@@ -53,7 +53,6 @@ class PreviewAndDataWidget(QWidget):
 
         #Add the image preview canvas
         self.canvas = FigureCanvas(Figure(figsize=(self.width() / 100, 3)))
-        layout.addWidget(self.canvas)
         self.ax = self.canvas.figure.subplots()
         self.canvas.figure.patch.set_facecolor('gray')
         self.ax.set_facecolor('black')
@@ -62,7 +61,9 @@ class PreviewAndDataWidget(QWidget):
         
         # Image preview controls
         self.toolbar = NavigationToolbar2QT(self.canvas, self)
+
         layout.addWidget(self.toolbar)
+        layout.addWidget(self.canvas)
 
         # Add the keyowords table to the layout 
         self.tableView = QTableView(self)

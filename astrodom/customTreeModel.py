@@ -23,12 +23,10 @@ class CustomFilterProxyModel(QSortFilterProxyModel):
 
         model = self.sourceModel()
         index = model.index(source_row, 0, source_parent)
-        if not index.internalPointer().parent().parent():
-        #return self.filter_string.lower() in model.data(index, Qt.ItemDataRole.DisplayRole).lower()
-            return self.filter_string.lower() in model.data(index, Qt.ItemDataRole.DisplayRole).lower()
-        else:
-            return True
-   
+
+        return True
+
+ 
 class TreeItem:
     def __init__(self, data, parent=None):
         self.parentItem = parent

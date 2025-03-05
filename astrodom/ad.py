@@ -11,10 +11,10 @@ import importlib_resources
 from astrodom.charts import Charts 
 from astrodom.dashboard import Dashboard
 from astrodom.fitsBrowser import FitsBrowser
-from astrodom.fitsHeader import FitsHeaderWidget
 from astrodom.loadSettings import *  # Import the constants
 from astrodom.logHandler import QTextEditLogger,ColorFormatter  
 from astrodom.projects import Projects  
+from astrodom.projectsArchiveWidget import ProjectsArchiveWidget
 from astrodom.settings import SettingsDialog  
 from astrodom.starAnalysis import StarAnalysis
 from astrodom.syncProgress import SyncProgress
@@ -104,10 +104,10 @@ class MainWindow(QMainWindow):
         self.starAnalysisButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'star.png'))))
 
         # Fits Header Button
-        self.fitsHeaderButton = self.findChild(QPushButton, 'fitsHeaderButton')
-        self.fitsHeaderButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
-        self.fitsHeaderButton.clicked.connect(self.open_fitsheader_dialog)
-        self.fitsHeaderButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'keyword.png'))))
+        self.projectsArchiveButton = self.findChild(QPushButton, 'projectsArchiveButton')
+        self.projectsArchiveButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
+        self.projectsArchiveButton.clicked.connect(self.open_projectsArchiveWidget)
+        self.projectsArchiveButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'keyword.png'))))
 
         # File Operations Button
         self.fileOpButton = self.findChild(QPushButton, 'fileOpButton')
@@ -123,15 +123,19 @@ class MainWindow(QMainWindow):
         self.altEdit.setText(str(ALT_LIMIT_DEFAULT))
         self.eccentricityEdit = self.findChild(QLineEdit, 'eccentricityEdit')
         self.eccentricityEdit.setText(str(ECCENTRICITY_LIMIT_DEFAULT))
-        self.filterSelectComboBox = self.findChild(QComboBox, 'filterSelectComboBox')
 
         self.setThresholdsButton = self.findChild(QPushButton, 'setThresholdsButton')
         self.setThresholdsButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
         self.setThresholdsButton.clicked.connect(self.setThresholds)
+        
+        self.filterSelectComboBox = self.findChild(QComboBox, 'filterSelectComboBox')
+        self.filterSelectComboBox.addItems(["--Filter--", "L", "R", "G", "B", "Ha", "Oiii", "Sii"])
+        self.filterSelectComboBox.currentIndexChanged.connect(self.filter_dashboard)
+        
+        # Target items are loaded when a project is selected in load_projects_combobox
+        self.targetComboBox = self.findChild(QComboBox, 'targetComboBox')
+        self.targetComboBox.currentIndexChanged.connect(self.filter_dashboard)
 
-        # Add the toggle button for FitsHeaderWidget
-        self.togglePreviewAndDataWidgetButton = self.findChild(QCheckBox, 'togglePreviewAndDataWidgetButton')
-        self.togglePreviewAndDataWidgetButton.stateChanged.connect(self.toggle_previewAndDataWidget_visibility)
 
     # Called when the sync button is pressed, this function starts the FitsBrowser thread
     # The thread is started with the project ID and the base folder
@@ -270,13 +274,13 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
         else: 
             logging.info(message)
 
-
     # Load the projects into the projectsComboBox
     def load_projects_combobox(self, project_id=None):
         self.projectsComboBox.clear()
         selected_project_id = project_id
+        logging.info(f"Selected project id: {selected_project_id}")
 
-        query = QSqlQuery("SELECT NAME,ID, DATE, STATUS FROM projects ORDER BY CASE STATUS WHEN 'Active' THEN 1 WHEN 'Completed' THEN 2 WHEN 'Archived' THEN 3 END, DATE DESC")
+        query = QSqlQuery("SELECT NAME,ID, DATE, STATUS FROM projects ORDER BY CASE STATUS WHEN 'Active' THEN 1 WHEN 'Archived' THEN 2 END, DATE DESC")
         
         # Important: decided to force the user to select a project
         # so the first item in the combobox is selected by default
@@ -292,8 +296,26 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
             if index != -1:
                 self.projectsComboBox.setCurrentIndex(index)
         
+        # This is need to load a default project in the dashboard.
         self.update_dashboard_contents()
+        self.loadTargetComboBox()
 
+    # Load the targets into the targetComboBox
+    def loadTargetComboBox(self):
+        self.targetComboBox.clear()
+        self.targetComboBox.addItems(["--Target--"])
+        project_id = self.projectsComboBox.currentData()
+
+
+        query = QSqlQuery()
+        query.prepare("SELECT DISTINCT OBJECT FROM images WHERE PROJECT_ID = :id")
+        query.bindValue(":id", project_id)
+        query.exec()
+
+        while query.next():
+            target = query.value(0)
+            self.targetComboBox.addItem(target)
+            logging.info(f"Target: {target}")
 
     # Update the dashboard contents when a project is selected
     # This function is connected to the projectsComboBox currentIndexChanged signal
@@ -319,6 +341,11 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
                 logging.info(f"Project base folder: {query.value(3)} ")
 
                 self.dashboard.setProjectID(selected_project_id)
+                
+                # Reset the filter combobox
+                self.filterSelectComboBox.setCurrentIndex(0)
+                # Reset the target loading the new targets for the selected project
+                self.loadTargetComboBox()
 
     # Handle the threshold values set by the user
     # and calls the applyThreshold method of the dashboard widget
@@ -328,27 +355,27 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
         alt = self.altEdit.text()
         eccentricity = self.eccentricityEdit.text()
 
-        self.dashboard.applyThreshold(fwhm, snr, alt, eccentricity)
-    
+        self.dashboard.applyThreshold(fwhm, snr, alt, eccentricity,)
+
+    # Filter the dashboard by filter
+    def filter_dashboard(self):
+        self.dashboard.load_data()
+
+        return    
+                   
+        
     # Open the settings dialog
     def open_settings_dialog(self):
         logging.info("Opening settings dialog")
         settings_dialog = SettingsDialog(self)
         settings_dialog.exec()
 
-    # Open the settings dialog
-    def open_fitsheader_dialog(self):
-        logging.info("Opening fits header dialog")
+    # Open the archive dialog
+    def open_projectsArchiveWidget(self):
+        logging.info("Opening projects archive")
 
-        if self.fileAtSelectedRow is not None and self.fileAtSelectedRow != "":
-            if os.path.exists(self.fileAtSelectedRow):
-                logging.info(f"Selected image: {self.fileAtSelectedRow}")
-                fitsheader_dialog = FitsHeaderDialog(self,self.fileAtSelectedRow)
-                fitsheader_dialog.show()
-            else:
-                logging.warning(f"Selected image file does not exist: {self.fileAtSelectedRow}")
-        else:
-            logging.warning("No valid image file selected")
+        projectsArchiveWidget = ProjectsArchiveWidget(self)
+        projectsArchiveWidget.show()
 
     # Open the star analysis dialog
     def open_staranalysis_dialog(self):
@@ -386,7 +413,7 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
             QMessageBox.warning(self, 'No Files Selected', 'File operations are not possible if no images are selected.', QMessageBox.StandardButton.Ok)
             return
         fileOperationDialog = FileOperationDialog(checked_files,self)
-        fileOperationDialog.filesDeleted.connect(self.refresh_dashboard_model)  
+        #fileOperationDialog.filesDeleted.connect(self.refresh_dashboard_model)  
 
         fileOperationDialog.exec()
         
@@ -411,12 +438,6 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
         dialog.project_updated.connect(self.load_projects_combobox)
         dialog.exec()
 
-    
-    def toggle_previewAndDataWidget_visibility(self):
-        if self.togglePreviewAndDataWidgetButton.isChecked():
-            self.previewAndDataWidget.show()
-        else:
-            self.previewAndDataWidget.hide() 
 
     # AstroDom uses a SQLite database to store project and image data
     # This function creates the database if it doesn't exist

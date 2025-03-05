@@ -93,6 +93,16 @@ class Dashboard(QTreeView):
         self.restore_expanded_state(expanded_items)
 
     def load_data(self):
+        sqlString = ""
+        selected_filter = self.parent.filterSelectComboBox.currentText()
+        selected_target = self.parent.targetComboBox.currentText()
+
+        if selected_filter != "--Filter--" and selected_filter != "":
+            sqlString = f" AND FILTER = '{selected_filter}' "
+
+        if selected_target != "--Target--" and selected_target != "":
+            sqlString += f" AND OBJECT = '{selected_target}' "
+
         # Connect to the database
         db_path = str(self.parent.rsc_path.joinpath( DBNAME))
         conn = sqlite3.connect(db_path)
@@ -104,8 +114,8 @@ class Dashboard(QTreeView):
             query = f"SELECT * FROM images ORDER BY PROJECT_ID DESC, DATE_OBS ASC"
 
         elif self.project_id > 0: 
-            query = f"SELECT * FROM images WHERE PROJECT_ID = {self.project_id} ORDER BY  PROJECT_ID DESC,  DATE_OBS ASC"
-        
+            query = f"SELECT * FROM images WHERE PROJECT_ID = {self.project_id} {sqlString} ORDER BY  PROJECT_ID DESC,  DATE_OBS ASC"
+            logging.debug(f"Loading data: {query}")   
         try:
             self.df = pd.read_sql_query(query, conn)
             conn.close()
@@ -131,6 +141,7 @@ class Dashboard(QTreeView):
 
     def update_contents(self,selected_project_id):
         self.proxy_model.setFilterString(str(selected_project_id))
+        
 
     def hide_columns(self, columns_to_hide):
         for column_name in columns_to_hide:
@@ -165,8 +176,3 @@ class Dashboard(QTreeView):
             child_index = self.proxy_model.index(row, 0, index)
             self._restore_expanded_state_recursive(child_index, expanded_items)
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    viewer = Dashboard()
-    viewer.show()
-    sys.exit(app.exec())

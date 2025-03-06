@@ -1,20 +1,18 @@
 import os, sys, logging
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget,QPushButton,QCheckBox,QComboBox,QTextEdit,QLineEdit,QStyle
+from PyQt6.QtWidgets import QFileDialog, QMainWindow, QVBoxLayout, QWidget,QPushButton,QComboBox,QTextEdit,QLineEdit,QStyle
 from PyQt6.QtWidgets import QMessageBox
-from PyQt6.QtCore import Qt
 from PyQt6.QtSql import QSqlQuery,QSqlDatabase
 from PyQt6 import uic
 from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt
 import importlib_resources
-
 from astrodom.charts import Charts 
 from astrodom.dashboard import Dashboard
 from astrodom.fitsBrowser import FitsBrowser
 from astrodom.loadSettings import *  # Import the constants
 from astrodom.logHandler import QTextEditLogger,ColorFormatter  
 from astrodom.projects import Projects  
-from astrodom.projectsArchiveWidget import ProjectsArchiveWidget
 from astrodom.settings import SettingsDialog  
 from astrodom.starAnalysis import StarAnalysis
 from astrodom.syncProgress import SyncProgress
@@ -103,10 +101,11 @@ class MainWindow(QMainWindow):
         self.starAnalysisButton.clicked.connect(self.open_staranalysis_dialog)
         self.starAnalysisButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'star.png'))))
 
-        # Fits Header Button
+        # Archive Button
         self.projectsArchiveButton = self.findChild(QPushButton, 'projectsArchiveButton')
+        self.projectsArchiveButton.setCheckable(True)
         self.projectsArchiveButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
-        self.projectsArchiveButton.clicked.connect(self.open_projectsArchiveWidget)
+        self.projectsArchiveButton.clicked.connect(self.toggle_projectsArchive)
         self.projectsArchiveButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'keyword.png'))))
 
         # File Operations Button
@@ -275,13 +274,13 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
             logging.info(message)
 
     # Load the projects into the projectsComboBox
-    def load_projects_combobox(self, project_id=None):
+    def load_projects_combobox(self, project_id=None,status="Active"):
         self.projectsComboBox.clear()
         selected_project_id = project_id
         logging.info(f"Selected project id: {selected_project_id}")
 
-        query = QSqlQuery("SELECT NAME,ID, DATE, STATUS FROM projects ORDER BY CASE STATUS WHEN 'Active' THEN 1 WHEN 'Archived' THEN 2 END, DATE DESC")
-        
+        query = QSqlQuery(f"SELECT NAME,ID, DATE, STATUS FROM projects WHERE STATUS = '{status}' ORDER BY DATE DESC")
+        logging.info(f"SELECT NAME,ID, DATE, STATUS FROM projects WHERE STATUS = '{status}' ORDER BY DATE DESC")
         # Important: decided to force the user to select a project
         # so the first item in the combobox is selected by default
         #self.projectsComboBox.addItem('---------- Select project ----------', 0)
@@ -357,12 +356,11 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
 
         self.dashboard.applyThreshold(fwhm, snr, alt, eccentricity,)
 
-    # Filter the dashboard by filter
+    # Filter the dashboard
     def filter_dashboard(self):
         self.dashboard.load_data()
 
         return    
-                   
         
     # Open the settings dialog
     def open_settings_dialog(self):
@@ -371,11 +369,25 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
         settings_dialog.exec()
 
     # Open the archive dialog
-    def open_projectsArchiveWidget(self):
+    def toggle_projectsArchive(self):
         logging.info("Opening projects archive")
 
-        projectsArchiveWidget = ProjectsArchiveWidget(self)
-        projectsArchiveWidget.show()
+        if self.projectsArchiveButton.isChecked():
+            self.load_projects_combobox(status = "Archived")
+            self.newProjectButton.setEnabled(False)
+            self.editProjectButton.setEnabled(False)
+            self.syncButton.setEnabled(False)
+            self.starAnalysisButton.setEnabled(False)
+            self.fileOpButton.setEnabled(False)
+            self.previewAndDataWidget.setVisible(False)
+        else:
+            self.load_projects_combobox(status = "Active")
+            self.newProjectButton.setEnabled(True)
+            self.editProjectButton.setEnabled(True)
+            self.syncButton.setEnabled(True)
+            self.starAnalysisButton.setEnabled(True)
+            self.fileOpButton.setEnabled(True)
+            self.previewAndDataWidget.setVisible(True)
 
     # Open the star analysis dialog
     def open_staranalysis_dialog(self):
@@ -389,12 +401,23 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
             else:
              logging.warning(f"Selected image file does not exist: {self.fileAtSelectedRow}")
         else:
-            logging.warning("No valid image file selected")
+
+            fits_path, _ = QFileDialog.getOpenFileName(self, "Select a FITS File", "", "FITS Files (*.fits *.fit *.FITS *.FIT)")
+            if not fits_path or not fits_path.lower().endswith(('.fits', '.fit')):
+                QMessageBox.warning(self, "Invalid File", "The selected file is not a valid FITS file.")
+                return
+            else:    
+                self.starAnalysis = StarAnalysis(self, fits_path)
+                self.starAnalysis.show()
 
     # Handle the click event on he table row and gets the file path that
     # Star Analysis will use to analyze the image
     def on_table_row_clicked(self, index):
 
+        #If a Target grouping row or a Filter grouping row is clicked there is no file to analyze
+        if not index.parent().isValid() or not index.parent().parent().isValid():
+            return
+        
         source_index = self.dashboard.proxy_model.mapToSource(index)
         source_model = self.dashboard.proxy_model.sourceModel()
         source_index = source_index.siblingAtColumn(25)

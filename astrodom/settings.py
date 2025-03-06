@@ -34,6 +34,9 @@ class SettingsDialog(QDialog):
         self.logging_level_edit.addItems(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
         self.logging_level_edit.setCurrentText(self.settings.get("DATE_FORMAT", "INFO"))
 
+        # Bias signal
+        self.bias_signal_edit = QLineEdit(str(self.settings.get("BIAS_SIGNAL", 0)))
+
         # Create a combo box for logging levels
         self.file_log = QComboBox()
         self.file_log.addItems(["YES", "NO"])
@@ -49,6 +52,8 @@ class SettingsDialog(QDialog):
         form_layout.addRow("Enable Log File :", self.file_log)
         form_layout.addRow(separator)
         form_layout.addRow("Date Format:", self.date_format_edit)
+        form_layout.addRow(separator)
+        form_layout.addRow("BIAS Signal:", self.bias_signal_edit)
 
         form_layout.addRow(separator)
         form_layout.addRow("ALT Threshold Default:", self.alt_limit_edit)
@@ -100,12 +105,14 @@ class SettingsDialog(QDialog):
         self.settings["FWHM_LIMIT_DEFAULT"] = float(self.fwhm_limit_edit.text())
         self.settings["ECCENTRICITY_LIMIT_DEFAULT"] = float(self.eccentricity_limit_edit.text())
         self.settings["SNR_LIMIT_DEFAULT"] = float(self.snr_limit_edit.text())
-
+        self.settings["BIAS_SIGNAL"] = float(self.bias_signal_edit.text())
         self.settings["ADDITIONAL_COLUMNS"] = [item.text() for item in self.additional_columns_list.selectedItems()]
 
         if not self.dbname_edit.text():
             logging.error("Database name cannot be empty.")
             return
+        if not self.settings["BIAS_SIGNAL"]:    
+            self.settings["BIAS_SIGNAL"] = 0.0
         if not self.settings["ALT_LIMIT_DEFAULT"]:
             self.settings["ALT_LIMIT_DEFAULT"] = 0.0
         if not self.settings["FWHM_LIMIT_DEFAULT"]:

@@ -118,12 +118,16 @@ class Projects(QDialog):
                 WHERE id = ?
             ''', (project_name, project_folder, project_date,project_status,self. project_id))
 
-            logging.info(f"Project {project_name} saved")
 
         # Commit and close the connection
         conn.commit()
         conn.close()
-        self.project_updated.emit(self.project_id)
+        if project_status == 'Archived':
+            self.project_updated.emit(0)
+            logging.warning(f"Project {project_name} is now archived")
+        else:   
+            self.project_updated.emit(self.project_id)
+            logging.info(f"Project {project_name} saved")
 
         self.accept()
 

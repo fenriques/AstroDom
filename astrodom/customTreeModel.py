@@ -323,24 +323,31 @@ class CustomTreeModel(QAbstractItemModel):
         return parentItem.childCount()
 
     def setupModelData(self, data, parent):
-
+        # The dashboard is a tree structure with the following hierarchy:
+        # Target/object -> Filter -> Image
+        # The first iteration is on the object level, the second on the filter level, and the third on the image level
         for object_name, object_group in data.groupby('OBJECT'):
+
             object_item = TreeItem([object_name, len(object_group), str(object_group['EXPOSURE'].sum()), object_group['SIZE'].sum(), 
-                                    "","", "", str(object_group['FWHM'].mean()), str(object_group['ECCENTRICITY'].mean()), "", "", "", 
-                                    "", "", "", "", "", "", "", "", "", "", "", "", "", ""], parent)
+                                    "","", "", str(object_group['FWHM'].mean()), str(object_group['ECCENTRICITY'].mean()), 
+                                    "", "", "", "", "", "", "", "", "", "", "", "", 
+                                    "", "", "", "", "", ""], parent)
             parent.appendChild(object_item)
-            parent.appendChild(TreeItem(["","","","","","","","","","","","","","","","","","","", "", "", "", "", "", "", "", ""],parent))
+
             
+            #Second iteration on the filter level
             for filter_name, filter_group in object_group.groupby('FILTER'):
-                #Compute SNR
+
+                #Compute SNR at filter level
                 if np.sqrt(np.sum(np.square(filter_group['STD']))) != 0:
-                    snr = str(filter_group['MEAN'].sum()/np.sqrt(np.sum(np.square(filter_group['STD']))))
+                    filter_snr = str((filter_group['MEDIAN']-BIAS_SIGNAL).sum()/np.sqrt(np.sum(np.square(filter_group['STD']))))
                 else:
-                    snr = ""
+                    filter_snr = ""
+
                 filter_item = TreeItem([filter_name, len(filter_group), filter_group['EXPOSURE'].sum(), filter_group['SIZE'].sum(), 
                                         "", "", "", str(filter_group['FWHM'].mean()), str(filter_group['ECCENTRICITY'].mean()), 
-                                        snr, "", "", 
-                                        "", "", "", "", "", "", "", str(filter_group['MEAN'].sum()), str(filter_group['MEDIAN'].sum()), 
+                                        filter_snr, "", "", 
+                                        "", "", "", "", "", "", "", str(filter_group['MEAN'].mean()), str(filter_group['MEDIAN'].mean()), 
                                         "", "", "", "", "", ""], object_item)
                 
                 object_item.appendChild(filter_item)
@@ -356,7 +363,7 @@ class CustomTreeModel(QAbstractItemModel):
                         image_row['FILTER'], 
                         image_row['FWHM'],
                         image_row['ECCENTRICITY'],
-                        image_row['STD'],
+                        str((image_row['MEDIAN']-BIAS_SIGNAL)/image_row['STD']),
                         image_row['OBJECT_ALT'], 
                         image_row['OBJECT_AZ'],
                         image_row['CCD_TEMP'], 

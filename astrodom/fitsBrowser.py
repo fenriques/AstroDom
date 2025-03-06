@@ -19,8 +19,8 @@ from datetime import datetime
 from PyQt6.QtCore import pyqtSignal,QThread
 from astrodom.settings import *
 from astrodom.loadSettings import *  
-from PyQt6.QtSql import QSqlQuery
 import warnings
+from astropy.table import QTable
 
 
 ad_keywords = {
@@ -50,6 +50,7 @@ ad_keywords = {
     "MOON_SEPARATION": {'fits_key': '', 'display_name': 'Moon Separation'}
     }
 warnings.filterwarnings("ignore")
+
 filterMapping = {"L": ["Luminance", "luminance", "Lum", "lum", "L", "l"], 
            "R": ["Red", "R", "r", "red"], 
            "B": ["Blue", "B", "b", "blue"], 
@@ -283,16 +284,16 @@ class FitsBrowser(QThread):
                         try:
                             starMeasurement = self.measure_stars(file_path)
                             if starMeasurement is None:
-                                starMeasurement = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                                starMeasurement = [0.0, 0.0, 0.0, 0.0, 0.0]
                         except Exception as e:
                             self.threadLogger.emit(f"Error measuring stars: {e}", "error")
-                            starMeasurement = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
-                        fits_data.append(("FWHM", starMeasurement[1]))
-                        fits_data.append(("ECCENTRICITY", starMeasurement[2]))
-                        fits_data.append(("MEAN", starMeasurement[3]))
-                        fits_data.append(("MEDIAN", starMeasurement[4]))
-                        fits_data.append(("STD", starMeasurement[5]))
+                            starMeasurement = [0.0, 0.0, 0.0, 0.0, 0.0]
+        
+                        fits_data.append(("FWHM", starMeasurement[0]))
+                        fits_data.append(("ECCENTRICITY", starMeasurement[1]))
+                        fits_data.append(("MEAN", starMeasurement[2]))
+                        fits_data.append(("MEDIAN", starMeasurement[3]))
+                        fits_data.append(("STD", starMeasurement[4]))
 
 
                     if ad_keyword == "MOON_PHASE" :
@@ -441,7 +442,6 @@ class FitsBrowser(QThread):
     def calculate_moon_phase(self, date, site_lat, site_long):
         
         try:
-
             # Create an observer 
             observer = ephem.Observer()
             observer.lon = str(site_long)
@@ -464,155 +464,149 @@ class FitsBrowser(QThread):
         else:
             starAnalysis = None
 
-        randomSources = starAnalysis.nStars if starAnalysis and starAnalysis.nStars else 30
-        self.threadLogger.emit(f"randomSources: {randomSources}","info")
+        self.nStars = starAnalysis.nStars if starAnalysis and starAnalysis.nStars else 30
+        self.threadLogger.emit(f"nStars: {self.nStars}","info")
 
-        cropFactor = starAnalysis.cropFactor if starAnalysis and starAnalysis.cropFactor else 2
-        self.threadLogger.emit(f"cropFactor: {cropFactor}","info")
+        self.cropFactor = starAnalysis.cropFactor if starAnalysis and starAnalysis.cropFactor else 2
+        self.threadLogger.emit(f"cropFactor: {self.cropFactor}","info")
 
-        threshold = starAnalysis.threshold if starAnalysis and starAnalysis.threshold else 20
-        self.threadLogger.emit(f"threshold: {threshold}","info")
+        self.threshold = starAnalysis.threshold if starAnalysis and starAnalysis.threshold else 20
+        self.threadLogger.emit(f"threshold: {self.threshold}","info")
 
-        bit = starAnalysis.bit if starAnalysis and starAnalysis.bit else 16
-        self.threadLogger.emit(f"bit: {bit}","info")
+        self.bit = starAnalysis.bit if starAnalysis and starAnalysis.bit else 16
+        self.threadLogger.emit(f"bit: {self.bit}","info")
 
-        bin = starAnalysis.bin if starAnalysis and starAnalysis.bin else 1
-        self.threadLogger.emit(f"bin: {bin}","info")
+        self.bin  = starAnalysis.bin if starAnalysis and starAnalysis.bin else 1
+        self.threadLogger.emit(f"bin: {self.bin}","info")
 
-        radius = starAnalysis.radius if starAnalysis and starAnalysis.radius else 7
-        self.threadLogger.emit(f"radius: {radius}","info")
+        self.radius = starAnalysis.radius if starAnalysis and starAnalysis.radius else 7
+        self.threadLogger.emit(f"radius: {self.radius}","info")
 
-        mode = "both" # "micah" or "astropy" or "both"
-        plot_image = False # plot the image with the detected stars
-        fwhm_micah = []
-        ecc = []
-        average_fwhm_micah, average_fwhm,average_ecc = 0,0,0
+        self.saturationLimit = starAnalysis.saturationLimit if starAnalysis and starAnalysis.radius else 95
+        self.threadLogger.emit(f"saturationLimit: {self.saturationLimit}","info")
+
+
+        fwhmfit = []
 
         # Load the FITS file
-        hdu_list = fits.open(fits_file, mode='readonly')
-        image_data = hdu_list[0].data
+        hdu_list = fits.open(fits_file)
+        self.image_data = hdu_list[0].data
         hdu_list.close()
-
-        # Crop the image by cropFactor of its width and height (faster processing)
-        height, width = image_data.shape
-        crop_height = height // cropFactor
-        crop_width = width // cropFactor
+        
+       # Crop the image by cropFactor of its width and height (faster processing)
+        height, width = self.image_data.shape
+        crop_height = height // self.cropFactor
+        crop_width = width // self.cropFactor
         start_y = (height - crop_height) // 2
         start_x = (width - crop_width) // 2
-        image_data = image_data[start_y:start_y + crop_height, start_x:start_x + crop_width]
+        self.image_data = self.image_data[start_y:start_y + crop_height, start_x:start_x + crop_width]
 
         # Calculate basic statistics
-        mean, median, std = sigma_clipped_stats(image_data, sigma = 3.0)
+        mean, median, std = sigma_clipped_stats(self.image_data, sigma = 3.0)
+        if std == 0:
+            self.threadLogger.emit("Standard deviation is zero, invalid operation encountered.","error")
+            return
+        self.threadLogger.emit(f"Mean: {mean:.2f}, Median: {median:.2f}, Std: {std:.2f}", "info")
+        
 
         # Detect stars
         try:
-            daofind = DAOStarFinder(fwhm = 3.0, threshold = threshold*std)
-            sources = daofind(image_data - median)
+            daofind = DAOStarFinder(fwhm = 3.0, threshold = self.threshold*std)
+            sources = daofind(self.image_data  - median)
+            self.threadLogger.emit(f"Number of stars detected by DAO: {len(sources)}","debug")
         except Exception as e:
             self.threadLogger.emit(f"Error detecting stars: {e}","error")
             return None
-        self.threadLogger.emit(f"Number of stars detected by DAO: {len(sources)}","debug")
-
-        # Cutting saturated stars
-        sources = sources[sources['peak'] < (2**bit)*0.98 ]
-        self.threadLogger.emit(f"Number of non clipped stars (< 98perc peak): {len(sources)}","debug")
-        #print(sources)
         
-        # Cutting weak stars (noise)
-        sources = sources[sources['peak'] > median*10.0]
-        self.threadLogger.emit(f"Number of non clipped  stars above background*10: {len(sources)}","debug")
-        # Exclude sources with flux/peak too high, it is likely to be in  a galaxy or in a nebula too bright
-        sources = sources[sources['peak'] / sources['flux'] > 0.0]
-        self.threadLogger.emit(f"Number of stars with flux/peak too high: {len(sources)}","debug")
+        # Cutting saturated stars and roundness < 0.5
+        sources = sources[(sources['peak'] < (2**self.bit)*self.saturationLimit/100)] 
+        sources = sources[(np.abs(sources['roundness2']) < 0.5)] 
+
+        self.threadLogger.emit(f"Number of non clipped stars (< {self.saturationLimit}% peak: {len(sources)}","debug")
+        
+
+        # Order the stars by peak/median ratio so by how much they are above the background
+        sources['peak_median_ratio'] = sources['peak'] / median
+        sources.sort('peak_median_ratio', reverse=True)
+        self.threadLogger.emit(f"Number of non clipped  stars above background*10: {len(sources)}", "info")
 
         if len(sources) == 0:
-            self.threadLogger.emit("No detected stars suitable for measurement ","warning")
+            self.threadLogger.emit("No stars detected", "error")
             return  
-        
-        # Choose randomSources (faster processing)
-        np.random.seed(42)  # For reproducibility
-        if len(sources) > randomSources:
-            sources = sources[np.random.choice(len(sources), randomSources, replace=False)]
-            #sources.sort('peak', reverse=True)
-            #sources = sources[:randomSources]
-        #print(sources)
+
+        # Reduce the number of stars (faster processing)
+        if len(sources) > self.nStars:
+            sources = sources[:self.nStars]
+        self.sources = sources
+
         # Calculate and print the average peak value
         average_peak = np.mean(sources['peak'])
         self.threadLogger.emit(f"Number of stars detected: {len(sources)}","info")
         self.threadLogger.emit(f"Average Peak: {average_peak:.2f}","debug")
         self.threadLogger.emit(f"Mean: {mean:.2f}, Median: {median:.2f}, Std: {std:.2f}","info")
         
-        if mode == "micah" or mode == "both":
-            for source in sources:
-                x = source['xcentroid']
-                y = source['ycentroid']
-                if (x > radius and x < (width - radius) and y > radius and y < (height - radius)):
-                # Assuming you have the star's image data in `data` and the aperture in `aperture`
-                    cutout = image_data[int(y-radius):int(y+radius), int(x-radius):int(x+radius)]
+        results_table = QTable(names=('xcentroid', 'ycentroid', 'peak', 'fwhm', 'roundness', 'peak_median_ratio'), dtype=('f4', 'f4', 'f4', 'f4', 'f4', 'f4'))
 
-                    # Fit a 2D Gaussian
-                    try:
-                        p_init = models.Gaussian2D(amplitude=np.max(cutout), x_mean=radius, y_mean=radius)
-                        fit_p = fitting.LevMarLSQFitter()
-                        y, x = np.mgrid[:cutout.shape[0], :cutout.shape[1]]
-                        p = fit_p(p_init, x, y, cutout)
-
-                        # Calculate the FWHM
-                        sigma_x = p.x_stddev.value
-                        sigma_y = p.y_stddev.value
-                        fwhm_x = sigma_x * gaussian_sigma_to_fwhm
-                        fwhm_y = sigma_y * gaussian_sigma_to_fwhm
-                        fwhm_micah.append(np.sqrt(fwhm_x * fwhm_y))
-                        if fwhm_y < fwhm_x:
-                            ecc.append(np.sqrt(abs(1 - fwhm_y/fwhm_x)))
-                        else:
-                            ecc.append(0)
-                    except Exception as e:
-                        self.threadLogger.emit(f"Error fitting 2D Gaussian at position x: {x}, y: {y}","warning")
-                        
-                        self.threadLogger.emit(f"Exception: {e}","error")
-
-                    #print(f"FWHM_x: {fwhm_x}, FWHM_y: {fwhm_y}")
-                else:
-                    self.threadLogger.emit(f"Star at position x: {x}, y: {y} is too close to the edge. Skipping star","warning")
-
-
-        if mode == "astropy" or mode ==  "both":
-            xypos = list(zip(sources['xcentroid'], sources['ycentroid']))
-
-            psfphot = fit_2dgaussian(image_data, xypos=xypos, fix_fwhm=False, fit_shape=(7, 7))
-            phot_tbl = psfphot.results
+        # Iterate over the detected stars
+        for source in sources:
+            x = source['xcentroid']
+            y = source['ycentroid']
             try:
-                fwhm = fit_fwhm(image_data, xypos=xypos, fit_shape=(7, 7))
+                #this condition is to avoid stars too close to the edge
+                if (x > self.radius and x < (width - self.radius) and y > self.radius and y < (height - self.radius)):
+                    # Assuming you have the star's image data in `data` and the aperture in `aperture`
+                    # A cutout of the star is a square region around the star
+                    self.threadLogger.emit(f"Cutout centered on the star at position: {x,y} ", "debug")
+
+                    starCutOut = self.image_data[int(y-self.radius):int(y+self.radius), int(x-self.radius):int(x+self.radius)]
+                    try:
+                        starCutOutMean, starCutOutMedian, starCutOutStd = sigma_clipped_stats(starCutOut, sigma = 3.0)
+                    except Exception as e:  
+                        self.threadLogger.emit(f"Error calculating cutout stats: {e}", "warning")
+                        continue    
+                    
+                    self.threadLogger.emit(f"Star Cutout Mean: {starCutOutMean:.2f}, Star Cutout Median: {starCutOutMedian:.2f}, Star Cutout Std: {starCutOutStd:.2f}", "debug")
+                    
+                    # A larger cutout is a square region around the same star, but larger
+                    largerCutOut = self.image_data[int(y-10*self.radius):int(y+10*self.radius), int(x-10*self.radius):int(x+10*self.radius)]
+                    try:
+                        largerCutOutMean, largerCutOutMedian, largerCutOutStd = sigma_clipped_stats(largerCutOut, sigma = 3.0)
+                    except Exception as e:
+                        self.threadLogger.emit(f"Error calculating larger cutout stats: {e}", "warning")
+                        continue    
+                
+                    self.threadLogger.emit(f"Larger Cutout Mean: {largerCutOutMean:.2f}, Larger Cutout Median: {largerCutOutMedian:.2f}, Larger Cutout Std: {largerCutOutStd:.2f}", "debug")    
+
+                    # If the median value of the larger region around the star is not above
+                    # (twice) the background of the image, we have a representative region that
+                    # is not affected by other sources like a nebula or a galaxy.
+                    if largerCutOutMedian < 2 * median:
+
+                        # Use photutils to fit the star with a 2D Gaussian
+                        fwhml = fit_fwhm(starCutOut - median, fit_shape=(7, 7))
+                        fwhmfit.append( fwhml)
+
+                        results_table.add_row((source['xcentroid'], source['ycentroid'], source['peak'], fwhml, source['roundness2'], source['peak_median_ratio']))
+
+                    else:
+                        self.threadLogger.emit("Star rejected because of high background, probably a star in a nebula or galaxy : {largerCutOutMedian}, vs : {median} ", "warning") 
+                else:
+                    self.threadLogger.emit(f"Star at position x: {x}, y: {y} is too close to the edge","warning")   
             except Exception as e:
-                self.threadLogger.emit(f"Error fitting FWHM: {e}","error")
-                fwhm = [0.0] * len(sources) 
-            #print(fwhm)
+                self.threadLogger.emit(f"Error fitting 2D Gaussian at position x: {x}, y: {y}", "warning")
+                self.threadLogger.emit(f"Cutout values: {starCutOut}", "warning")
+                self.threadLogger.emit(f"Exception: {e}", "warning")
 
-        # Calculate and print the average FWHM value
-        if mode == "micah" or mode == "both": 
-            average_fwhm_micah = np.mean(fwhm_micah)
-            self.threadLogger.emit(f"Average FWHM Micah: {average_fwhm_micah:.2f}","debug")
-            average_ecc = np.mean(ecc)
-            self.threadLogger.emit(f"Average ecc: {average_ecc:.2f}","info")
-    
-        if mode == "astropy" or mode == "both": 
-            average_fwhm = np.mean(fwhm)
-            self.threadLogger.emit(f"Average FWHM Astropy: {average_fwhm:.2f}","info")
 
-        if plot_image:
+        
+        # FWHM average
+        average_fwhm = np.mean(fwhmfit)
+        self.threadLogger.emit(f"Average FWHM: {average_fwhm:.2f}", "info")
 
-            cpositions = np.transpose((sources['xcentroid'], sources['ycentroid']))
-            apertures = CircularAperture(cpositions, r = radius)
-            plt.figure()
-            plt.imshow(image_data, cmap = 'Greys', origin = 'lower', norm = LogNorm(), interpolation = 'nearest')
-            plt.colorbar()
+        # Eccentricity in DAOStarFinder is the ratio of the minor and major axes of the star
+        roundness2_avg = np.mean(abs(results_table['roundness']))
+        self.threadLogger.emit(f"Average Roundness: {roundness2_avg:.2f}", "info")
 
-            # draw apertures. apertures.plot command takes arguments (color, line-width, and opacity (alpha))
-            apertures.plot(color = 'red', lw = 2.5, alpha = 0.5)
-            for i, cposition in enumerate(cpositions):
-                plt.text(cposition[0], cposition[1], f'{fwhm[i]:.2f}', color='red', fontsize=9, ha='right', va='top')
-                plt.text(cposition[0], cposition[1], f'{sources["peak"][i]:.2f}', color='blue', fontsize=9, ha='left', va='bottom')
-            plt.show()
+        
+        return np.array([ round(average_fwhm, 2), round(roundness2_avg, 2), round(mean, 2), round(median, 2), round(std, 2)])
 
-        return np.array([round(average_fwhm_micah, 2), round(average_fwhm, 2), round(average_ecc, 2), round(mean, 2), round(median, 2), round(std, 2)])

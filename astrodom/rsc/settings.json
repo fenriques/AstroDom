@@ -4,10 +4,11 @@
     "FILE_LOG": "NO",
     "DATE_FORMAT": "%d-%m-%Y",
     "ALT_LIMIT_DEFAULT": 30.0,
-    "FWHM_LIMIT_DEFAULT": 2.8,
+    "FWHM_LIMIT_DEFAULT": 4.0,
     "ECCENTRICITY_LIMIT_DEFAULT": 0.3,
-    "SNR_LIMIT_DEFAULT": 22.0,
+    "SNR_LIMIT_DEFAULT": 7.0,
     "ADDITIONAL_COLUMNS": [
-        "Temp"
-    ]
+        "File"
+    ],
+    "BIAS_SIGNAL": 0.0
 }

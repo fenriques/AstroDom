@@ -61,6 +61,15 @@ class Dashboard(QTreeView):
         self.decDelegate = DmsDelegate(self)
         self.setItemDelegateForColumn(self.itemList.index("DEC"), self.decDelegate)
         
+        self.siteLatDelegate = DmsDelegate(self)
+        self.setItemDelegateForColumn(self.itemList.index("Site Lat"), self.siteLatDelegate)
+        
+        self.siteLongDelegate = DmsDelegate(self)
+        self.setItemDelegateForColumn(self.itemList.index("Site Long"), self.siteLongDelegate)
+        
+        self.moonSeparationDelegate = DmsDelegate(self)
+        self.setItemDelegateForColumn(self.itemList.index("Moon Separation"), self.moonSeparationDelegate)
+                
         self.roundDelegate = RoundDelegate(self)
         self.setItemDelegateForColumn(self.itemList.index("Mean"), self.roundDelegate)
         self.setItemDelegateForColumn(self.itemList.index("Median"), self.roundDelegate)
@@ -72,12 +81,13 @@ class Dashboard(QTreeView):
 
 
     def on_selection_changed(self, selected, deselected):
+        return
         indexes = self.selectionModel().selectedIndexes()
         if indexes:
             index = indexes[0]
             model_index = self.proxy_model.mapToSource(index)
             value = self.proxy_model.sourceModel().data(model_index.siblingAtColumn(self.itemList.index("File")), Qt.ItemDataRole.DisplayRole)
-
+    
     def applyThreshold(self,fwhm, snr, alt, eccentricity):
         # setLimit is a method in the Delegate classes that formats the threshold values
         self.fwhmDelegate.setLimit(float(fwhm))

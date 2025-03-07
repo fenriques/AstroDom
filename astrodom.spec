@@ -13,7 +13,7 @@ a = Analysis(
     pathex=['.'],  # Use the current directory as the search path
     binaries=[],
     datas=[
-        ('rsc/*', 'rsc'),
+        ('astrodom/rsc/*', 'rsc'),
     ],
     hiddenimports=hiddenimports,
     hookspath=[],
@@ -37,8 +37,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,
-    icon='path/to/icon.ico'  # Optional: specify an icon file
+    console=False
 )
 
 coll = COLLECT(

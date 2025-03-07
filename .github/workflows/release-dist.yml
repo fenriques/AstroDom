@@ -56,6 +56,14 @@ jobs:
           # Move the binary from PyInstaller dist directory to release folder
           cp -r dist/astrodom* release/${{ matrix.platform.name }}
 
+      - name: Delete Existing Release
+        if: always()
+        run: |
+          gh release delete ${{ github.ref }} -y || true
+          gh api -X DELETE /repos/${{ github.repository }}/git/refs/tags/${{ github.ref }} || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Create Release
         id: create_release

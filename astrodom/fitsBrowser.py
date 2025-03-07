@@ -3,24 +3,21 @@
 import os
 import numpy as np
 import sqlite3
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-from photutils.detection import DAOStarFinder
-from photutils.psf import fit_2dgaussian, fit_fwhm
-from photutils.aperture import CircularAperture
-from astropy.io import fits
-from astropy.stats import sigma_clipped_stats,gaussian_sigma_to_fwhm
-from astropy.modeling import models, fitting
-from astropy.coordinates import Angle, AltAz, EarthLocation, SkyCoord
-from astropy.time import Time
 import astropy.units as u
 import ephem
+import warnings
+from matplotlib.colors import LogNorm
+from photutils.detection import DAOStarFinder
+from photutils.psf import  fit_fwhm
+from astropy.io import fits
+from astropy.stats import sigma_clipped_stats
+from astropy.coordinates import Angle, AltAz, EarthLocation, SkyCoord
+from astropy.time import Time
+from astropy.table import QTable
 from datetime import datetime
 from PyQt6.QtCore import pyqtSignal,QThread
 from astrodom.settings import *
 from astrodom.loadSettings import *  
-import warnings
-from astropy.table import QTable
 
 
 ad_keywords = {
@@ -49,7 +46,6 @@ ad_keywords = {
     "MOON_PHASE": {'fits_key': '', 'display_name': 'Moon Phase'},
     "MOON_SEPARATION": {'fits_key': '', 'display_name': 'Moon Separation'}
     }
-warnings.filterwarnings("ignore")
 
 filterMapping = {"L": ["Luminance", "luminance", "Lum", "lum", "L", "l"], 
            "R": ["Red", "R", "r", "red"], 
@@ -59,6 +55,10 @@ filterMapping = {"L": ["Luminance", "luminance", "Lum", "lum", "L", "l"],
            "Sii": ["SII", "Sii", "sii", "s2"], 
            "Oiii": ["OIII", "Oiii", "oiii", "O3"], 
            "LPR": ["Lpr", "LPR", "lpr"]}
+
+# When in a thread, the warnings displayed in the console could crash the application
+# So are suppressed in the thread 
+warnings.filterwarnings("ignore")
 
 class FitsBrowser(QThread):
     threadLogger = pyqtSignal(str,str)
@@ -126,7 +126,7 @@ class FitsBrowser(QThread):
                 return   
 
             self.threadLogger.emit(f"Parsing: { file}", "info")
-            fits_data =[]
+            fits_data = []
             fits_data_dict = {}
             
             # Open the single FITS file and extract the header
@@ -420,6 +420,7 @@ class FitsBrowser(QThread):
         conn.close()
         self.threadLogger.emit(f"All files for project {project_id} deleted from database", "info")
 
+    # Ephem is used to calculate the moon phase and separation, works better than Astropy
     def calculate_moon_separation(self, date, target_ra, target_dec, site_lat, site_long):
 
         observer = ephem.Observer()

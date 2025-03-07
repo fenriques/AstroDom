@@ -24,6 +24,7 @@ from astrodom.settings import *
 from astrodom.loadSettings import *  
 import os
 
+# Stars data are displayed in a QTableView
 class QTableModel(QAbstractTableModel):
     def __init__(self, data):
         super().__init__()
@@ -54,7 +55,9 @@ class StarAnalysis(QDialog):
 
         self.rsc_path = importlib_resources.files("astrodom").joinpath('rsc')
 
-        self.fits_path = fits_path # Path to the FITS file to analyze
+        # Path to the FITS file to analyze: could be a file selected in the filesystem or
+        # a file selected clicking on the dashboard 
+        self.fits_path = fits_path 
         self.nStars = 30 # Choose randomSources (faster processing)
         self.threshold = 20 #threshold for star detection, 20 seems to work well
         self.pixelScale = 0.73 # pixel scale in arcsec/pixel
@@ -62,11 +65,11 @@ class StarAnalysis(QDialog):
         self.bin = 1 # binning factor
         self.radius = 7 # radius of the aperture for the star measurement
         self.saturationLimit = 95 # saturation limit in percent of the peak value
+
         # Crop the image by cropFactor of its width and height (faster processing)
         try:
             file_size = os.path.getsize(self.fits_path) / (1024 * 1024)
             self.cropFactor =int(file_size // 50)
-
         except Exception as e:  
             logging.error(f"Error getting file size: {e}")
             self.cropFactor = 2 
@@ -80,8 +83,6 @@ class StarAnalysis(QDialog):
         control_panel = QWidget(self)
 
         # Add QLineEdit and QComboBox widgets to the control panel
-
-
         self.cropFactorComboBox = QComboBox(self)
         crop_factor_label = QLabel("Crop Factor", self)
         self.cropFactorComboBox.addItems(['1', '2', '3', '4'])
@@ -138,14 +139,13 @@ class StarAnalysis(QDialog):
         control_grid_layout.addWidget(self.applyButton, 1, 6)
         control_grid_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 0,8, 2, 1)
         control_panel.setLayout(control_grid_layout)
-        # Group box for control panel
 
+        # Group box for control panel
         control_group_box = QGroupBox("Star Detection Parameters", self)
         control_group_box.setLayout(control_grid_layout)
 
         # Add the group box to the main layout
         main_layout.addWidget(control_group_box)
-
 
         # Add a widget to show the current file name and average values
         file_info_layout = QHBoxLayout()
@@ -171,7 +171,6 @@ class StarAnalysis(QDialog):
         canvas_layout = QVBoxLayout(canvas_widget)
         canvas_layout.setContentsMargins(0, 0, 0, 0)
         canvas_layout.setSpacing(10)
-
 
         self.imageCanvas = FigureCanvas(Figure(figsize=(5, 3)))
         self.starCanvas = FigureCanvas(Figure(figsize=(5, 3)))
@@ -210,7 +209,6 @@ class StarAnalysis(QDialog):
 
         self.data_stars = self.measure_stars(self.fits_path)
         logging.info(self.data_stars)
-        #Sprint(self.sources)
 
         df = DataFrame(np.array(self.sources))
         df = df[['id', 'xcentroid', 'ycentroid', 'sharpness', 'roundness2', 'peak', 'peak_median_ratio']].round(2)

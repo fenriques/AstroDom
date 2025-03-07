@@ -56,6 +56,17 @@ jobs:
           # Move the binary from PyInstaller dist directory to release folder
           cp -r dist/astrodom* release/${{ matrix.platform.name }}
 
+      - name: create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.head_commit.message }}
+          release_name: ${{ github.event.head_commit.message }}
+          draft: false
+          prerelease: false
+
       - name: Upload binaries to GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
@@ -64,3 +75,4 @@ jobs:
           asset_name: ${{ matrix.platform.name }}
           tag: ${{ github.ref }}
           overwrite: true
+  

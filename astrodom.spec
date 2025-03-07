@@ -5,6 +5,7 @@ from PyInstaller.utils.hooks import collect_submodules
 
 # Collect all submodules for hidden imports
 hiddenimports = collect_submodules('astrodom')
+block_cipher = None
 
 # Update the Analysis section to include hidden imports
 a = Analysis(
@@ -22,7 +23,6 @@ a = Analysis(
     win_private_assemblies=False,
     cipher=block_cipher,
 )
-block_cipher = None
 
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)

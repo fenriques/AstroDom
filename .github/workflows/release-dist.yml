@@ -45,7 +45,7 @@ jobs:
       - name: Build Executable
         run: |
           # Build the executable with PyInstaller for each platform (adjusting accordingly)
-          pyinstaller --onefile --name astrodom --windowed __main__.py   working-directory: .
+          pyinstaller --onefile --name astrodom --windowed --specpath . astrodom.spec
 
       - name: Prepare assets
         shell: bash

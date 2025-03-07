@@ -36,7 +36,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'  # Set up the Python environment
+          python-version: '3.12'  # Set up the Python environment
 
       - name: Install PyInstaller
         run: |
@@ -46,8 +46,7 @@ jobs:
       - name: Build Executable
         run: |
           # Build the executable with PyInstaller for each platform (adjusting accordingly)
-          pyinstaller --onefile hello.py
-        working-directory: .
+          pyinstaller --onefile --name astrodom --windowed __main__.py   working-directory: .
 
       - name: Prepare assets
         shell: bash

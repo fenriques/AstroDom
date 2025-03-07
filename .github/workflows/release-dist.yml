@@ -6,6 +6,9 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: .
     steps:
 
       - name: Checkout repository
@@ -30,5 +33,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Windows-exe
-          path: dist/windows.exe
+          name: Windows
+          path: dist/

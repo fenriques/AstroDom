@@ -1,78 +1,66 @@
-name: release-dist
+name: Build and Release
+
 on:
   push:
     tags:
-      - 'v*'  # Trigger release when a new tag is pushed
+      - 'v*.*.*'
 
 jobs:
-  release:
-    name: Release - ${{ matrix.platform.release_for }}
-    runs-on: ${{ matrix.platform.os }}
+  build:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        platform:
-          - release_for: Linux-x86_64
-            os: ubuntu-latest
-            pyinstaller_target: linux
-            bin: astrodom
-            name: astrodom-linux-amd64
-
-          - release_for: Windows-x86_64
-            os: windows-latest
-            pyinstaller_target: windows
-            bin: astrodom.exe
-            name: astrodom-windows-amd64.exe
-
-          - release_for: macOS-x86_64
-            os: macos-latest
-            pyinstaller_target: macos
-            bin: astrodom
-            name: astrodom-macos-amd64
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v2  # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'  # Set up the Python environment
+          python-version: '3.12'
 
       - name: Install PyInstaller
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller  # Install PyInstaller for packaging
+          pip install pyinstaller
 
       - name: Build Executable
         run: |
-          # Build the executable with PyInstaller for each platform (adjusting accordingly)
           pyinstaller astrodom.spec
 
       - name: Prepare assets
         shell: bash
         run: |
-          # Prepare the release folder
           mkdir -p release
+          cp -r dist/astrodom* release/${{ matrix.os }}
 
-          # Move the binary from PyInstaller dist directory to release folder
-          cp -r dist/astrodom* release/${{ matrix.platform.name }}
+      - name: Delete Existing Release
+        if: always()
+        run: |
+          gh release delete ${{ github.ref }} -y || true
+          gh api -X DELETE /repos/${{ github.repository }}/git/refs/tags/${{ github.ref }} || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: create release
+      - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.head_commit.message }}
-          release_name: ${{ github.event.head_commit.message }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
 
-      - name: Upload binaries to GitHub release
-        uses: svenstaro/upload-release-action@v2
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: release/${{ matrix.platform.name }}
-          asset_name: ${{ matrix.platform.name }}
-          tag: ${{ github.ref }}
-          overwrite: true
-  
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: release/astrodom
+          asset_name: astrodom-${{ matrix.os }}
+          asset_content_type: application/octet-stream

@@ -1,5 +1,4 @@
-name: Release-Dist
-
+name: release-dist
 on:
   push:
     tags:

@@ -54,7 +54,7 @@ jobs:
           mkdir -p release
 
           # Move the binary from PyInstaller dist directory to release folder
-          cp dist/astrodom* release/${{ matrix.platform.name }}
+          cp -r dist/astrodom* release/${{ matrix.platform.name }}
 
       - name: Upload binaries to GitHub release
         uses: svenstaro/upload-release-action@v2

@@ -14,20 +14,20 @@ jobs:
           - release_for: Linux-x86_64
             os: ubuntu-latest
             pyinstaller_target: linux
-            bin: hello
-            name: hello-linux-amd64
+            bin: astrodom
+            name: astrodom-linux-amd64
 
           - release_for: Windows-x86_64
             os: windows-latest
             pyinstaller_target: windows
-            bin: hello.exe
-            name: hello-windows-amd64.exe
+            bin: astrodom.exe
+            name: astrodom-windows-amd64.exe
 
           - release_for: macOS-x86_64
             os: macos-latest
             pyinstaller_target: macos
-            bin: hello
-            name: hello-macos-amd64
+            bin: astrodom
+            name: astrodom-macos-amd64
 
     steps:
       - uses: actions/checkout@v2  # Checkout code
@@ -54,7 +54,7 @@ jobs:
           mkdir -p release
 
           # Move the binary from PyInstaller dist directory to release folder
-          cp dist/hello* release/${{ matrix.platform.name }}
+          cp dist/astrodom* release/${{ matrix.platform.name }}
 
       - name: Upload binaries to GitHub release
         uses: svenstaro/upload-release-action@v2

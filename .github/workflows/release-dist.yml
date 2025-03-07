@@ -56,11 +56,24 @@ jobs:
           # Move the binary from PyInstaller dist directory to release folder
           cp -r dist/astrodom* release/${{ matrix.platform.name }}
 
-      - name: Upload binaries to GitHub release
-        uses: fenriques/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: release/${{ matrix.platform.name }}
-          asset_name: ${{ matrix.platform.name }}
-          tag: ${{ github.ref }}
-          overwrite: true
+
+          - name: Create Release
+          id: create_release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            tag_name: ${{ github.ref }}
+            release_name: Release ${{ github.ref }}
+            draft: false
+            prerelease: false
+  
+          - name: Upload Release Asset
+            uses: actions/upload-release-asset@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            with:
+              upload_url: ${{ steps.create_release.outputs.upload_url }}
+              asset_path: release/astrodom
+              asset_name: astrodom-${{ matrix.os }}
+              asset_content_type: application/octet-stream

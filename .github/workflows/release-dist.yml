@@ -36,24 +36,18 @@ jobs:
           mkdir -p release
           cp -r dist/astrodom* release/${{ matrix.os }}
 
-      - name: Delete Existing Release
-        if: always()
-        run: |
-          gh release delete ${{ github.ref }} -y || true
-          gh api -X DELETE /repos/${{ github.repository }}/git/refs/tags/${{ github.ref }} || true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Release
+      - name: Create or Update Release
         id: create_release
-        uses: actions/create-release@v1
+        run: |
+          if gh release view ${{ github.ref }}; then
+            echo "Release exists, updating..."
+            gh release edit ${{ github.ref }} --prerelease=false --draft=false --title "Release ${{ github.ref }}"
+          else
+            echo "Creating new release..."
+            gh release create ${{ github.ref }} --prerelease=false --draft=false --title "Release ${{ github.ref }}"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1

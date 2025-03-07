@@ -1,7 +1,12 @@
+from PyInstaller.utils.hooks import collect_submodules
+
 # -*- mode: python ; coding: utf-8 -*-
+# Add the following import statement
 
-block_cipher = None
+# Collect all submodules for hidden imports
+hiddenimports = collect_submodules('astrodom')
 
+# Update the Analysis section to include hidden imports
 a = Analysis(
     ['astrodom/__main__.py'],
     pathex=['.'],  # Use the current directory as the search path
@@ -9,7 +14,7 @@ a = Analysis(
     datas=[
         ('rsc/*', 'rsc'),
     ],
-    hiddenimports=[],
+    hiddenimports=hiddenimports,
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
@@ -17,6 +22,9 @@ a = Analysis(
     win_private_assemblies=False,
     cipher=block_cipher,
 )
+block_cipher = None
+
+
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(

@@ -1,4 +1,4 @@
-# Astrodom2
+# Astrodom
 
 AstroDom is a culling tool for deep sky imaging sessions and an archive for cataloging images.  
 In a standard imaging workflow, Astrodom helps finding the best frames for image processing and stores the information about a target that can be retrieved at any time.
@@ -14,8 +14,6 @@ In a standard imaging workflow, Astrodom helps finding the best frames for image
 
 ![Astrodom Home](home.png)
 
-
-## Installation
 
 ## Installation
 

@@ -5,6 +5,10 @@ In a standard imaging workflow, Astrodom helps finding the best frames for image
 
 ![Astrodom Workflow](astrodomWF.png)
 
+## Support
+
+Search for AstroDom server on Discord.
+
 ## Features
 
 - Scan folders for FITS file and import in an intenal searchable database
@@ -18,26 +22,26 @@ In a standard imaging workflow, Astrodom helps finding the best frames for image
 ## Installation
 
 ## Requirements
-AstroDom is developed using Python's QT bindings (PyQT) and thus can be installed on Linux, Windows and MacOS platforms.
+AstroDom is developed using Python's QT bindings (PyQT) and thus can run on Linux, Windows and MacOS platforms.
+
 AstroDom is all about presenting data, so a high definition display (1920x1080 or higher) is recommended. 
 
 ## Prerequisites: Python and Venv
-AstroDom runs in a python virtual environment (venv). 
-
-Installation of Python and venv is not the main purpose of this document; you can search for many resource that have step by step instruction for your platform.
-On a terminal window check  which Python and Virtualenv are installed.
+AstroDom runs in a python virtual environment (venv), to check which versions are installed, on a terminal window:
 
     python --version
     virtualenv --version
-  
+
+Installation of the Python interpreter and venv is not in scope with this document, you find online step by step instruction for your platform.
+
 AstroDom requires **Python version 3.12**.
 
 ## Install and Run AstroDom
-To install AstroDom, create a directory on your system where you will store AstroDom's file. 
+To install AstroDom, create a directory anywhere on your file system where AstroDom files and data will be saved . 
 Any name is ok, but '**astrodom**' is recommended.
 
 ### Script based installation
-Download the install and run scripts to  'astrodom' folder:
+Download the install and run scripts to 'astrodom' folder:
 
 https://github.com/fenriques/AstroDom/tree/master/astrodom/rsc/scripts/
 

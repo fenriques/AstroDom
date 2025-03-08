@@ -18,6 +18,7 @@ from astrodom.starAnalysis import StarAnalysis
 from astrodom.syncProgress import SyncProgress
 from astrodom.fileOperation import FileOperationDialog
 from astrodom.previewAndDataWidget import PreviewAndDataWidget
+from astrodom import __version__
 
 
 class MainWindow(QMainWindow):
@@ -43,7 +44,7 @@ class MainWindow(QMainWindow):
         self.createDB()
 
         #Initialize the main window
-        self.setWindowTitle("AstroDom 2.0")
+        self.setWindowTitle(f"AstroDom {__version__}")
         self.setGeometry(100, 100, 800, 600)
 
         # Integrate the Dashboard widget

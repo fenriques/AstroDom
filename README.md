@@ -1,34 +1,28 @@
 # Astrodom2
 
-Welcome to Astrodom2! This project is designed to help you explore the wonders of the universe.
-
+AstroDom is a culling tool for deep sky imaging sessions and an archive for cataloging images.  
+![Astrodom Home](home.png)
 ## Features
 
-- Star mapping
-- Planet tracking
-- Real-time celestial events
+- Scan folders for FITS file and import in an intenal searchable database
+- Calculate important features like FWHM, Eccentricity and SNR fitting the stars with gaussian functions
+- Reject images that are below a threshold
+- Image data are stored in a database. When original files are deleted or zipped, the user can always retrieve information from the database
+
 
 ## Installation
 
-To install Astrodom2, follow these steps:
+## Installation
+
+To install Astrodom from PyPI, use the following command:
 
 ```bash
-git clone https://github.com/yourusername/astrodom2.git
-cd astrodom2
-npm install
+pip install astrodom
 ```
 
-## Usage
+Make sure you have Python 3.12, venv and pip installed on your system. 
 
-To start using Astrodom2, run the following command:
 
-```bash
-npm start
-```
-
-## Contributing
-
-We welcome contributions! Please read our [contributing guidelines](CONTRIBUTING.md) before getting started.
 
 ## License
 
@@ -36,6 +30,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contact
 
-For any questions or suggestions, please open an issue or contact us at support@astrodom2.com.
+For any questions or suggestions, please open an issue.
 
 Happy stargazing!

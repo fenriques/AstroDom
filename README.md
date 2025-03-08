@@ -1,13 +1,16 @@
 # Astrodom2
 
 AstroDom is a culling tool for deep sky imaging sessions and an archive for cataloging images.  
-![Astrodom Home](home.png)
+![Astrodom Workflow](astrodomWF.png)
+
 ## Features
 
 - Scan folders for FITS file and import in an intenal searchable database
 - Calculate important features like FWHM, Eccentricity and SNR fitting the stars with gaussian functions
 - Reject images that are below a threshold
 - Image data are stored in a database. When original files are deleted or zipped, the user can always retrieve information from the database
+
+![Astrodom Home](home.png)
 
 
 ## Installation

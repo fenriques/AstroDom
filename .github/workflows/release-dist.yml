@@ -29,8 +29,7 @@ jobs:
       - name: Package Application with PyInstaller
         run: |
           pyinstaller astrodom.spec
-      - name: Create dist directory
-        run: mkdir -p dist
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

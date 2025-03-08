@@ -1,6 +1,7 @@
 # Astrodom2
 
 AstroDom is a culling tool for deep sky imaging sessions and an archive for cataloging images.  
+
 ![Astrodom Workflow](astrodomWF.png)
 
 ## Features

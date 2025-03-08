@@ -43,6 +43,8 @@ setup(
     python_requires=">=3.12",
     install_requires=[
         "astropy",
+        "ephem",
+        "fitsio",
         "matplotlib",
         "numpy",
         "pandas",

@@ -44,7 +44,6 @@ setup(
     install_requires=[
         "astropy",
         "ephem",
-        "fitsio",
         "matplotlib",
         "numpy",
         "pandas",

@@ -1,14 +1,13 @@
 import os
+import numpy as np
+import logging
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableView, QHeaderView
 from PyQt6.QtCore import QAbstractTableModel, Qt
 from astropy.io import fits
 from astropy.visualization import *
-import fitsio
-import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT
 from matplotlib.figure import Figure
 from matplotlib import colors, cm, pyplot as plt
-import logging
 
 class KeywordsModel(QAbstractTableModel):
     def __init__(self, header, parent=None):
@@ -95,12 +94,11 @@ class PreviewAndDataWidget(QWidget):
     def plotImage(self):
 
         self.ax.clear()
-        # FITSIO is used to read the FITS file because it is faster as it reads the data in chunks
 
-        with fitsio.FITS(self.fits_path) as fits:
-            
-            if len(fits) > 0 and fits[0].has_data():
-                image_data = fits[0].read()
+        with fits.open(self.fits_path) as hdul:
+            if len(hdul) > 0 and hdul[0].data is not None:
+                image_data = hdul[0].data
+
                 height, width = image_data.shape
                 logging.debug(f"Image width: {width}, Image height: {height}")
 

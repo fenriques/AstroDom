@@ -8,11 +8,11 @@
     "ECCENTRICITY_LIMIT_DEFAULT": 0.3,
     "SNR_LIMIT_DEFAULT": 7.0,
     "ADDITIONAL_COLUMNS": [
-        "File",
         "Temp",
         "Frame",
         "RA",
-        "DEC"
+        "DEC",
+        "File"
     ],
     "BIAS_SIGNAL": 0.0
 }

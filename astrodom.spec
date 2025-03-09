@@ -9,7 +9,7 @@ block_cipher = None
 
 # Update the Analysis section to include hidden imports
 a = Analysis(
-    ['astrodom/__main__.py'],
+    ['astrodom_launch.py'],
     pathex=['.'],  # Use the current directory as the search path
     binaries=[],
     datas=[

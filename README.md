@@ -3,7 +3,7 @@
 AstroDom is a culling tool for deep sky imaging sessions and an archive for cataloging images.  
 In a standard imaging workflow, Astrodom helps finding the best frames for image processing and stores the information about a target that can be retrieved at any time.
 
-![Astrodom Workflow](astrodomWF.png)
+![Astrodom Workflow](astrodom/rsc/astrodomWF.png)
 
 ## Support
 
@@ -16,7 +16,7 @@ Search for AstroDom server on Discord.
 - Reject images that are below a threshold
 - Image data are stored in a database. When original files are deleted or zipped, the user can always retrieve information from the database
 
-![Astrodom Home](home.png)
+![Astrodom Home](astrodom/rsc/home.png)
 
 
 # Install AstroDom

@@ -18,6 +18,8 @@ from astrodom.starAnalysis import StarAnalysis
 from astrodom.syncProgress import SyncProgress
 from astrodom.fileOperation import FileOperationDialog
 from astrodom.previewAndDataWidget import PreviewAndDataWidget
+from astrodom.file_monitor import FileMonitorThread  # Import the file monitor thread
+
 from astrodom import __version__
 from PyQt6.QtWidgets import QApplication
 
@@ -136,6 +138,27 @@ class MainWindow(QMainWindow):
         # Target items are loaded when a project is selected in load_projects_combobox
         self.targetComboBox = self.findChild(QComboBox, 'targetComboBox')
         self.targetComboBox.currentIndexChanged.connect(self.filter_dashboard)
+        # Start the file monitor thread
+        self.start_file_monitor()
+
+    def start_file_monitor(self):
+        current_data = self.projectsComboBox.currentData()
+        if current_data is not None:
+            selected_project_id = int(current_data)
+            query = QSqlQuery()
+            query.prepare("SELECT BASE_DIR FROM projects WHERE ID = :id")
+            query.bindValue(":id", selected_project_id)
+            if query.exec() and query.next():
+                base_dir = query.value(0)
+                self.file_monitor_thread = FileMonitorThread(base_dir)
+                self.file_monitor_thread.file_added.connect(self.on_file_added)
+                self.file_monitor_thread.start()
+
+    def on_file_added(self, file_path):
+        logging.info(f"New file added: {file_path}")
+        # Add the new file to the model
+        #self.dashboard.model.add_file(file_path)
+        self.dashboard.load_data()
 
 
     # Called when the sync button is pressed, this function starts the FitsBrowser thread

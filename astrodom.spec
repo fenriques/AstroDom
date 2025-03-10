@@ -4,7 +4,7 @@ from PyInstaller.utils.hooks import collect_submodules
 # Add the following import statement
 
 # Collect all submodules for hidden imports
-hiddenimports = collect_submodules('astrodom')
+hiddenimports = collect_submodules('astrodom') + ['photutils.geometry.core']
 block_cipher = None
 
 # Update the Analysis section to include hidden imports
@@ -13,7 +13,10 @@ a = Analysis(
     pathex=['.'],  # Use the current directory as the search path
     binaries=[],
     datas=[
-        ('astrodom/rsc/*', 'rsc'),
+        ('astrodom/rsc/gui/*', 'astrodom/rsc/gui'), 
+        ('astrodom/rsc/icons/*', 'astrodom/rsc/icons'), 
+        ('astrodom/rsc/settings.json', 'astrodom/rsc/'),  
+        ('astrodom/rsc/CITATION.rst', 'photutils'),  # Add the missing CITATION file
     ],
     hiddenimports=hiddenimports,
     hookspath=[],

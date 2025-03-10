@@ -19,14 +19,18 @@ Search for AstroDom server on Discord.
 ![Astrodom Home](home.png)
 
 
-## Installation
+# Installation
 
-## Requirements
 AstroDom is developed using Python's QT bindings (PyQT) and thus can run on Linux, Windows and MacOS platforms.
 
 AstroDom is all about presenting data, so a high definition display (1920x1080 or higher) is recommended. 
 
-## Prerequisites: Python and Venv
+Download exe files from:
+
+https://github.com/fenriques/AstroDom/releases
+
+## Alternative installation via pip
+
 AstroDom runs in a python virtual environment (venv), to check which versions are installed, on a terminal window:
 
     python --version
@@ -36,7 +40,8 @@ Installation of the Python interpreter and venv is not in scope with this docume
 
 AstroDom requires **Python version 3.12**.
 
-## Install and Run AstroDom
+### Install and Run AstroDom
+
 To install AstroDom, create a directory anywhere on your file system where AstroDom files and data will be saved . 
 Any name is ok, but '**astrodom**' is recommended.
 
@@ -50,7 +55,7 @@ Launch the .sh (Linux) or .bat (Win) install script from a terminal window.
 Then to run AstroDom, execute the run script. 
 Do not move the run script outside of the 'astrodom' directory; rather  create a desktop icon to launch this script.
 
-### Manual installation
+## Manual installation
 As an alternative to script installation, you can follow these steps:
 Install on Linux:
 

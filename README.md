@@ -9,6 +9,8 @@ In a standard imaging workflow, Astrodom helps finding the best frames for image
 
 Search for AstroDom server on Discord.
 
+Astrodom user manual https://github.com/fenriques/AstroDom/wiki/Documenation
+
 ## Features
 
 - Scan folders for FITS file and import in an intenal searchable database

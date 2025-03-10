@@ -26,7 +26,6 @@ AstroDom is developed using Python's QT bindings (PyQT) and thus can run on Linu
 AstroDom is all about presenting data, so a high definition display (1920x1080 or higher) is recommended. 
 
 Download exe files from:
-
 https://github.com/fenriques/AstroDom/releases
 
 ## Alternative installation via pip

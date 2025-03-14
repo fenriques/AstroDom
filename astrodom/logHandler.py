@@ -7,8 +7,7 @@ class QTextEditLogger(logging.Handler):
         self.log_edit = log_edit
 
     def emit(self, record):
-        msg = self.format(record)
-        self.log_edit.append(msg)
+        self.log_edit.append(self.format(record))
         self.log_edit.verticalScrollBar().setValue(self.log_edit.verticalScrollBar().maximum()) 
         self.flush()
 

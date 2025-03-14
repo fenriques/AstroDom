@@ -1,11 +1,8 @@
 
 
-import os
+import os, sqlite3, ephem, warnings
 import numpy as np
-import sqlite3
 import astropy.units as u
-import ephem
-import warnings
 from matplotlib.colors import LogNorm
 from photutils.detection import DAOStarFinder
 from photutils.psf import  fit_fwhm
@@ -18,7 +15,7 @@ from datetime import datetime
 from PyQt6.QtCore import pyqtSignal,QThread
 from astrodom.settings import *
 from astrodom.loadSettings import *  
-
+import threading
 
 ad_keywords = {
     "OBJECT": {'fits_key': ["OBJECT", "OBJ", "TARGET"], 'display_name': 'Target'},
@@ -66,30 +63,42 @@ class FitsBrowser(QThread):
     nFileSync = pyqtSignal(int)
     nFileTot = pyqtSignal(int)
     
-    def __init__(self,  project_id, base_dir,bResync,parent=None):
+    def __init__(self,  project_id, base_dir,bResync,bAutoSync,files_path=None,parent=None):
 
         super().__init__(parent)
 
         self.project_id = project_id
         self.base_directory = base_dir
         self.bResync = bResync
+        self.bAutoSync = bAutoSync
+        self.files_path = files_path
         self.parent = parent
 
         self.runs = True
         #this is used to store the filenames of the images in the database so that are skipped when parsing
         self.filesAlreadyInDb = []
         self.file_counter = 0
-        self.files_path = [] 
 
     def run(self):
         self.filesAlreadyInDb = self.get_filesFromDb(self.project_id)
-        self.syncFolder()
-        self.stop()
-       
+
+        if self.files_path is not None:
+            self.syncFiles(self.files_path)
+        elif self.bAutoSync == False :
+            self.files_path = []
+            self.syncFolder()
+            self.stop()
+
     def stop(self):
         self.runs = False
     
-    def get_files(self):
+    def syncFolder(self)  :
+
+        # If a resync is requested, all the files for the project are deleted from the database
+        if self.bResync == True:
+            self.delete_files_from_db(self.project_id)
+
+
         # Search for FITS files starting from the base directory
         for root, dirs, parseFiles in os.walk(self.base_directory):
 
@@ -99,17 +108,35 @@ class FitsBrowser(QThread):
                     self.files_path.append(parseFile_path)
         
         self.nFileTot.emit(len(self.files_path))
-        return len(self.files_path)
 
-    
-    def syncFolder(self)  :
+        self.syncFiles(self.files_path)
+
+        self.threadLogger.emit(f"New files inserted in the database: {self.file_counter}", "info")
+
+        # Syncing means also that files that are not in the folder anymore (deleted by user?) are removed from the db
+        # If a resync is forced, the files are already removed from the db
+        if len(self.filesAlreadyInDb)  > 0 and self.bResync == False:
+            self.threadLogger.emit(f"These are files not found in the database anymore: {self.filesAlreadyInDb}", "debug")    
+            
+            # Remove the files that are not in the folder anymore
+            db_path = str(self.parent.rsc_path.joinpath(DBNAME))
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            for file in self.filesAlreadyInDb:
+                cursor.execute("DELETE FROM images WHERE file = ?", (file,))
+                self.threadLogger.emit(f"File removed from database: {file}","warning")
+            conn.commit()
+            conn.close()
         
-        # If a resync is requested, all the files for the project are deleted from the database
-        if self.bResync == True:
-            self.delete_files_from_db(self.project_id)
+        self.threadLogger.emit(f"Task completed in sync thread", "debug")
 
+        self.taskCompleted.emit()
+
+        return
+
+    def syncFiles(self,files_path):
         nParsed = 0
-        self.get_files()
+        self.threadLogger.emit(f"files : {self.files_path}", "info")
 
         # Loop over the FITS files found        
         for file_path in self.files_path:     
@@ -215,18 +242,18 @@ class FitsBrowser(QThread):
                         if ad_keyword == "OBJECT-ALT" or ad_keyword == "OBJECT-AZ" :
                             self.threadLogger.emit(f"{ad_keyword} calculation", "info")
 
-                            # The following 3 oblecjt (EarthLocation, Skycoord and Time) are utitities used to calculate the ALT and AZ of the target if they are not in the FITS header
+                            # The following 3 objects (EarthLocation, Skycoord and Time) are utitities used to calculate the ALT and AZ of the target if they are not in the FITS header
                             # Create EarthLocation object for the observer's location
                             try:
-                                lat1 =header["SITELAT"].split('.')[0]
-                                lon1 = header["SITELONG"].split('.')[0]
+                                lat1 =header["SITELAT"]
+                                lon1 = header["SITELONG"]
                                 location = EarthLocation(lat=lat1*u.deg, lon=lon1*u.deg)
                             except Exception as e:
                                 self.threadLogger.emit(f"Error creating EarthLocation object: {e}", "info")
                                 self.threadLogger.emit(f"Using alternative headers", "info")
                                 try:                               
-                                    lat2 =header["LAT-OBS"].split('.')[0]
-                                    lon2 = header["LONG-OBS"].split('.')[0]
+                                    lat2 =header["LAT-OBS"]
+                                    lon2 = header["LONG-OBS"]
                                     location = EarthLocation(lat=lat2*u.deg, lon=lon2*u.deg)
                                 except Exception as e:  
                                     self.threadLogger.emit(f"Error creating EarthLocation object: {e}", "warning")
@@ -322,29 +349,9 @@ class FitsBrowser(QThread):
             self.threadLogger.emit("File parsed: " + file_path,"debug")
             nParsed += 1
             self.nFileSync.emit(nParsed)
-
-        self.threadLogger.emit(f"New files inserted in the database: {self.file_counter}", "info")
-
-        # Syncing means also that files that are not in the folder anymore (deleted by user?) are removed from the db
-        # If a resync is forced, the files are already removed from the db
-        if len(self.filesAlreadyInDb)  > 0 and self.bResync == False:
-            self.threadLogger.emit(f"These are files not found in the database anymore: {self.filesAlreadyInDb}", "debug")    
-            
-            # Remove the files that are not in the folder anymore
-            db_path = str(self.parent.rsc_path.joinpath(DBNAME))
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            for file in self.filesAlreadyInDb:
-                cursor.execute("DELETE FROM images WHERE file = ?", (file,))
-                self.threadLogger.emit(f"File removed from database: {file}","warning")
-            conn.commit()
-            conn.close()
         
-        self.threadLogger.emit(f"Task completed in sync thread", "debug")
-
-        self.taskCompleted.emit()
-        return
-
+        return 
+    
     # this function is used to get the filenames of the images in the database so that are skipped when parsing
     # files in the folders and the remainders are removed from the db if they are not in the folder
     def get_filesFromDb(self,project_id):

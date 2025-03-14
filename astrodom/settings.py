@@ -88,7 +88,6 @@ class SettingsDialog(QDialog):
 
     def load_settings(self):
         db_path = str(self.parent().rsc_path.joinpath( 'settings.json'))
-        print(db_path)
         try:
             with open(str(self.parent().rsc_path.joinpath('settings.json')), 'r') as file:
                 return json.load(file)

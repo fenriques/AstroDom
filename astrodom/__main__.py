@@ -18,11 +18,16 @@ from astrodom.starAnalysis import StarAnalysis
 from astrodom.syncProgress import SyncProgress
 from astrodom.fileOperation import FileOperationDialog
 from astrodom.previewAndDataWidget import PreviewAndDataWidget
-from astrodom.file_monitor import FileMonitorThread  # Import the file monitor thread
-
+#from astrodom.fileMonitorWidget import FileMonitorWidget  
+from astrodom.file_monitor import FileMonitorThread  
+from astrodom.blinkWidget import BlinkWidget
 from astrodom import __version__
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QDialog,QHBoxLayout
+from PyQt6.QtCore import QThread, pyqtSignal
+import locale
 
+# Set the locale to use '.' as the decimal separator
+locale.setlocale(locale.LC_ALL, 'C')
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -61,7 +66,7 @@ class MainWindow(QMainWindow):
         # Initialize PreviewAndDataWidget
         previewAndDataWidget = self.findChild(QWidget, 'PreviewAndDataWidget')
         if previewAndDataWidget:
-            self.previewAndDataWidget = PreviewAndDataWidget(self)
+            self.previewAndDataWidget = PreviewAndDataWidget(previewWidth=320, parent=self)
             fits_header_layout = QVBoxLayout(previewAndDataWidget)
             fits_header_layout.setContentsMargins(0, 5, 0, 5)
             fits_header_layout.addWidget(self.previewAndDataWidget)
@@ -117,6 +122,16 @@ class MainWindow(QMainWindow):
         self.fileOpButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
         self.fileOpButton.clicked.connect(self.open_fileOperation_dialog)
 
+        # Auto Sync Button
+        self.autoSyncButton = self.findChild(QPushButton, 'autoSyncButton')
+        self.autoSyncButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
+        self.autoSyncButton.clicked.connect(self.autoSyncButtonPressed)
+
+        # Blink Button
+        self.blinkButton = self.findChild(QPushButton, 'blinkButton')
+        self.blinkButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
+        self.blinkButton.clicked.connect(self.open_blink_dialog)
+
         # Thresholds
         self.fwhmEdit = self.findChild(QLineEdit, 'fwhmEdit')
         self.fwhmEdit.setText(str(FWHM_LIMIT_DEFAULT))
@@ -139,26 +154,43 @@ class MainWindow(QMainWindow):
         self.targetComboBox = self.findChild(QComboBox, 'targetComboBox')
         self.targetComboBox.currentIndexChanged.connect(self.filter_dashboard)
         # Start the file monitor thread
-        self.start_file_monitor()
 
-    def start_file_monitor(self):
+    def autoSyncButtonPressed(self):
         current_data = self.projectsComboBox.currentData()
+        reply = QMessageBox.question(self, 'Experimental Feature', 
+                         'This is an experimental feature and should be used for testing only. Do you want to proceed?', 
+                         QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+
+        if reply == QMessageBox.StandardButton.Cancel:
+            logging.info("Experimental feature declined")
+            return
         if current_data is not None:
             selected_project_id = int(current_data)
             query = QSqlQuery()
             query.prepare("SELECT BASE_DIR FROM projects WHERE ID = :id")
             query.bindValue(":id", selected_project_id)
-            if query.exec() and query.next():
-                base_dir = query.value(0)
-                self.file_monitor_thread = FileMonitorThread(base_dir)
-                self.file_monitor_thread.file_added.connect(self.on_file_added)
-                self.file_monitor_thread.start()
 
-    def on_file_added(self, file_path):
-        logging.info(f"New file added: {file_path}")
-        # Add the new file to the model
-        #self.dashboard.model.add_file(file_path)
-        self.dashboard.load_data()
+            if query.exec() and query.next():
+                base_directory = query.value(0)
+
+                self.fileMonitorWidget = FileMonitorThread(base_directory, project_id=selected_project_id,bResync=False, bAutoSync=True,parent=self)
+                self.fileMonitorWidget.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
+                self.fileMonitorWidget.file_added.connect(self.on_file_added)
+                self.fileMonitorWidget.start()
+
+
+    def on_file_added(self, base_directory, project_id, file_path):
+        #logging.info(f"New file added: {file_path} - {base_directory} - {project_id}")
+        QThread.sleep(2)
+        files_path=[file_path]
+        self.fits_browser_thread = FitsBrowser(project_id=project_id, base_dir=base_directory, bResync=False, bAutoSync=True,files_path=file_path, parent=self)
+        self.fits_browser_thread.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
+        self.fits_browser_thread.taskCompleted.connect(self.dashboard.load_data)
+
+        self.fits_browser_thread.start()
+
+
+        # Create and start a simple dummy thread
 
 
     # Called when the sync button is pressed, this function starts the FitsBrowser thread
@@ -218,16 +250,19 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
                     if reply == QMessageBox.StandardButton.No:
                         logging.info("Resync not selected")
                         bResync = False
-                    
 
             # The FitsBrowser thread is created and started 
             # Two signals are connected to the thread: one for logging and one for updating the dashboard
             # when the thread is completed.
-            self.thread = FitsBrowser(project_id=selected_project_id, base_dir=base_dir, bResync=bResync,parent=self)
-            self.thread.taskCompleted.connect(self.dashboard.load_data)
-            self.thread.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
+            try:
+                self.thread = FitsBrowser(project_id=selected_project_id, base_dir=base_dir, bResync=bResync,bAutoSync=False,parent=self)
+                self.thread.taskCompleted.connect(self.dashboard.load_data)
+                self.thread.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
+                self.thread.start()
+            except Exception as e:
+                logging.error(f"An error occurred: {e}")
+                return
 
-            self.thread.start()
             # Open the sync progress dialog
 
             self.sync_progress_dialog = SyncProgress(self.thread, self)
@@ -339,7 +374,6 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
         while query.next():
             target = query.value(0)
             self.targetComboBox.addItem(target)
-            logging.info(f"Target: {target}")
 
     # Update the dashboard contents when a project is selected
     # This function is connected to the projectsComboBox currentIndexChanged signal
@@ -465,6 +499,13 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
 
         fileOperationDialog.exec()
         
+    # Open blink dialog
+    def open_blink_dialog(self):
+        blinkDialog = BlinkWidget(self.projectsComboBox.currentData(), self)
+        blinkDialog.exec()
+        
+        return
+        
     
     # Open the charts dialog
     def open_charts_dialog(self):
@@ -555,8 +596,24 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
                 except Exception as e:
                     logging.error(f"An error occurred: {e}")
 
+    # Override the closeEvent method to stop running threads
+    def closeEvent(self, event):
+        if hasattr(self, 'thread') :
+            if self.thread.isRunning():
+                self.thread.stop()
+                self.thread.wait()
+                logging.info("Stopped running thread before closing the application.")
+        if hasattr(self, 'monitor_thread') :
+            if self.monitor_thread.isRunning():
+                self.monitor_thread.stop()
+                self.monitor_thread.wait()
+                logging.info("Stopped running thread before closing the application.")
+        event.accept()  # Accept the event to close the window
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+

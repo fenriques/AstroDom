@@ -17,12 +17,12 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT, FigureCanva
 from matplotlib.figure import Figure
 from astropy.table import QTable
 from pandas import DataFrame
-from PyQt6.QtWidgets import QSpacerItem, QSizePolicy
-from PyQt6.QtWidgets import QGroupBox
+from PyQt6.QtWidgets import QSpacerItem, QSizePolicy, QGroupBox, QStyle
 
 from astrodom.settings import *
 from astrodom.loadSettings import *  
 import os
+import sqlite3
 
 # Stars data are displayed in a QTableView
 class QTableModel(QAbstractTableModel):
@@ -151,9 +151,18 @@ class StarAnalysis(QDialog):
         file_info_layout = QHBoxLayout()
         self.averageFwhmLabel = QLabel("<b>Average FWHM: N/A</b>", self)
         self.averageRoundnessLabel = QLabel("<b>Average Roundness: N/A</b>", self)
+        self.SNRLabel = QLabel("<b>SNR: N/A</b>", self)
         
+        self.saveButton = QPushButton("Save to DB", self)
+        self.saveButton.setEnabled(False)
+        self.saveButton.clicked.connect(self.save_to_db)
+        self.saveButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
+
+        file_info_layout.addWidget(self.saveButton) 
         file_info_layout.addWidget(self.averageFwhmLabel)
         file_info_layout.addWidget(self.averageRoundnessLabel)
+        file_info_layout.addWidget(self.SNRLabel)
+        file_info_layout.addWidget(self.saveButton)
         
         main_layout.addLayout(file_info_layout)
 
@@ -392,5 +401,34 @@ class StarAnalysis(QDialog):
         if average_fwhm and roundness2_avg:
             self.averageFwhmLabel.setText(f"<b>Average FWHM: {average_fwhm:.2f}</b>")
             self.averageRoundnessLabel.setText(f"<b>Average Roundness: {roundness2_avg:.2f}</b>")
+            self.SNRLabel.setText(f"<b>SNR: {((median - BIAS_SIGNAL) / std):.2f}</b>")
+            self.saveButton.setEnabled(True)
 
-        return np.array([ round(average_fwhm, 2), round(roundness2_avg, 2)])
+        return np.array([ round(average_fwhm, 2), round(roundness2_avg, 2), round(mean, 2), round(median, 2), round(std, 2)])
+
+    def save_to_db(self):
+        # Connect to the database
+        db_path = str(self.rsc_path.joinpath( DBNAME))
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+       
+        # Prepare the data to be updated
+        fwhm = self.data_stars[0]
+        eccentricity = self.data_stars[1]
+        mean = self.data_stars[2]
+        median = self.data_stars[3]
+        std = self.data_stars[4]
+
+        # Update the row in the database
+        try:
+            cursor.execute("""
+                UPDATE images
+                SET FWHM = ?, Eccentricity = ?, mean = ?, median = ?, std = ?
+                WHERE FILE = ?
+            """, (fwhm, eccentricity, mean, median, std, self.fits_path))
+            conn.commit()
+            logging.info("Database updated successfully")
+        except sqlite3.Error as e:
+            logging.error(f"Error updating database: {e}")
+        finally:
+            conn.close()

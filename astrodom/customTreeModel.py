@@ -230,7 +230,7 @@ class CustomTreeModel(QAbstractItemModel):
             index = self.index(row, self.itemList.index("File"), parent_index)
         
             files.append(self.data(index, Qt.ItemDataRole.DisplayRole))
-            logging.debug(self.data(index, Qt.ItemDataRole.DisplayRole))
+            #logging.debug(self.data(index, Qt.ItemDataRole.DisplayRole))
         
         return files
 
@@ -238,7 +238,7 @@ class CustomTreeModel(QAbstractItemModel):
         if not index.isValid():
             return False
         
-        logging.debug(f"Index: {self.checked_items}")
+        #logging.debug(f"Index: {self.checked_items}")
         
         if role == Qt.ItemDataRole.CheckStateRole :
             # Target level
@@ -351,8 +351,15 @@ class CustomTreeModel(QAbstractItemModel):
                                         "", "", "", "", "", ""], object_item)
                 
                 object_item.appendChild(filter_item)
-                
+
+
                 for _, image_row in filter_group.iterrows():
+                    
+                    if image_row['STD'] != 0:
+                        image_snr = round((image_row['MEDIAN'] - BIAS_SIGNAL) / image_row['STD'], 2)
+                    else:
+                        image_snr = 0
+                    
                     image_item = TreeItem([
                         image_row['OBJECT'], 
                         "", 
@@ -363,7 +370,7 @@ class CustomTreeModel(QAbstractItemModel):
                         image_row['FILTER'], 
                         image_row['FWHM'],
                         image_row['ECCENTRICITY'],
-                        str((image_row['MEDIAN']-BIAS_SIGNAL)/image_row['STD']),
+                        image_snr,
                         image_row['OBJECT_ALT'], 
                         image_row['OBJECT_AZ'],
                         image_row['CCD_TEMP'], 

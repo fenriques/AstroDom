@@ -51,6 +51,7 @@ setup(
         "photutils",
         "pyqtgraph",
         "importlib_resources",
+        "watchdog",
     ],
     url="https://github.com/fenriques/AstroDom",
     license="MIT",

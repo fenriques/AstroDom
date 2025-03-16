@@ -7,22 +7,22 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 import importlib_resources
-from astrodom.charts import Charts 
-from astrodom.dashboard import Dashboard
-from astrodom.fitsBrowser import FitsBrowser
+from astrodom.plotDialog import PlotDialog 
+from astrodom.dashboardTreeView import DashboardTreeView
+from astrodom.syncImages import SyncImages
 from astrodom.loadSettings import *  # Import the constants
 from astrodom.logHandler import QTextEditLogger,ColorFormatter  
-from astrodom.projects import Projects  
-from astrodom.settings import SettingsDialog  
-from astrodom.starAnalysis import StarAnalysis
-from astrodom.syncProgress import SyncProgress
-from astrodom.fileOperation import FileOperationDialog
+from astrodom.projectDialog import ProjectDialog  
+from astrodom.settingsDialog import SettingsDialog  
+from astrodom.starAnalysisDialog import StarAnalysisDialog
+from astrodom.syncProgressDialog import SyncProgressDialog
+from astrodom.fileOperationDialog import FileOperationDialog
 from astrodom.previewAndDataWidget import PreviewAndDataWidget
-#from astrodom.fileMonitorWidget import FileMonitorWidget  
+#from astrodom.fileMonitorDialog import FileMonitorDialog 
 from astrodom.file_monitor import FileMonitorThread  
-from astrodom.blinkWidget import BlinkWidget
+from astrodom.blinkDialog import BlinkDialog
 from astrodom import __version__
-from PyQt6.QtWidgets import QApplication, QDialog,QHBoxLayout
+from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QThread, pyqtSignal
 import locale
 
@@ -56,12 +56,12 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 800, 600)
 
         # Integrate the Dashboard widget
-        self.dashboard = Dashboard(self)
+        self.dashboardTreeView = DashboardTreeView(self)
         dashboard_widget = self.findChild(QWidget, 'dashboard')
         dashboard_layout = QVBoxLayout(dashboard_widget)
         dashboard_layout.setContentsMargins(0, 5, 0, 5)
-        dashboard_layout.addWidget(self.dashboard)
-        self.dashboard.clicked.connect(self.on_table_row_clicked)
+        dashboard_layout.addWidget(self.dashboardTreeView)
+        self.dashboardTreeView.clicked.connect(self.on_dashboard_row_clicked)
 
         # Initialize PreviewAndDataWidget
         previewAndDataWidget = self.findChild(QWidget, 'PreviewAndDataWidget')
@@ -94,10 +94,10 @@ class MainWindow(QMainWindow):
         self.syncButton.clicked.connect(self.syncButtonPressed)
 
         # Charts Button
-        self.chartsButton = self.findChild(QPushButton, 'chartsButton')
-        self.chartsButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'chart-up.png'))))
-        self.charts_widget = None
-        self.chartsButton.clicked.connect(self.open_charts_dialog)
+        self.plotsButton = self.findChild(QPushButton, 'chartsButton')
+        self.plotsButton.setIcon(QIcon(str(self.rsc_path.joinpath( 'icons', 'chart-up.png'))))
+        self.plotDialog = None
+        self.plotsButton.clicked.connect(self.open_plot_dialog)
 
         # Settings Button
         self.settingsButton = self.findChild(QPushButton, 'settingsButton')
@@ -129,7 +129,7 @@ class MainWindow(QMainWindow):
 
         # Blink Button
         self.blinkButton = self.findChild(QPushButton, 'blinkButton')
-        self.blinkButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
+        self.blinkButton.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_MediaPlay))
         self.blinkButton.clicked.connect(self.open_blink_dialog)
 
         # Thresholds
@@ -158,8 +158,8 @@ class MainWindow(QMainWindow):
     def autoSyncButtonPressed(self):
         current_data = self.projectsComboBox.currentData()
         reply = QMessageBox.question(self, 'Experimental Feature', 
-                         'This is an experimental feature and should be used for testing only. Do you want to proceed?', 
-                         QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+            'This is an experimental feature and should be used for testing only. Do you want to proceed?', 
+            QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
 
         if reply == QMessageBox.StandardButton.Cancel:
             logging.info("Experimental feature declined")
@@ -173,27 +173,23 @@ class MainWindow(QMainWindow):
             if query.exec() and query.next():
                 base_directory = query.value(0)
 
-                self.fileMonitorWidget = FileMonitorThread(base_directory, project_id=selected_project_id,bResync=False, bAutoSync=True,parent=self)
-                self.fileMonitorWidget.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
-                self.fileMonitorWidget.file_added.connect(self.on_file_added)
-                self.fileMonitorWidget.start()
+                self.fileMonitorDialog = FileMonitorThread(base_directory, project_id=selected_project_id,bResync=False, bAutoSync=True,parent=self)
+                self.fileMonitorDialog.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
+                self.fileMonitorDialog.file_added.connect(self.on_file_added)
+                self.fileMonitorDialog.start()
 
 
     def on_file_added(self, base_directory, project_id, file_path):
         #logging.info(f"New file added: {file_path} - {base_directory} - {project_id}")
         QThread.sleep(2)
         files_path=[file_path]
-        self.fits_browser_thread = FitsBrowser(project_id=project_id, base_dir=base_directory, bResync=False, bAutoSync=True,files_path=file_path, parent=self)
-        self.fits_browser_thread.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
-        self.fits_browser_thread.taskCompleted.connect(self.dashboard.load_data)
+        self.sync_images_thread = SyncImages(project_id=project_id, base_dir=base_directory, bResync=False, bAutoSync=True,files_path=file_path, parent=self)
+        self.sync_images_thread.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
+        self.sync_images_thread.taskCompleted.connect(self.dashboardTreeView.load_data)
 
-        self.fits_browser_thread.start()
+        self.sync_images_thread.start()
 
-
-        # Create and start a simple dummy thread
-
-
-    # Called when the sync button is pressed, this function starts the FitsBrowser thread
+    # Called when the sync button is pressed, this function starts the SyncImages thread
     # The thread is started with the project ID and the base folder
     # The thread is connected to the dashboard widget to update the data
     def syncButtonPressed(self):
@@ -207,7 +203,7 @@ class MainWindow(QMainWindow):
             logging.warning("Sync stopped")
 
             # After the thread is stopped, the buttons are re-enabled
-            self.chartsButton.setEnabled(True)
+            self.plotsButton.setEnabled(True)
             self.syncButton.setText('Sync Folder')
             self.projectsComboBox.setEnabled(True)
             self.editProjectButton.setEnabled(True)
@@ -251,12 +247,12 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
                         logging.info("Resync not selected")
                         bResync = False
 
-            # The FitsBrowser thread is created and started 
+            # The SyncImages thread is created and started 
             # Two signals are connected to the thread: one for logging and one for updating the dashboard
             # when the thread is completed.
             try:
-                self.thread = FitsBrowser(project_id=selected_project_id, base_dir=base_dir, bResync=bResync,bAutoSync=False,parent=self)
-                self.thread.taskCompleted.connect(self.dashboard.load_data)
+                self.thread = SyncImages(project_id=selected_project_id, base_dir=base_dir, bResync=bResync,bAutoSync=False,parent=self)
+                self.thread.taskCompleted.connect(self.dashboardTreeView.load_data)
                 self.thread.threadLogger.connect(lambda message,logType: self.threadLogger(message,logType))
                 self.thread.start()
             except Exception as e:
@@ -265,13 +261,13 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
 
             # Open the sync progress dialog
 
-            self.sync_progress_dialog = SyncProgress(self.thread, self)
+            self.sync_progress_dialog = SyncProgressDialog(self.thread, self)
             self.sync_progress_dialog.show()
             # During file parsing, all widget that could have conflict are disabled
             # Then renabled after thread completion 
             if self.thread.isRunning():
                 logging.debug("Sync is running")
-                self.chartsButton.setEnabled(False)
+                self.plotsButton.setEnabled(False)
                 self.syncButton.setText('Stop Sync')
                 self.projectsComboBox.setEnabled(False)
                 self.editProjectButton.setEnabled(False)
@@ -280,13 +276,13 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
                 self.setThresholdsButton.setEnabled(False)
                 self.fileOpButton.setEnabled(False)
 
-                self.thread.taskCompleted.connect(self.on_task_completed)
+                self.thread.taskCompleted.connect(self.on_sync_task_completed)
 
         return
     
     # When the sync thread is completed, the buttons are re-enabled
-    def on_task_completed(self):
-        self.chartsButton.setEnabled(True)
+    def on_sync_task_completed(self):
+        self.plotsButton.setEnabled(True)
         self.projectsComboBox.setEnabled(True)
         self.editProjectButton.setEnabled(True)
         self.newProjectButton.setEnabled(True)
@@ -337,10 +333,9 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
     def load_projects_combobox(self, project_id=None,status="Active"):
         self.projectsComboBox.clear()
         selected_project_id = project_id
-        logging.info(f"Selected project id: {selected_project_id}")
 
         query = QSqlQuery(f"SELECT NAME,ID, DATE, STATUS FROM projects WHERE STATUS = '{status}' ORDER BY DATE DESC")
-        logging.info(f"SELECT NAME,ID, DATE, STATUS FROM projects WHERE STATUS = '{status}' ORDER BY DATE DESC")
+        logging.debug(f"SELECT NAME,ID, DATE, STATUS FROM projects WHERE STATUS = '{status}' ORDER BY DATE DESC")
         # Important: decided to force the user to select a project
         # so the first item in the combobox is selected by default
         #self.projectsComboBox.addItem('---------- Select project ----------', 0)
@@ -355,6 +350,8 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
             if index != -1:
                 self.projectsComboBox.setCurrentIndex(index)
         
+        logging.info(f"Selected project id: {selected_project_id}")
+
         # This is need to load a default project in the dashboard.
         self.update_dashboard_contents()
         self.loadTargetComboBox()
@@ -398,7 +395,7 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
                 logging.info(f"Selected project: {query.value(0)} ({query.value(2)},{query.value(1)})")
                 logging.info(f"Project base folder: {query.value(3)} ")
 
-                self.dashboard.setProjectID(selected_project_id)
+                self.dashboardTreeView.setProjectID(selected_project_id)
                 
                 # Reset the filter combobox
                 self.filterSelectComboBox.setCurrentIndex(0)
@@ -413,24 +410,32 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
         alt = self.altEdit.text()
         eccentricity = self.eccentricityEdit.text()
 
-        self.dashboard.applyThreshold(fwhm, snr, alt, eccentricity,)
+        self.dashboardTreeView.applyThreshold(fwhm, snr, alt, eccentricity,)
 
     # Filter the dashboard
     def filter_dashboard(self):
-        self.dashboard.load_data()
+        self.dashboardTreeView.load_data()
 
         return    
         
     # Open the settings dialog
     def open_settings_dialog(self):
-        logging.info("Opening settings dialog")
+        logging.debug("Opening settings dialog")
         settings_dialog = SettingsDialog(self)
         settings_dialog.exec()
 
     # Open the archive dialog
     def toggle_projectsArchive(self):
-        logging.info("Opening projects archive")
+        logging.debug("Opening projects archive")
 
+        query = QSqlQuery("SELECT COUNT(*) FROM projects WHERE STATUS = 'Archived'")
+        if query.exec() and query.next():
+            if query.value(0) == 0:
+                QMessageBox.information(self, 'No Archived Projects', 'There are no archived projects in the database.', 
+                    QMessageBox.StandardButton.Ok)
+                self.projectsArchiveButton.setChecked(False)
+                return
+            
         if self.projectsArchiveButton.isChecked():
             self.load_projects_combobox(status = "Archived")
             self.newProjectButton.setEnabled(False)
@@ -450,13 +455,13 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
 
     # Open the star analysis dialog
     def open_staranalysis_dialog(self):
-        logging.info("Opening star analysis dialog")
+        logging.debug("Opening star analysis dialog")
 
         if self.fileAtSelectedRow is not None and self.fileAtSelectedRow != "":
             if os.path.exists(self.fileAtSelectedRow):
                 logging.info(f"Selected image: {self.fileAtSelectedRow}")
-                self.starAnalysis = StarAnalysis(self,self.fileAtSelectedRow)
-                self.starAnalysis.show()
+                self.starAnalysisDialog = StarAnalysisDialog(self,self.fileAtSelectedRow)
+                self.starAnalysisDialog.show()
             else:
              logging.warning(f"Selected image file does not exist: {self.fileAtSelectedRow}")
         else:
@@ -466,19 +471,19 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
                 QMessageBox.warning(self, "Invalid File", "The selected file is not a valid FITS file.")
                 return
             else:    
-                self.starAnalysis = StarAnalysis(self, fits_path)
-                self.starAnalysis.show()
+                self.starAnalysisDialog = StarAnalysisDialog(self, fits_path)
+                self.starAnalysisDialog.show()
 
     # Handle the click event on he table row and gets the file path that
     # Star Analysis will use to analyze the image
-    def on_table_row_clicked(self, index):
+    def on_dashboard_row_clicked(self, index):
 
         #If a Target grouping row or a Filter grouping row is clicked there is no file to analyze
         if not index.parent().isValid() or not index.parent().parent().isValid():
             return
         
-        source_index = self.dashboard.proxy_model.mapToSource(index)
-        source_model = self.dashboard.proxy_model.sourceModel()
+        source_index = self.dashboardTreeView.proxy_model.mapToSource(index)
+        source_model = self.dashboardTreeView.proxy_model.sourceModel()
         source_index = source_index.siblingAtColumn(25)
     
         self.fileAtSelectedRow = source_model.data(source_index, Qt.ItemDataRole.DisplayRole)
@@ -489,8 +494,8 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
 
     # Open the file operationsdialog
     def open_fileOperation_dialog(self):
-        logging.info("Opening open_fileOperation_dialog")
-        checked_files = self.dashboard.proxy_model.sourceModel().get_checked_files()
+        logging.debug("Opening open_fileOperation_dialog")
+        checked_files = self.dashboardTreeView.proxy_model.sourceModel().get_checked_files()
         if len(checked_files) == 0:
             QMessageBox.warning(self, 'No Files Selected', 'File operations are not possible if no images are selected.', QMessageBox.StandardButton.Ok)
             return
@@ -501,31 +506,30 @@ Examples: If you want to update values like  FWHM, SNR, etc.), you have to resyn
         
     # Open blink dialog
     def open_blink_dialog(self):
-        blinkDialog = BlinkWidget(self.projectsComboBox.currentData(), self)
+        blinkDialog = BlinkDialog(self.projectsComboBox.currentData(), self)
         blinkDialog.exec()
         
         return
         
-    
     # Open the charts dialog
-    def open_charts_dialog(self):
-        logging.info("Opening charts dialog")
-        charts_widget = Charts(self.dashboard.df, self)
-        charts_widget.exec()
+    def open_plot_dialog(self):
+        logging.debug("Opening charts dialog")
+        plotDialog = PlotDialog(self.dashboardTreeView.df, self)
+        plotDialog.exec()
     
     # Open the projects dialog
     def open_new_project_dialog(self):
-        dialog = Projects(self)
-        dialog.project_updated.connect(self.load_projects_combobox)
-        dialog.exec()
+        projectDialog = ProjectDialog(self)
+        projectDialog.project_updated.connect(self.load_projects_combobox)
+        projectDialog.exec()
 
     # Open the projects dialog with the selected project
     def open_edit_project_dialog(self):
         current_project_id = self.projectsComboBox.currentData()
 
-        dialog = Projects(self, project_id=current_project_id)
-        dialog.project_updated.connect(self.load_projects_combobox)
-        dialog.exec()
+        projectDialog = ProjectDialog(self, project_id=current_project_id)
+        projectDialog.project_updated.connect(self.load_projects_combobox)
+        projectDialog.exec()
 
 
     # AstroDom uses a SQLite database to store project and image data

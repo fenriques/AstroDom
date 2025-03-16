@@ -10,7 +10,7 @@ from matplotlib import colors, cm, pyplot as plt
 
 logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
 
-
+# This class is the model for the FITS keywords table.
 class KeywordsModel(QAbstractTableModel):
     def __init__(self, header, parent=None):
         super(KeywordsModel, self).__init__(parent)
@@ -41,8 +41,9 @@ class KeywordsModel(QAbstractTableModel):
             elif section == 1:
                 return "Value"
         return None
+    
 # Important to understand the flow in this class. The class is instantiated in the main window
-# and the itemsAtSelectedRow is set by the main window when the user clicks a row in the table.
+# and the itemsAtSelectedRow is set  when the user clicks a row in the table.
 # When a new row is clicked, the setItemsAtSelectedRow method is called and the plot method of this class
 # is called. 
 # The zoom events are tracked by the onPress and onRelease methods and dimensions stored in class variables.
@@ -63,10 +64,8 @@ class PreviewAndDataWidget(QWidget):
         layout.setSpacing(0)
         self.setLayout(layout)
 
-
-
         #Add the image preview canvas
-        self.canvas = FigureCanvas(Figure(figsize=(self.width() / 100, 3)))
+        self.canvas = FigureCanvas(Figure(figsize=(self.width() / 100, self.width() / 100)))
         self.ax = self.canvas.figure.subplots()
         self.canvas.figure.patch.set_facecolor('gray')
         self.ax.set_facecolor('black')
@@ -94,7 +93,6 @@ class PreviewAndDataWidget(QWidget):
         self.fits_path = fits_path
         logging.debug(f"Setting blink item: {self.fits_path}")
         self.plotImage()
-
 
     # Called by the main window when a new row is clicked
     def setItemsAtSelectedRow(self, itemsAtSelectedRow):
@@ -134,7 +132,6 @@ class PreviewAndDataWidget(QWidget):
                 # The scale factor will be used as the sampling reading of the image
                 self.imageScaleFactor = max(int(self.width / (self.previewWidth * 2)), 1)
                 logging.debug(f"Scale factor: {self.imageScaleFactor}")
-
 
                 if self.x_end == 0:
                     #This case is on first load or when the image zoom is reset

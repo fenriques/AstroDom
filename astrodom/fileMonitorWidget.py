@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QFileDial
 from PyQt6.QtCore import QThread, pyqtSignal
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from astrodom.fitsBrowser import FitsBrowser
+from astrodom.syncImages import SyncImages
 
 class FileMonitorHandler(FileSystemEventHandler):
     def __init__(self, callback):
@@ -40,12 +40,12 @@ class FileMonitorThread(QThread):
 
     def on_file_added(self, file_path):
         #logging.info(f"New file detected: {file_path}")
-        self.fits_browser_thread = FitsBrowser(project_id=self.project_id, base_dir=self.base_dir, bResync=False, bAutoSync=True,files_path=[file_path], parent=self)
-        self.fits_browser_thread.start()
+        self.sync_images_thread = SyncImages(project_id=self.project_id, base_dir=self.base_dir, bResync=False, bAutoSync=True,files_path=[file_path], parent=self)
+        self.sync_images_thread.start()
     def stop(self):
         self.observer.stop()
 
-class FileMonitorWidget(QDialog):
+class FileMonitorDialog(QDialog):
     def __init__(self, base_dir,project_id, bResync=False, bAutoSync=True,parent=None):
         super().__init__(parent)
         self.project_id = project_id
@@ -66,8 +66,8 @@ class FileMonitorWidget(QDialog):
     def on_file_added(self, file_path):
         #logging.info(f"New file added: {file_path}")
         file_path = [file_path]
-        self.fits_browser_thread = FitsBrowser(project_id=self.project_id, base_dir=self.base_dir, bResync=False, bAutoSync=True,files_path=file_path, parent=self)
-        self.fits_browser_thread.start()
+        self.sync_images_thread = SyncImages(project_id=self.project_id, base_dir=self.base_dir, bResync=False, bAutoSync=True,files_path=file_path, parent=self)
+        self.sync_images_thread.start()
 
     def stop_monitoring(self):
         self.file_monitor_thread.stop()

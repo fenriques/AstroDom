@@ -1,8 +1,7 @@
-import os,shutil, importlib_resources,sqlite3
+import os,shutil, importlib_resources,sqlite3, logging
 from PyQt6.QtWidgets import QTextEdit, QDialog, QGridLayout, QLabel, QComboBox, QLineEdit, QFileDialog, QPushButton,QMessageBox, QStyle
 from PyQt6.QtCore import pyqtSignal
 from astrodom.loadSettings import *  
-from PyQt6.QtSql import QSqlDatabase, QSqlQuery
 
 
 class FileOperationDialog(QDialog):
@@ -68,8 +67,9 @@ class FileOperationDialog(QDialog):
         operation = self.selectedImagesComboBox.currentText()
         destination = self.directorySelectEdit.text()
         if operation in ["Move to", "Copy to"] and not destination:
-            raise ValueError("Select a destination folder")
-
+            logging.error("Select a destination folder")
+            return
+        
         match operation:
             case "Move to":
                 self.filesTextArea.clear()
@@ -102,9 +102,9 @@ class FileOperationDialog(QDialog):
             case "Delete":
 
                 reply = QMessageBox.question(self, 'Confirm Delete', 
-                                             f"Are you sure you want to delete {len(self.files)} files?", 
-                                             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
-                                             QMessageBox.StandardButton.No)
+                    f"Are you sure you want to delete {len(self.files)} files?", 
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
+                    QMessageBox.StandardButton.No)
                 if reply == QMessageBox.StandardButton.Yes:
             
                     self.filesTextArea.clear()

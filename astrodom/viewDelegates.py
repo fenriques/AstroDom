@@ -15,7 +15,7 @@ from PyQt6 import QtCore, QtGui
 from PyQt6 import QtWidgets
 
 from PyQt6.QtGui import QColor
-from astrodom.settings import *
+from astrodom.settingsDialog import *
 from astrodom.loadSettings import *  
 
 

@@ -1,5 +1,5 @@
 import sys,json,logging
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QFrame, QComboBox, QApplication
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QFrame, QComboBox
 from PyQt6.QtWidgets import QListWidget
 
 class SettingsDialog(QDialog):
@@ -8,8 +8,8 @@ class SettingsDialog(QDialog):
         self.parent() == parent
 
 
-        self.setWindowTitle("Settings")
-        self.setGeometry(100, 100, 400, 300)
+        self.setWindowTitle("AstroDom Settings")
+        self.setGeometry(100, 100, 400, 600)
 
         # Load settings from JSON file
         self.settings = self.load_settings()
@@ -32,7 +32,7 @@ class SettingsDialog(QDialog):
         # Create a combo box for logging levels
         self.logging_level_edit = QComboBox()
         self.logging_level_edit.addItems(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
-        self.logging_level_edit.setCurrentText(self.settings.get("DATE_FORMAT", "INFO"))
+        self.logging_level_edit.setCurrentText(self.settings.get("LOGGING_LEVEL", "INFO"))
 
         # Bias signal
         self.bias_signal_edit = QLineEdit(str(self.settings.get("BIAS_SIGNAL", 0)))
@@ -45,7 +45,7 @@ class SettingsDialog(QDialog):
         # Create a combo box for logging levels
         self.date_format_edit = QComboBox()
         self.date_format_edit.addItems(["%d-%m-%Y", "%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y"])
-        self.date_format_edit.setCurrentText(self.settings.get("LOGGING_LEVEL", "%Y-%m-%d"))
+        self.date_format_edit.setCurrentText(self.settings.get("DATE_FORMAT", "%Y-%m-%d"))
 
         form_layout.addRow("Database Name:", self.dbname_edit)
         form_layout.addRow("Logging Level:", self.logging_level_edit)
@@ -124,7 +124,7 @@ class SettingsDialog(QDialog):
         with open(str(self.parent().rsc_path.joinpath('settings.json')), 'w') as file:
             json.dump(self.settings, file, indent=4)
 
-            logging.debug(f"Settings to be saved: {self.settings}")
+            logging.debug(f"Settings: {self.settings}")
 
         logging.info( "Settings saved successfully.")
         logging.warning( "Please restart AstroDom to reload settings.")

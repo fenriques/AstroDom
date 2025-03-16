@@ -1,14 +1,18 @@
-import sqlite3, sys, logging
+import sqlite3, logging
 import pandas as pd
-from PyQt6.QtWidgets import QApplication, QTreeView,QHeaderView
+from PyQt6.QtWidgets import QTreeView,QHeaderView
 from PyQt6.QtCore import Qt
-from astrodom.customTreeModel import CustomTreeModel, CustomFilterProxyModel
+from astrodom.dashboardTreeModel import DashboardTreeModel, CustomFilterProxyModel
 from astrodom.viewDelegates import *
-from astrodom.settings import *
 from astrodom.loadSettings import *  # Import the constants
 
-
-class Dashboard(QTreeView):
+# The Dashboard class is a QTreeView widget that displays the data from the database (load_data method) in a table.
+# it also handles the presentation of the data through the view delegates
+# The applyThreshold method is called from the main window when the user clicks the "Apply" button.
+# Other methods are used to save and restore the expanded state of the tree view
+# The setProjectID method is called from the main window upon class instantiation when a project is selected
+# The hide_columns method hides columns that are not in the ADDITIONAL_COLUMNS list
+class DashboardTreeView(QTreeView):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.project_id = None
@@ -74,12 +78,11 @@ class Dashboard(QTreeView):
         self.setItemDelegateForColumn(self.itemList.index("Mean"), self.roundDelegate)
         self.setItemDelegateForColumn(self.itemList.index("Median"), self.roundDelegate)
         
-        allAdditionalColumns = ["Temp", "Frame","Bin","RA", "DEC", "Gain", "Offset", "Mean", "Median", "Site Lat", "Site Long", "Moon Phase", "Moon Separation", "File"]
-        hidden_columns = [col for col in allAdditionalColumns if col not in ADDITIONAL_COLUMNS]
-        
-        self.hide_columns(hidden_columns)
+        # Hide columns that are not in the ADDITIONAL_COLUMNS list
+        self.hide_columns()
 
-
+    # Not working. The method is called when a row is selected in the table
+    # At the moment the user needs to click on the row to select it
     def on_selection_changed(self, selected, deselected):
         return
         indexes = self.selectionModel().selectedIndexes()
@@ -88,6 +91,9 @@ class Dashboard(QTreeView):
             model_index = self.proxy_model.mapToSource(index)
             value = self.proxy_model.sourceModel().data(model_index.siblingAtColumn(self.itemList.index("File")), Qt.ItemDataRole.DisplayRole)
     
+    # The applyThreshold method is called from the main window when the user clicks the "Apply" button
+    # The threshold values are then set in the view delegate (setLimit) and the model (setThresholds)
+    # because both handle the threshold logic and formatting 
     def applyThreshold(self,fwhm, snr, alt, eccentricity):
         # setLimit is a method in the Delegate classes that formats the threshold values
         self.fwhmDelegate.setLimit(float(fwhm))
@@ -101,7 +107,11 @@ class Dashboard(QTreeView):
 
         self.proxy_model.layoutChanged.emit()
         self.restore_expanded_state(expanded_items)
-
+    
+    # The main method to load data from the database. 
+    # Called from the main window upon class instantiation when a project is selected
+    # Filters on filter and target are applied if selected in the GUI
+    # The model is then set through the proxy model using a pandas dataframe
     def load_data(self):
         sqlString = ""
         selected_filter = self.parent.filterSelectComboBox.currentText()
@@ -130,12 +140,12 @@ class Dashboard(QTreeView):
             self.df = pd.read_sql_query(query, conn)
             conn.close()
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
             conn.close()
             return
 
-        # Set the model
-        self.model = CustomTreeModel(self.df, parent=self)
+        # Set the model through the proxy model
+        self.model = DashboardTreeModel(self.df, parent=self)
         self.proxy_model = CustomFilterProxyModel(self)
         self.proxy_model.setSourceModel(self.model)
 
@@ -145,16 +155,17 @@ class Dashboard(QTreeView):
         self.expand(self.proxy_model.index(0, 0))
 
     # The project_id is set automatically at startup and updated when a project is selected
+    #  called from the main window update_dashboard_contents method
     def setProjectID(self,project_id):
         self.project_id = project_id
         self.load_data()
 
-    def update_contents(self,selected_project_id):
-        self.proxy_model.setFilterString(str(selected_project_id))
-        
-
-    def hide_columns(self, columns_to_hide):
-        for column_name in columns_to_hide:
+    # Hide columns that are not in the ADDITIONAL_COLUMNS list
+    def hide_columns(self):
+        allAdditionalColumns = ["Temp", "Frame","Bin","RA", "DEC", "Gain", "Offset", "Mean", "Median", "Site Lat", "Site Long", "Moon Phase", "Moon Separation", "File"]
+        hidden_columns = [col for col in allAdditionalColumns if col not in ADDITIONAL_COLUMNS]
+   
+        for column_name in hidden_columns:
             column_index = self.itemList.index(column_name)
             self.setColumnHidden(column_index, True)
 

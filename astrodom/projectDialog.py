@@ -5,12 +5,9 @@ from PyQt6.QtWidgets import QDialog, QComboBox, QLabel, QPushButton, QLineEdit, 
 from PyQt6.QtWidgets import QFileDialog, QStyle,QMessageBox
 from PyQt6.QtCore import pyqtSignal
 from PyQt6 import uic
-from astrodom.settings import *
 from astrodom.loadSettings import *  # Import the constants
 
-
-
-class Projects(QDialog):
+class ProjectDialog(QDialog):
     
     project_updated = pyqtSignal(int)
     
@@ -104,19 +101,16 @@ class Projects(QDialog):
         if self.project_id is None:
             # Insert project data
             cursor.execute('''
-                INSERT INTO projects (name, base_dir, date, status)
-                VALUES (?, ?, ?, ?)
-            ''', (project_name, project_folder, project_date, project_status))
+                INSERT INTO projects (name, base_dir, date, status) VALUES (?, ?, ?, ?)''', 
+                (project_name, project_folder, project_date, project_status))
             
             logging.info(f"Project {project_name} created")
             self.project_id = cursor.lastrowid
         else:
             # Update project data
             cursor.execute('''
-                UPDATE projects
-                SET name = ?, base_dir = ?, date = ?, status = ?
-                WHERE id = ?
-            ''', (project_name, project_folder, project_date,project_status,self. project_id))
+                UPDATE projects SET name = ?, base_dir = ?, date = ?, status = ? WHERE id = ?''', 
+                (project_name, project_folder, project_date,project_status,self. project_id))
 
 
         # Commit and close the connection

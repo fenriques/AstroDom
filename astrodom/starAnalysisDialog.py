@@ -19,7 +19,6 @@ from astropy.table import QTable
 from pandas import DataFrame
 from PyQt6.QtWidgets import QSpacerItem, QSizePolicy, QGroupBox, QStyle
 
-from astrodom.settings import *
 from astrodom.loadSettings import *  
 import os
 import sqlite3
@@ -49,7 +48,7 @@ class QTableModel(QAbstractTableModel):
                 return str(self._data.index[section])
         return None
     
-class StarAnalysis(QDialog):
+class StarAnalysisDialog(QDialog):
     def __init__(self, parent = None, fits_path = None):
         super().__init__(parent)
 

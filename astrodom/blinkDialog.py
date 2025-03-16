@@ -4,14 +4,16 @@ from PyQt6.QtSql import QSqlQuery
 from PyQt6.QtWidgets import QVBoxLayout,QPushButton,QSizePolicy,QLabel, QMessageBox,QStyle
 from astrodom.previewAndDataWidget import PreviewAndDataWidget
 
-
-class BlinkWidget(QDialog):
+# This class is a dialog that allows the user to check FITS files in the project folder
+# and eventually delete them.
+# It relies on the PreviewAndDataWidget class to display the FITS files.
+class BlinkDialog(QDialog):
     def __init__(self, project_id,parent=None):
         super().__init__(parent)
         self.parent = parent
         self.project_id = project_id
 
-        logging.info("Opening open_blink_dialog")
+        logging.debug("Opening open_blink_dialog")
         # Find all FITS files in the project base folder and subfolders
         query = QSqlQuery()
         query.prepare("SELECT BASE_DIR FROM projects WHERE ID = :id ORDER BY DATE DESC")
@@ -73,7 +75,7 @@ class BlinkWidget(QDialog):
         if self.current_fits_index < len(self.fits_files) - 1:
             self.current_fits_index += 1
             self.update_preview()
-
+        
     def delete_item(self):
         if self.fits_files:
             reply = QMessageBox.question(self, 'Delete Confirmation', 
@@ -83,7 +85,12 @@ class BlinkWidget(QDialog):
                 return
             file_to_delete = self.fits_files.pop(self.current_fits_index)
             
-            os.remove(file_to_delete)
+            try:
+                os.remove(file_to_delete)
+                logging.info(f"Deleted {file_to_delete}")
+            except Exception as e:
+                logging.error(f"Error deleting {file_to_delete}: {e}")  
+                
             if self.current_fits_index >= len(self.fits_files):
                 self.current_fits_index = len(self.fits_files) - 1
             self.update_preview()

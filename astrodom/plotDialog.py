@@ -3,9 +3,9 @@ from PyQt6.QtCore import Qt
 import pandas as pd
 from PyQt6.QtGui import QColor
 import pyqtgraph as pg
-from astrodom.settings import *
+from astrodom.settingsDialog import *
 
-class Charts(QDialog):
+class PlotDialog(QDialog):
     def __init__(self, df: pd.DataFrame, parent=None):
         super().__init__(parent)
 

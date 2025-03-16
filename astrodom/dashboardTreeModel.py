@@ -59,7 +59,7 @@ class TreeItem:
             return self.parentItem.childItems.index(self)
         return 0
 
-class CustomTreeModel(QAbstractItemModel):
+class DashboardTreeModel(QAbstractItemModel):
     def __init__(self, data, parent=None):
         super().__init__(parent)
 
@@ -237,9 +237,7 @@ class CustomTreeModel(QAbstractItemModel):
     def setData(self, index, value, role):
         if not index.isValid():
             return False
-        
-        #logging.debug(f"Index: {self.checked_items}")
-        
+
         if role == Qt.ItemDataRole.CheckStateRole :
             # Target level
             parent_parent_row = index.parent().parent().row()

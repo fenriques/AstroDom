@@ -13,10 +13,10 @@ from astropy.time import Time
 from astropy.table import QTable
 from datetime import datetime
 from PyQt6.QtCore import pyqtSignal,QThread
-from astrodom.settings import *
 from astrodom.loadSettings import *  
-import threading
 
+# AstroDom internal keywords used to parse the FITS files and display the data in the main window
+# The keywords are mapped to the FITS header keywords but there are also calculated values (eg FWHM, Moon Phase)
 ad_keywords = {
     "OBJECT": {'fits_key': ["OBJECT", "OBJ", "TARGET"], 'display_name': 'Target'},
     "DATE-OBS": {'fits_key': ["DATE-OBS"], 'display_name': 'Date'},
@@ -43,7 +43,8 @@ ad_keywords = {
     "MOON_PHASE": {'fits_key': '', 'display_name': 'Moon Phase'},
     "MOON_SEPARATION": {'fits_key': '', 'display_name': 'Moon Separation'}
     }
-
+# Mapping of the filter names to the FITS header values because 
+# the filters are not always the same in the FITS header (depends on the imaging software)
 filterMapping = {"L": ["Luminance", "luminance", "Lum", "lum", "L", "l"], 
            "R": ["Red", "R", "r", "red"], 
            "B": ["Blue", "B", "b", "blue"], 
@@ -57,7 +58,23 @@ filterMapping = {"L": ["Luminance", "luminance", "Lum", "lum", "L", "l"],
 # So are suppressed in the thread 
 warnings.filterwarnings("ignore")
 
-class FitsBrowser(QThread):
+# Class to read the FITS files and sync the database through the sync and autosync buttons in the main window.
+# The class runs in a thread so no direct outpit is allowed: only signals to update the GUI (data, log messages)
+# The run method is the entry point that is called when the thread is started
+# The syncFolder method is used to read all the fits files starting from the base directory. Sends a list to syncFiles.
+# The syncFiles method is called by syncFolder (sync button->run) or directly (autosync button->run) to parse the FITS files
+# SyncFiles iterates over the FITS files and over the AstroDom internal keywords
+# The bResync bool is used to force re parsing all files (true) or only new ones (false) 
+# Based on bResync files can be deleted from db delete_files_from_db  and likewise  
+# get_filesFromDb has images already in db so that are skipped when parsing)
+# There are then utility methods:  
+# save_to_db saves the data to the database
+# The calculate_moon_phase and calculate_moon_separation methods are used to calculate the moon phase and separation
+# The measure_stars method is used to measure the stars in the image
+# The delete_files_from_db method is used to delete the files from the database when a resync is forced
+# The stop method is used to stop the thread based on self.runs flag
+
+class SyncImages(QThread):
     threadLogger = pyqtSignal(str,str)
     taskCompleted = pyqtSignal()
     nFileSync = pyqtSignal(int)
@@ -94,10 +111,14 @@ class FitsBrowser(QThread):
     
     def syncFolder(self)  :
 
-        # If a resync is requested, all the files for the project are deleted from the database
+        self.threadLogger.emit(f"Start syncing project n: {self.project_id}", "debug")
+        self.threadLogger.emit(f"Base folder: {self.base_directory}", "debug")
+        self.threadLogger.emit(f"Resync: {self.bResync}", "debug")
+
+        # If a resync is requested, all the files have to be parsed again
+        # So the first step is to delete all the project files that are in the database
         if self.bResync == True:
             self.delete_files_from_db(self.project_id)
-
 
         # Search for FITS files starting from the base directory
         for root, dirs, parseFiles in os.walk(self.base_directory):
@@ -136,23 +157,22 @@ class FitsBrowser(QThread):
 
     def syncFiles(self,files_path):
         nParsed = 0
-        self.threadLogger.emit(f"files : {self.files_path}", "info")
 
         # Loop over the FITS files found        
         for file_path in self.files_path:     
             file = os.path.basename(file_path)
+            self.threadLogger.emit(f"Parsing file: {file}", "info")
 
             # Skip parsing if the file is already in the database
             if self.bResync == False and file_path in self.filesAlreadyInDb:
                 self.filesAlreadyInDb.remove(file_path)
-                self.threadLogger.emit(f"File was already parsed, so skipping: {file}", "info")
+                self.threadLogger.emit(f"File was already parsed, so skipping: {file}", "warning")
                 continue
             
             if not self.runs:
                 self.threadLogger.emit("Sync stop requested by user","warning")
                 return   
 
-            self.threadLogger.emit(f"Parsing: { file}", "info")
             fits_data = []
             fits_data_dict = {}
             
@@ -174,8 +194,7 @@ class FitsBrowser(QThread):
                     keyword_intersection = set(ad_value['fits_key']) & set(header.keys())
                     if keyword_intersection:
                         value = header[next(iter(keyword_intersection))]
-                        self.threadLogger.emit(f"Keyword {ad_keyword} found in header", "debug")  
-                        self.threadLogger.emit(f"with value {value} ", "debug")  
+                        self.threadLogger.emit(f"FITS header keyword: {ad_keyword} = {value} ", "debug")  
                         
                         #DATE-OBS 
                         if ad_keyword == "DATE-OBS" and value:
@@ -236,59 +255,73 @@ class FitsBrowser(QThread):
                     # this else is for the case where the ad_keyword is not found in the header of the FITS file
                     # (eg, NINA doesn't have ALT/ AZ)
                     else:
-                        self.threadLogger.emit(f"Keyword {ad_keyword} not found in header", "debug")
+                        self.threadLogger.emit(f"{ad_keyword}:", "debug")
 
                         # This will compute ALT and AZ from RA and DEC, DATE-OBS and LONG-OBS, LAT-OBS
                         if ad_keyword == "OBJECT-ALT" or ad_keyword == "OBJECT-AZ" :
-                            self.threadLogger.emit(f"{ad_keyword} calculation", "info")
+                            self.threadLogger.emit(f"ALT/AZ calculation based on other keywords", "info")
 
                             # The following 3 objects (EarthLocation, Skycoord and Time) are utitities used to calculate the ALT and AZ of the target if they are not in the FITS header
                             # Create EarthLocation object for the observer's location
                             try:
-                                lat1 =header["SITELAT"]
+                                lat1 = header["SITELAT"]
                                 lon1 = header["SITELONG"]
                                 location = EarthLocation(lat=lat1*u.deg, lon=lon1*u.deg)
+                                self.threadLogger.emit(f"Using keywords SITELAT {lat1}, SITELONG {lon1}  ", "debug")
                             except Exception as e:
-                                self.threadLogger.emit(f"Error creating EarthLocation object: {e}", "info")
-                                self.threadLogger.emit(f"Using alternative headers", "info")
+                                self.threadLogger.emit(f"Error creating EarthLocation object: {e}", "debug")
                                 try:                               
-                                    lat2 =header["LAT-OBS"]
+                                    lat2 = header["LAT-OBS"]
                                     lon2 = header["LONG-OBS"]
+                                    self.threadLogger.emit(f"Using alternative keywords LAT-OBS {lat2}, LONG-OBS {lon2}", "debug")
                                     location = EarthLocation(lat=lat2*u.deg, lon=lon2*u.deg)
                                 except Exception as e:  
-                                    self.threadLogger.emit(f"Error creating EarthLocation object: {e}", "warning")
+                                    self.threadLogger.emit(f"Error creating EarthLocation object: {e}", "error")
                                     location = EarthLocation(lat=0*u.deg, lon=0*u.deg)  
-            
+                            
+                            self.threadLogger.emit(f"Earth Location: {location}", "info")
+
                             # Create SkyCoord object for the target
                             try:
-                                target = SkyCoord(header["OBJECT-RA"], header["OBJECT-DEC"], unit=(u.hourangle, u.deg))
+                                ra1 = header["OBJECT-RA"]
+                                dec1 = header["OBJECT-DEC"]
+                                self.threadLogger.emit(f"Using keywords OBJECT-RA {ra1}, OBJECT-DEC {dec1}  ", "debug")
+                                target = SkyCoord(ra1, dec1, unit=(u.hourangle, u.deg))
 
                             except Exception as e:
-                                self.threadLogger.emit(f"Error creating SkyCoord object: {e}", "info")
-                                self.threadLogger.emit(f"Using alternative headers", "info")
-                                target = SkyCoord(header["OBJCTRA"], header["OBJCTDEC"], unit=(u.hourangle, u.deg))
-                                
+                                self.threadLogger.emit(f"Error creating SkyCoord object: {e}", "debug")
+                                try:
+                                    ra2 = header["OBJCTRA"]
+                                    dec2 = header["OBJCTDEC"]
+                                    self.threadLogger.emit(f"Using alternative OBJCTRA {ra2}, OBJCTDEC {dec2} ", "debug")
+                                    target = SkyCoord(ra2, dec2, unit=(u.hourangle, u.deg))
+                                except Exception as e:  
+                                    self.threadLogger.emit(f"Error creating SkyCoord object: {e}", "error")
+                                    target = SkyCoord(0*u.deg, 0*u.deg)
 
-                            # Create Time object for the observation time
+                                self.threadLogger.emit(f"Target RA: {target.ra.deg} deg, DEC: {target.dec.deg} deg", "info") 
+                                
                             try:
                                 observation_time = Time(header["DATE-OBS"])
+                                self.threadLogger.emit(f"Using keyword DATE-OBS {header["DATE-OBS"],}", "debug")
                             except Exception as e:
-                                self.threadLogger.emit(f"Error creating Time object: {e}", "info")
-                                self.threadLogger.emit(f"Using alternative headers", "info")
+                                self.threadLogger.emit(f"Error creating Time object: {e}", "debug")
+                                self.threadLogger.emit(f"Using alternative keyword DATE {header["DATE"],}", "debug")
                                 try:
                                     observation_time = Time(header["DATE"], format='fits')
                                 except Exception as e:
-                                    self.threadLogger.emit(f"Error creating Time object: {e}", "warning")
+                                    self.threadLogger.emit(f"Error creating Time object: {e}", "error")
                                     observation_time = Time.now()   
-                        
+
+                            self.threadLogger.emit(f"Observation time: {observation_time}", "info")
 
                             # Create AltAz frame for the transformation
                             try:
                                 altaz_frame = AltAz(obstime=observation_time, location=location)
                             except Exception as e:
-                                self.threadLogger.emit(f"Error creating AltAz frame: {e}", "warning")
-                                self.threadLogger.emit(f"Using alternative headers", "info")
+                                self.threadLogger.emit(f"Error creating ALT/AZ: {e}", "error")
                                 altaz_frame = AltAz(obstime=Time.now(), location=EarthLocation(lat=0*u.deg, lon=0*u.deg))
+                            
 
                             # Transform the target coordinates to AltAz
                             altaz = target.transform_to(altaz_frame)
@@ -296,15 +329,24 @@ class FitsBrowser(QThread):
                             # Extract ALT and AZ
                             altitude = altaz.alt.degree
                             azimuth = altaz.az.degree
-                            if ad_keyword == "OBJECT-ALT" : fits_data.append(("OBJECT-ALT", round(Angle(altitude, unit='deg').degree, 4)))
-                            if ad_keyword == "OBJECT-AZ" : fits_data.append(("OBJECT-AZ", round(Angle(azimuth, unit='deg').degree, 4)))
+                            fits_data.append(("OBJECT-ALT", round(Angle(altitude, unit='deg').degree, 4)))
+                            self.threadLogger.emit(f"OBJECT-ALT: {altitude}", "info")
+                            fits_data.append(("OBJECT-AZ", round(Angle(azimuth, unit='deg').degree, 4)))
+                            self.threadLogger.emit(f"OBJECT-AZ: {azimuth}", "info")
 
 
                     # Other Ad_keyowrds are not meant to be in the FITS header so they are derived from calculation
-                    fits_data.append(("FILE", file_path))
-                    fits_data.append(("SIZE", round(os.path.getsize(file_path) / (1024 * 1024), 2)))
-                    fits_data.append(("PROJECT_ID", self.project_id))
-                        
+                    if ad_keyword == "FILE" :
+                        fits_data.append(("FILE", file_path))
+                        self.threadLogger.emit(f"FILE: {file_path}", "debug")
+                    if ad_keyword == "SIZE" :
+                        fits_data.append(("SIZE", round(os.path.getsize(file_path) / (1024 * 1024), 2)))
+                        self.threadLogger.emit(f"SIZE: {round(os.path.getsize(file_path) / (1024 * 1024), 2)}", "debug")
+                    if ad_keyword == "PROJECT_ID" :
+                        fits_data.append(("PROJECT_ID", self.project_id))
+                        self.threadLogger.emit(f"PROJECT_ID: {self.project_id}", "debug")
+
+
                     # Measure stars for FWHM, ECCENTRICITY, MEAN, MEDIAN, STD
                     # only needs file path
                     if ad_keyword == "FWHM" :
@@ -330,7 +372,7 @@ class FitsBrowser(QThread):
                         except Exception as e:
                             self.threadLogger.emit(f"Error calculating moon phase: {e}", "error")
                             moon_phase = 0.0
-                        self.threadLogger.emit(f"moon phase: {moon_phase}", "error")
+                        self.threadLogger.emit(f"Moon phase: {moon_phase}", "info")
                         fits_data.append(("MOON_PHASE", (moon_phase)))  
 
                     if ad_keyword == "MOON_SEPARATION" :
@@ -340,7 +382,7 @@ class FitsBrowser(QThread):
                             self.threadLogger.emit(f"Error calculating moon separation: {e}", "error")
                             moon_separation = 0.0
                         fits_data.append(("MOON_SEPARATION", moon_separation))
-                        self.threadLogger.emit(f" MOON_SEPARATION: {moon_separation}", "error")
+                        self.threadLogger.emit(f"Moon separation: {moon_separation}", "info")
 
                 fits_data_dict = dict(fits_data)
 
@@ -407,14 +449,11 @@ class FitsBrowser(QThread):
             fits_data.get('PROJECT_ID', self.project_id)
             ))
             conn.commit()
-            self.threadLogger.emit(f"PHASE ok : { fits_data.get('MOON_PHASE', 0)}", "error")
 
         except sqlite3.Error as e:
             self.threadLogger.emit(f"Error: {e} for file {fits_data['FILE']}", "error")
 
         conn.close()
-
- 
         self.threadLogger.emit(f"Saved to db: {fits_data['FILE']}","debug")
     
     # To be used when a resync is forced ( bResync == True)
@@ -465,33 +504,39 @@ class FitsBrowser(QThread):
 
         return phase_illumination
     
+    # Measure fwhm.eccentricity (roundess) and snr (std) from sources in the image
+    # The same function is used in the Star Analysis widget (duplicated code, to be fixed in a next release)
+    # A fitting function is used to calculate the FWHM, eccentricity of the stars
+    # SNR is calculated as the standard deviation of the background over the median background
     def measure_stars(self,fits_file):
 
-        if self.parent and hasattr(self.parent, 'starAnalysis'):
-            starAnalysis = self.parent.starAnalysis
+        # Important: the parameters are read from Star Analysis widget if available
+        # else they are set to default values
+        if self.parent and hasattr(self.parent, 'starAnalysisDialog'):
+            starAnalysisDialog = self.parent.starAnalysisDialog
         else:
-            starAnalysis = None
+            starAnalysisDialog = None
 
-        self.nStars = starAnalysis.nStars if starAnalysis and starAnalysis.nStars else 30
-        self.threadLogger.emit(f"nStars: {self.nStars}","info")
+        self.nStars = starAnalysisDialog.nStars if starAnalysisDialog and starAnalysisDialog.nStars else 30
+        self.threadLogger.emit(f"nStars: {self.nStars}","debug")
 
-        self.cropFactor = starAnalysis.cropFactor if starAnalysis and starAnalysis.cropFactor else 2
-        self.threadLogger.emit(f"cropFactor: {self.cropFactor}","info")
+        self.cropFactor = starAnalysisDialog.cropFactor if starAnalysisDialog and starAnalysisDialog.cropFactor else 2
+        self.threadLogger.emit(f"cropFactor: {self.cropFactor}","debug")
 
-        self.threshold = starAnalysis.threshold if starAnalysis and starAnalysis.threshold else 20
-        self.threadLogger.emit(f"threshold: {self.threshold}","info")
+        self.threshold = starAnalysisDialog.threshold if starAnalysisDialog and starAnalysisDialog.threshold else 20
+        self.threadLogger.emit(f"threshold: {self.threshold}","debug")
 
-        self.bit = starAnalysis.bit if starAnalysis and starAnalysis.bit else 16
-        self.threadLogger.emit(f"bit: {self.bit}","info")
+        self.bit = starAnalysisDialog.bit if starAnalysisDialog and starAnalysisDialog.bit else 16
+        self.threadLogger.emit(f"bit: {self.bit}","debug")
 
-        self.bin  = starAnalysis.bin if starAnalysis and starAnalysis.bin else 1
-        self.threadLogger.emit(f"bin: {self.bin}","info")
+        self.bin  = starAnalysisDialog.bin if starAnalysisDialog and starAnalysisDialog.bin else 1
+        self.threadLogger.emit(f"bin: {self.bin}","debug")
 
-        self.radius = starAnalysis.radius if starAnalysis and starAnalysis.radius else 7
-        self.threadLogger.emit(f"radius: {self.radius}","info")
+        self.radius = starAnalysisDialog.radius if starAnalysisDialog and starAnalysisDialog.radius else 7
+        self.threadLogger.emit(f"radius: {self.radius}","debug")
 
-        self.saturationLimit = starAnalysis.saturationLimit if starAnalysis and starAnalysis.radius else 95
-        self.threadLogger.emit(f"saturationLimit: {self.saturationLimit}","info")
+        self.saturationLimit = starAnalysisDialog.saturationLimit if starAnalysisDialog and starAnalysisDialog.radius else 95
+        self.threadLogger.emit(f"saturationLimit: {self.saturationLimit}","debug")
 
 
         fwhmfit = []
@@ -513,7 +558,7 @@ class FitsBrowser(QThread):
         mean, median, std = sigma_clipped_stats(self.image_data, sigma = 3.0)
         if std == 0:
             self.threadLogger.emit("Standard deviation is zero, invalid operation encountered.","error")
-            return
+            return None
         self.threadLogger.emit(f"Mean: {mean:.2f}, Median: {median:.2f}, Std: {std:.2f}", "info")
         
 
@@ -530,17 +575,17 @@ class FitsBrowser(QThread):
         sources = sources[(sources['peak'] < (2**self.bit)*self.saturationLimit/100)] 
         sources = sources[(np.abs(sources['roundness2']) < 0.5)] 
 
-        self.threadLogger.emit(f"Number of non clipped stars (< {self.saturationLimit}% peak: {len(sources)}","debug")
+        self.threadLogger.emit(f"Number of non clipped stars (less than {self.saturationLimit} perc peak: {len(sources)}","debug")
         
 
         # Order the stars by peak/median ratio so by how much they are above the background
         sources['peak_median_ratio'] = sources['peak'] / median
         sources.sort('peak_median_ratio', reverse=True)
-        self.threadLogger.emit(f"Number of non clipped  stars above background*10: {len(sources)}", "info")
+        self.threadLogger.emit(f"Number of non clipped  stars above background: {len(sources)}", "debug")
 
         if len(sources) == 0:
-            self.threadLogger.emit("No stars detected", "error")
-            return  
+            self.threadLogger.emit("No stars detected, cannot calc Fwhm, eccentricity and snr", "error")
+            return  None
 
         # Reduce the number of stars (faster processing)
         if len(sources) > self.nStars:
@@ -551,7 +596,6 @@ class FitsBrowser(QThread):
         average_peak = np.mean(sources['peak'])
         self.threadLogger.emit(f"Number of stars detected: {len(sources)}","info")
         self.threadLogger.emit(f"Average Peak: {average_peak:.2f}","debug")
-        self.threadLogger.emit(f"Mean: {mean:.2f}, Median: {median:.2f}, Std: {std:.2f}","info")
         
         results_table = QTable(names=('xcentroid', 'ycentroid', 'peak', 'fwhm', 'roundness', 'peak_median_ratio'), dtype=('f4', 'f4', 'f4', 'f4', 'f4', 'f4'))
 
@@ -599,10 +643,10 @@ class FitsBrowser(QThread):
                     else:
                         self.threadLogger.emit("Star rejected because of high background, probably a star in a nebula or galaxy : {largerCutOutMedian}, vs : {median} ", "warning") 
                 else:
-                    self.threadLogger.emit(f"Star at position x: {x}, y: {y} is too close to the edge","warning")   
+                    self.threadLogger.emit(f"Skipping star at position x {x}, y {y}:  too close to the edge","warning")   
             except Exception as e:
                 self.threadLogger.emit(f"Error fitting 2D Gaussian at position x: {x}, y: {y}", "warning")
-                self.threadLogger.emit(f"Cutout values: {starCutOut}", "warning")
+                self.threadLogger.emit(f"Cutout values: {starCutOut}", "debug")
                 self.threadLogger.emit(f"Exception: {e}", "warning")
 
 

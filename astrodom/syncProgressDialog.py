@@ -1,11 +1,11 @@
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QProgressBar, QPushButton
 from PyQt6.QtCore import pyqtSlot
 
-class SyncProgress(QDialog):
+class SyncProgressDialog(QDialog):
 
 
     def __init__(self, thread, parent=None):
-        super(SyncProgress, self).__init__(parent)
+        super(SyncProgressDialog, self).__init__(parent)
         self.thread = thread
         self.initUI()
         self.parent = parent
@@ -45,7 +45,7 @@ class SyncProgress(QDialog):
             #self.parent.logging.warning("Sync stopped")
 
             # After the thread is stopped, the buttons are re-enabled
-            self.parent.chartsButton.setEnabled(True)
+            self.parent.plotsButton.setEnabled(True)
             self.parent.syncButton.setText('Sync Folder')
             self.parent.projectsComboBox.setEnabled(True)
             self.parent.editProjectButton.setEnabled(True)

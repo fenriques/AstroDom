@@ -11,7 +11,7 @@ numpy==2.2.2
 packaging==24.2
 pandas==2.2.3
 photutils==2.1.0
-pillow==11.1.0
+pillow==12.1.1
 prettytable==3.14.0
 pyerfa==2.0.1.5
 pyparsing==3.2.1
